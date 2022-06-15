@@ -24,6 +24,7 @@ import com.microsoft.graph.models.AadUserConversationMember;
 import com.microsoft.graph.models.Chat;
 import com.microsoft.graph.models.ChatType;
 import com.microsoft.graph.models.ConversationMember;
+import com.microsoft.graph.requests.ChatMessageCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionResponse;
 import com.microsoft.graph.requests.GraphServiceClient;
@@ -61,13 +62,13 @@ public class TicketQualityService {
 		tkt = ticket.get(turnContext.getActivity().getFrom().getId());
 		String msgId=turnContext.getActivity().getReplyToId();
 		
+		if(tkt==null) {
+			tkt = ticketRepo.findAllByClstktreplyId(msgId);
+		}
+		
 		if ("CLOSE TICKET".equalsIgnoreCase(status)) { // close the ticket
 			
 			
-			if(tkt==null) {
-				tkt = ticketRepo.findAllByClstktreplyId(msgId);
-			}
-
 			
 			tkt.setStatuscycleId("sfarm_cloud_env_10");
 			tkt.setUpdateDateTime(new Date());
@@ -280,6 +281,7 @@ public class TicketQualityService {
 	
 	public String creatchatwithTeamMembers(Ticket_296 tkt) {
 
+		// 
 		String json = null;
 		// MyNewApp
 
@@ -409,8 +411,10 @@ public class TicketQualityService {
 			// graphClient.applications().buildRequest().post(application);
 			Chat cli = graphClient.chats().buildRequest().post(chat);
 			tkt.setChatGroupId(cli.id);
+			tkt.setStatuscycleId("sfarm_cloud_env_11");
 			ticketRepo.save(tkt);
-
+			
+			System.out.println("test");
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 			
 			Container con = new Container();

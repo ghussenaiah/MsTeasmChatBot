@@ -51,11 +51,14 @@
 
 
 
-<dependency>
-			<groupId>com.microsoft.graph</groupId>
-			<artifactId>microsoft-graph</artifactId>
-			<version>3.9.0</version>
-		</dependency>
+
+
+		<dependency>
+  <!-- Include the sdk as a dependency -->
+  <groupId>com.microsoft.graph</groupId>
+  <artifactId>microsoft-graph</artifactId>
+  <version>5.26.0</version>
+</dependency>
 
 
 		<dependency>
@@ -120,25 +123,18 @@
 
 
 		<!-- https://mvnrepository.com/artifact/com.microsoft.graph/microsoft-graph -->
-		<dependency>
-			<groupId>com.microsoft.graph</groupId>
-			<artifactId>microsoft-graph</artifactId>
-			<version>3.9.0</version>
-		</dependency>
-
-
-		<dependency>
-			<!-- Include the sdk as a dependency -->
-			<groupId>com.microsoft.graph</groupId>
-			<artifactId>microsoft-graph</artifactId>
-			<version>5.24.0</version>
-		</dependency>
+	
 		<dependency>
 			<!-- This dependency is only needed if you are using the TokenCrendentialAuthProvider -->
 			<groupId>com.azure</groupId>
 			<artifactId>azure-identity</artifactId>
 			<version>1.2.5</version>
 		</dependency>
+		
+		
+
+  <!-- This dependency is only needed if you are using the TokenCrendentialAuthProvider -->
+
 
 		<!-- <dependency> <groupId>com.microsoft.graph</groupId> <artifactId>microsoft-graph-beta</artifactId> 
 			<version>0.17.0-SNAPSHOT</version> </dependency> -->

@@ -67,7 +67,7 @@ public class FetchnSave_Retry_Mechanism {
 	@Scheduled(cron = "*/1 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
-		// updateTeamsMsgToDatabase();
+		 // updateTeamsMsgToDatabase();
 		//updateTicketQualityAfter5Hours();
 	}
 
@@ -92,7 +92,7 @@ public class FetchnSave_Retry_Mechanism {
 		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
 		int chatNumber = lastNumberObj.getAutoCodeNo();
 
-		Ticket_296 tkt = ticketRepo.findAllByChatGroupId("19:c952e2cb8c8241c18124cc8f9fba7e57@thread.v2");
+		Ticket_296 tkt = ticketRepo.findAllByChatGroupId("19:1d13e45f1c94414cb73baee6c68e27d0@thread.v2");
 		System.out.println(tkt);
 
 		log.info("Current Time = {}", dateFormat.format(new Date()));
@@ -103,15 +103,24 @@ public class FetchnSave_Retry_Mechanism {
 		final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
 				usernamePasswordCredential);
 		System.out.println("hello world");
+	
+		
+        // String graphUrl="https://graph.microsoft.com/v1.0/users/admin@kgmip.onmicrosoft.com/contacts";
+		// URL graphUrl = new URL("https://graph.microsoft.com/v1.0/me/");
+		
+		// String token = tokenCredentialAuthProvider.getAuthorizationTokenAsync(new URL("https://graph.microsoft.com/v1.0/me/")).get();
+		
+		// System.out.println(token);
+	
+		
+		
 
 		final GraphServiceClient<Request> graphClient = GraphServiceClient.builder()
 				.authenticationProvider(tokenCredentialAuthProvider).buildClient();
 		System.out.println(graphClient.getServiceRoot());
 
-		ChatMessageCollectionPage messages = graphClient.chats("19:c952e2cb8c8241c18124cc8f9fba7e57@thread.v2")
-				.messages().buildRequest().top(2).get();
-		
-		ChatMessageCollectionPage mess = graphClient.chats("19:c952e2cb8c8241c18124cc8f9fba7e57@thread.v2").messages().buildRequest().get();
+
+		ChatMessageCollectionPage messages = graphClient.chats("19:1d13e45f1c94414cb73baee6c68e27d0@thread.v2").messages().buildRequest().top(2).get();
 		
 
 		// System.out.println(messages.getCurrentPage().get(0));

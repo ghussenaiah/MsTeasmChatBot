@@ -35,12 +35,14 @@ public class SupportService {
 	@Autowired
 	SupportImpl supportImpl;
 	
-
+	
 	
 	public String createSupportAdaptiveCard(String departmentId, LinkedHashMap botResponseMap,
 			ConcurrentHashMap<String, Ticket_296> ticket,TurnContext turnContext) {
 
 		// ============= create department Json structure done =======================
+		
+		
 		
 		Ticket_296 tkt = ticket.get(turnContext.getActivity().getFrom().getId());
 	

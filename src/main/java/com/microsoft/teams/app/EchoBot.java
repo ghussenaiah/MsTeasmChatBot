@@ -28,6 +28,7 @@ import com.microsoft.graph.core.CustomRequestBuilder;
 import com.microsoft.graph.httpcore.HttpClients;
 import com.microsoft.graph.models.ChatMessage;
 import com.microsoft.graph.models.Drive;
+import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.ResponseType;
 import com.microsoft.graph.models.Site;
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
@@ -158,12 +159,12 @@ public class EchoBot extends TeamsActivityHandler {
 	 * 
 	 * }
 	 */
-	
+	 
 	    @PostConstruct 
 		public void test() throws Exception {
 	    	
 	    	
-	    	
+	    	//fetchnSave_Retry_Mechanism.updateTeamsMsgToDatabase();
 	    	
 	    	
 	    	String clientId = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx";
@@ -191,10 +192,67 @@ public class EchoBot extends TeamsActivityHandler {
 			final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
 					usernamePasswordCredential);
 			System.out.println("hello world");
+			
+		//	 String accessToken = tokenCredentialAuthProvider.getAuthorizationTokenAsync(new URL("https://graph.microsoft.com/v1.0/me/")).get();
+			
+		//	  System.out.println(accessToken);
 
 			final GraphServiceClient<Request> graphClient = GraphServiceClient.builder()
 					.authenticationProvider(tokenCredentialAuthProvider).buildClient();
 			
+			DriveItemCollectionPage children = graphClient.me().drive().root().children()
+					.buildRequest()
+					.get();
+			
+			List<DriveItem> di=children.getCurrentPage();
+			
+			System.out.println(di.get(0));
+			
+		//	DriveItem drive=graphClient.shares("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png").driveItem().buildRequest().get();
+			
+			
+		//	System.out.println(drive);
+			 
+			
+		//	URL url1 = new URL("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png");
+		//	URL url1 = new URL("https://www.w3schools.com/html/pic_trulli.jpg");
+			//URL url1 = new URL("https://kgmip-my.sharepoint.com/:x:/g/personal/husenaiah_g_kgmip_onmicrosoft_com/EZgbvc5oTghIglTxP5X2fFABvInffzpjRYxC0AdtEA1YPw?e=dtSAtP");
+		
+			
+			URL url1=new URL("https://m365x214355-my.sharepoint.com/personal/meganb_m365x214355_onmicrosoft_com/_layouts/15/download.aspx?UniqueId=dd092d3e-427f-45ea-8daf-e25e7f77530c&Translate=false&tempauth=eyJ0eXAiOiJKV1QiLCJhbGciOiJub25lIn0.eyJhdWQiOiIwMDAwMDAwMy0wMDAwLTBmZjEtY2UwMC0wMDAwMDAwMDAwMDAvbTM2NXgyMTQzNTUtbXkuc2hhcmVwb2ludC5jb21AZGNkMjE5ZGQtYmM2OC00YjliLWJmMGItNGEzM2E3OTZiZTM1IiwiaXNzIjoiMDAwMDAwMDMtMDAwMC0wZmYxLWNlMDAtMDAwMDAwMDAwMDAwIiwibmJmIjoiMTY1NTI2NjEyNyIsImV4cCI6IjE2NTUyNjk3MjciLCJlbmRwb2ludHVybCI6IjlacHYvK25wK3ExWnFXdnlMM2RZNGVVaHdtMlllaHJvRTlBSmFjOC84R2c9IiwiZW5kcG9pbnR1cmxMZW5ndGgiOiIxNjkiLCJpc2xvb3BiYWNrIjoiVHJ1ZSIsImNpZCI6Ik5tUTVOR1U0WWpNdE5EWmxNQzAwTnpGaExUZzRNREl0TVRjeE5tWXdNV0k0TnpSaSIsInZlciI6Imhhc2hlZHByb29mdG9rZW4iLCJzaXRlaWQiOiJaRGd5TXpFeVpqa3RZakl6WWkwMFkySmpMVGsxWkRVdE0yVXdaRGswWlRZNFl6RmwiLCJhcHBfZGlzcGxheW5hbWUiOiJhcGlzYW5kYm94cHJveHkiLCJnaXZlbl9uYW1lIjoiTWVnYW4iLCJmYW1pbHlfbmFtZSI6IkJvd2VuIiwiYXBwaWQiOiIwNWIxMGEyZC02MmRiLTQyMGMtODYyNi01NWYzYTVlNzg2NWIiLCJ0aWQiOiJkY2QyMTlkZC1iYzY4LTRiOWItYmYwYi00YTMzYTc5NmJlMzUiLCJ1cG4iOiJtZWdhbmJAbTM2NXgyMTQzNTUub25taWNyb3NvZnQuY29tIiwicHVpZCI6IjEwMDNCRkZEQTM4MTMxQUYiLCJjYWNoZWtleSI6IjBoLmZ8bWVtYmVyc2hpcHwxMDAzYmZmZGEzODEzMWFmQGxpdmUuY29tIiwic2NwIjoibXlmaWxlcy5yZWFkIGdyb3VwLnJlYWQgYWxsc2l0ZXMucmVhZCBhbGxwcm9maWxlcy5yZWFkIGFsbHByb2ZpbGVzLnJlYWQiLCJ0dCI6IjIiLCJ1c2VQZXJzaXN0ZW50Q29va2llIjpudWxsLCJpcGFkZHIiOiIyMC4xOTAuMTMyLjQwIn0.ZTBLZHFQbTdudGdGTlJydm8yNWxsVFE0VGN4c2hwRkxHY05jRDM5a3Bmdz0&ApiVersion=2.0");
+			HttpURLConnection httpConn = (HttpURLConnection) url1.openConnection();
+	          httpConn.setDoOutput(true);
+	          httpConn.setRequestProperty("api-version", "1.5");
+	          httpConn.setDoInput(true);	
+	          //httpConn.setRequestMethod("GET");			
+	          //httpConn.setRequestProperty("Accept", "application/json;odata=minimalmetadata");
+	          //httpConn.setRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+	    	  //urlConn.setReadTimeout(5000);
+	    	  //urlConn.setConnectTimeout(5000);
+	    	  //con.setRequestProperty("Cookie", "foo=bar"); 
+	          //httpConn.setRequestProperty("Authorization", "Bearer " + accessToken);
+	           
+	          
+	          
+	          System.out.println("content type =>"+httpConn.getContentType()+"");
+	          
+	          System.out.println("content type =>"+httpConn.getResponseCode()+"");
+	          
+	          
+	          InputStream is = httpConn.getInputStream();
+	          byte[] bytedata=is.readAllBytes();
+	    	    System.out.println(bytedata.length);
+	    	     
+				File outputFile = new File("/home/husenaiah/Downloads/2022/hello_amchecking.xlsx");
+	    	    
+	    	
+				try (FileOutputStream outputStream1 = new FileOutputStream(outputFile);) {
+
+					outputStream1.write(bytedata); // Write the bytes and you're done.
+
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			
 			
 			
@@ -233,8 +291,8 @@ public class EchoBot extends TeamsActivityHandler {
 	    	
 	    	  // URL url1 = new URL("https://www.w3schools.com/css/img_5terre.jpg");
 
-	    	  URL url1 = new URL("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Employee%20Declaration%20_Income%20tax_Form.xlsx");
-	          HttpURLConnection con = (HttpURLConnection) url1.openConnection();
+	    
+	          
 	 
 	                // Setting the request method and
 	                // properties.
@@ -257,45 +315,26 @@ public class EchoBot extends TeamsActivityHandler {
 	    	
 	    	    
 	    	    //URLConnection urlConn = url.openConnection();
-	    	    con.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
+	    	   // con.addRequestProperty("User-Agent", "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.1)");
 	    	    //urlConn.setReadTimeout(5000);
 	    	    //urlConn.setConnectTimeout(5000);
-	    	    con.setRequestProperty("Cookie", "foo=bar"); 
+	    	    //con.setRequestProperty("Cookie", "foo=bar"); 
 
-	    	    String contentType = con.getContentType();
+//	    	    String contentType = con.getContentType();
 
-	    	    System.out.println("contentType:" + contentType);
+//	    	    System.out.println("contentType:" + contentType);
 
-	    	    InputStream is = con.getInputStream();
+	    	   
 	    	    
 	    	    
 	    	  //  BufferedReader reader = new BufferedReader(new InputStreamReader(is,Charset.forName("UTF-8")));
 	    	
 	    	   // File outputFile = new File("/home/husenaiah/Downloads/2022/pngtesttest20055.jpg");		
-				File outputFile = new File("/home/husenaiah/Downloads/2022/pngtesttest20055execl.xlsx");
+
 	    	    
 	    	   // FileUtils.copyInputStreamToFile(is, outputFile);
 	    	    
-	    	    byte[] bytedata=is.readAllBytes();
-	    	    System.out.println(bytedata.length);
-	    	        // append = false
-					/*
-					 * FileOutputStream outputStream = new FileOutputStream(outputFile, false); int
-					 * read; byte[] bytes = new byte[8192]; while ((read = is.read(bytes)) != -1) {
-					 * outputStream.write(bytes, 0, read); }
-					 * 
-					 */
 	    	    
-	    	    
-	    	   // byte[] bytedata=is.readAllBytes();
-
-		
-				  
-				  try ( FileOutputStream outputStream1 = new FileOutputStream(outputFile); ) {
-				  
-				  outputStream1.write(bytedata); // Write the bytes and you're done.
-				  
-				  } catch (Exception e) { e.printStackTrace(); }
 				 
 	    	    
 	    	 //   bis = new BufferedInputStream(is, 4 * 1024);
@@ -323,9 +362,9 @@ public class EchoBot extends TeamsActivityHandler {
 			
 			System.out.println(graphClient);
 			
-			DriveCollectionPage drive = graphClient.me().drives().buildRequest().get();
+			DriveCollectionPage drive1 = graphClient.me().drives().buildRequest().get();
 			
-					System.out.println(drive.getCurrentPage());
+					System.out.println(drive1.getCurrentPage());
 			SiteCollectionPage sites = graphClient.sites()
 					.buildRequest()
 					.get();
@@ -363,8 +402,8 @@ public class EchoBot extends TeamsActivityHandler {
 
 		}
 	 
-		@Override
-		protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
+		
+		protected CompletableFuture<Void> onMessageActivity12(TurnContext turnContext) {
 			HeroCard card = new HeroCard();
 			card.setText("You can upload an image or select one of the following choices");
 		
@@ -381,8 +420,8 @@ public class EchoBot extends TeamsActivityHandler {
 			return turnContext.sendActivity(reply).thenApply(resourceResponse -> null);
 
 		}
-	    
-	protected CompletableFuture<Void> onMessageActivity12(TurnContext turnContext) {
+		@Override  
+	protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
 
 		logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
 		logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
