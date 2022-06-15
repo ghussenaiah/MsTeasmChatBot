@@ -52,6 +52,9 @@ public class TicketQualityService {
 	@Autowired
 	TicketImpl ticketImpl;
 	
+	@Autowired
+	CommonUtility commonUtility;
+	
 	
 	public String ticketStatusUpdate(String status, ConcurrentHashMap<String, Ticket_296> ticket,
 			TurnContext turnContext) {
@@ -72,6 +75,9 @@ public class TicketQualityService {
 			
 			tkt.setStatuscycleId("sfarm_cloud_env_10");
 			tkt.setUpdateDateTime(new Date());
+			
+			tkt.setTimediff(commonUtility.CalculateDateDifference(tkt.getCreateDateTime(), tkt.getUpdateDateTime()));
+			
 			ticketRepo.save(tkt);
 			
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();

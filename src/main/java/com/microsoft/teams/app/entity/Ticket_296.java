@@ -55,6 +55,10 @@ public class Ticket_296  implements Serializable {
     @JsonProperty("clstktreplyId")
     private String clstktreplyId;
     
+    @Column(name = "timediff")
+    @JsonProperty("timediff")
+    private String timediff;
+    
     @Column(name = "nextroles")
     @JsonProperty("nextRoles")
     private String nextRoles;
