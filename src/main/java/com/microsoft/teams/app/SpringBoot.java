@@ -45,8 +45,7 @@ public class SpringBoot extends BotDependencyConfiguration {
 		System.out.println("Application started");
 	}
 	
-	
-    /**
+	/**
      * Returns the Bot for this application.
      *
      * <p>

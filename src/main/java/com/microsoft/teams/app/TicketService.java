@@ -21,6 +21,7 @@ import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
+import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
@@ -54,6 +55,13 @@ public class TicketService {
 	
 	@Autowired
 	DepartmentImpl departmentImpl;
+	
+	@Autowired
+	EscalateTicketQualityService ecalateTicketQualityService;
+	
+	/*
+	 * @Autowired AuthenticationService authService;
+	 */
 	
 	
 	
@@ -113,6 +121,11 @@ public class TicketService {
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 		List<Container> conlist = new ArrayList<>();
 		List<ActionSet> actList = new ArrayList<>();
+		
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
+		
+		adcard.setMsTeams(mst);
 
 		String json = null;
 
@@ -126,7 +139,7 @@ public class TicketService {
 		con2.setType("Input.Text");
 		con2.setId("IssueTitle");
 		con2.setPlaceholder("enter text here");
-		con2.setMaxLength("500");
+		//con2.setMaxLength("500");
 		
 		
 		Container con3 = new Container();
@@ -139,7 +152,7 @@ public class TicketService {
 		con4.setType("Input.Text");
 		con4.setId("IssueDescription");
 		con4.setPlaceholder("enter text here");
-		con4.setMaxLength("500");
+		//con4.setMaxLength("1000");
 		con4.setIsMultiline(true);
 		
 		conlist.add(con);
@@ -156,6 +169,8 @@ public class TicketService {
 		actList.add(action);
 
 		adcard.setActions(actList);
+		
+		
 
 		// ============= create ticket Json structure done =======================
 
@@ -207,10 +222,11 @@ public class TicketService {
 			tkt.setTransactionentityId(trasactionNumber);
 			tkt.setChatGroupId(null);
 			tkt.setNextRoles(null);
-			tkt.setPriorityId("sfarm_cloud_env_1");
+			//tkt.setPriorityId("sfarm_cloud_env_1");// low priority
+			tkt.setPriorityId(null);
 			tkt.setStatus(null);
-			tkt.setTicketQualityRate(null);
-			tkt.setTicketQualityRate(null);
+			tkt.setTicketQualityRate("5");
+			tkt.setTicketQualityComments(null);
 			tkt.setUpdatedBy(turnContext.getActivity().getFrom().getName());
 			tkt.setCreatedBy(turnContext.getActivity().getFrom().getName());
 
@@ -218,10 +234,15 @@ public class TicketService {
 			autoGenerationRepo.save(lastNumberObj);
 
 			ticketRepo.save(tkt);
-			List<Ticket_296> tktlist = ticketRepo.findAll();
-			System.out.println(tktlist);
+			
+			
+			
+			//List<Ticket_296> tktlist = ticketRepo.findAll();
+			//System.out.println(tktlist);
 
 			Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+			
+			String chatUrl=ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,dep.get().getDeptName());
 
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 			List<Container> conlist = new ArrayList<>();
@@ -259,53 +280,47 @@ public class TicketService {
 
 			conlist.add(con2);
 
-			Container con3 = new Container();
-			con3.setType("TextBlock");
-			con3.setText("They will revert back to you soon.");
-			con3.setWeight("bolder");
-			con3.setSize("medium");
-
-			conlist.add(con3);
+			/*
+			 * Container con3 = new Container(); con3.setType("TextBlock");
+			 * con3.setText("They will revert back to you soon."); con3.setWeight("bolder");
+			 * con3.setSize("medium");
+			 * 
+			 * conlist.add(con3);
+			 */
 
 			adcard.setBody(conlist);
-
+			
 			ActionSet action = new ActionSet();
-			action.setType("Action.Execute");
-			action.setTitle("CLOSE TICKET");
-			action.setVerb("personalDetailsFormSubmit");
-			action.setId("ReplyYes");
+			action.setType("Action.OpenUrl");
+			action.setTitle("Open New Chat");
+			action.setUrl(chatUrl);
 
-			ActionData ad = new ActionData();
-			ad.setKey1(true);
-			ad.setKey2("okay");
-
-			Actionfallback af = new Actionfallback();
-			af.setType("Action.Submit");
-			af.setTitle("CLOSE TICKET");
-
-			action.setData(ad);
-			action.setFallback(af);
-
-			ActionSet action2 = new ActionSet();
-			action2.setType("Action.Execute");
-			action2.setTitle("ESCALATE");
-			action2.setVerb("personalDetailsFormSubmit");
-			action2.setId("ReplyNo");
-
-			ActionData ad2 = new ActionData();
-			ad2.setKey1(true);
-			ad2.setKey2("okay");
-
-			Actionfallback af2 = new Actionfallback();
-			af2.setType("Action.Submit");
-			af2.setTitle("ESCALATE");
-
-			action2.setData(ad2);
-			action2.setFallback(af2);
-
+			/*
+			 * ActionSet action = new ActionSet(); action.setType("Action.Execute");
+			 * action.setTitle("CLOSE TICKET"); action.setVerb("personalDetailsFormSubmit");
+			 * action.setId("ReplyYes");
+			 * 
+			 * ActionData ad = new ActionData(); ad.setKey1(true); ad.setKey2("okay");
+			 * 
+			 * Actionfallback af = new Actionfallback(); af.setType("Action.Submit");
+			 * af.setTitle("CLOSE TICKET");
+			 * 
+			 * action.setData(ad); action.setFallback(af);
+			 * 
+			 * ActionSet action2 = new ActionSet(); action2.setType("Action.Execute");
+			 * action2.setTitle("ESCALATE"); action2.setVerb("personalDetailsFormSubmit");
+			 * action2.setId("ReplyNo");
+			 * 
+			 * ActionData ad2 = new ActionData(); ad2.setKey1(true); ad2.setKey2("okay");
+			 * 
+			 * Actionfallback af2 = new Actionfallback(); af2.setType("Action.Submit");
+			 * af2.setTitle("ESCALATE");
+			 * 
+			 * action2.setData(ad2); action2.setFallback(af2);
+			 * 
+			 * actList.add(action); actList.add(action2);
+			 */
 			actList.add(action);
-			actList.add(action2);
-
 			adcard.setActions(actList);
 
 			// ============= create ticket Json structure done =======================

@@ -32,7 +32,8 @@ public interface TicketRepo extends JpaRepository<Ticket_296, String> {
     public List<Support_298> findAllByDepartmentId(@Param("departmentid") String departmentId);
     
 
-	@Query("SELECT t FROM Ticket_296 t WHERE t.statuscycleId = :statuscycleid and t.ticketQualityRate is null")
+	//@Query("SELECT t FROM Ticket_296 t WHERE t.statuscycleId = :statuscycleid and t.ticketQualityRate is null")
+	@Query("SELECT t FROM Ticket_296 t WHERE t.statuscycleId = :statuscycleid")
 	public List<Ticket_296> findAllByStatuscycleId(@Param("statuscycleid") String statuscycleid);
     
     

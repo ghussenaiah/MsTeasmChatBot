@@ -35,6 +35,10 @@ public class SupportService {
 	@Autowired
 	SupportImpl supportImpl;
 	
+	/*
+	 * @Autowired AuthenticationService authService;
+	 */
+	
 	
 	
 	public String createSupportAdaptiveCard(String departmentId, LinkedHashMap botResponseMap,

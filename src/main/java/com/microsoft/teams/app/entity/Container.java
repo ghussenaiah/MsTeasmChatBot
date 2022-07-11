@@ -38,6 +38,10 @@ public class Container {
 	private List<Choices> choices;
 	private List<Item> items;
 	private Boolean wrap;
+	private String url;
+	private String altText;
+	
+	
 
 
 }
