@@ -197,7 +197,7 @@ public class TicketImpl  implements TicketRepo{
 	@Override
 	public List<Ticket_296> findAllByStatuscycleId(String statuscycleid) {
 		// TODO Auto-generated method stub
-		return null;
+		return ticketRepo.findAllByStatuscycleId(statuscycleid);
 	}
 	 
 

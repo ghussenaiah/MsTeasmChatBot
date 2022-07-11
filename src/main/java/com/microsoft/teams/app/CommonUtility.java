@@ -3,13 +3,22 @@ package com.microsoft.teams.app;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.teams.app.entity.Ticket_296;
 
+// cEu8Q~u90O9y64cPUfVrtbocOqjmh3QHDTASJcFX  value client secrets
+// f12a8447-9713-43e4-84a2-66c8873fd8ba
+// Applicaion Id 685bdac5-8cc2-4cc9-87a5-ee7d8914ac2c
+
 @Component
 public class CommonUtility {
+	
+	/*
+	 * @Autowired AuthenticationService authService;
+	 */
 	
 	
 	public void removeContextData(ConcurrentHashMap<String, Ticket_296> ticket,TurnContext turnContext) {

@@ -20,13 +20,17 @@ public class AdaptiveCardsRequest {
 	private String $schema;
 	private String type;
 	private String version;
+	private MsTeams msTeams;
 	private List<Container> body;
 	private List<ActionSet> actions;
+	
+
 
   public AdaptiveCardsRequest() {
 		this.set$schema("http://adaptivecards.io/schemas/adaptive-card.json");
 		this.type = "AdaptiveCard";
 		this.version = "1.0";
+		
 	}
 
 	public String get$schema() {

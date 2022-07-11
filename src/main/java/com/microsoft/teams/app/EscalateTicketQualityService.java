@@ -6,7 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-
+import java.util.concurrent.ExecutionException;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -18,12 +18,19 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.JsonPrimitive;
+import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.Attachment;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.AadUserConversationMember;
+import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.Chat;
+import com.microsoft.graph.models.ChatMessage;
+import com.microsoft.graph.models.ChatSendActivityNotificationParameterSet;
 import com.microsoft.graph.models.ChatType;
 import com.microsoft.graph.models.ConversationMember;
+import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionResponse;
@@ -43,7 +50,7 @@ import okhttp3.Request;
 
 
 @Component
-public class TicketQualityService {
+public class EscalateTicketQualityService {
 	
 	
 	@Autowired
@@ -54,6 +61,10 @@ public class TicketQualityService {
 	
 	@Autowired
 	CommonUtility commonUtility;
+	
+	/*
+	 * @Autowired AuthenticationService authService;
+	 */
 	
 	
 	public String ticketStatusUpdate(String status, ConcurrentHashMap<String, Ticket_296> ticket,
@@ -268,7 +279,7 @@ public class TicketQualityService {
 
 			// create chat
 
-			json=creatchatwithTeamMembers(tkt);
+			// json=creatchatwithTeamMembers(tkt, turnContext);
 
 		}
 		return json;
@@ -278,17 +289,23 @@ public class TicketQualityService {
 	
 	public void updateCloseTicketMessageId(String messageId, ConcurrentHashMap<String, Ticket_296> ticket,
 			TurnContext turnContext) {
-		Ticket_296 tkt = null;
-		tkt = ticket.get(turnContext.getActivity().getFrom().getId());
-		tkt.setClstktreplyId(messageId);
-		ticketRepo.save(tkt);
+		try {
+			Ticket_296 tkt = null;
+			tkt = ticket.get(turnContext.getActivity().getFrom().getId());
+			tkt.setClstktreplyId(messageId);
+			ticketRepo.save(tkt);
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 	}
 	
 	
-	public String creatchatwithTeamMembers(Ticket_296 tkt) {
+	public String creatchatwithTeamMembers(Ticket_296 tkt,TurnContext turnContext,String deptName) {
 
 		// 
-		String json = null;
+		//String json = null;
+		String chaturl=null;
 		// MyNewApp
 
 		/*
@@ -306,30 +323,45 @@ public class TicketQualityService {
 		 */
 
 		
-		final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
-				.clientId("dc3cba5c-d9f7-4a84-b6f6-f51d07a20480").username("admin@kgmip.onmicrosoft.com")
-				.password("Kgm@123$").build();
-		final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
-				usernamePasswordCredential);
-		System.out.println("hello world");
 
-		final GraphServiceClient<Request> graphClient = GraphServiceClient.builder()
-				.authenticationProvider(tokenCredentialAuthProvider).buildClient();
-		System.out.println(graphClient.getServiceRoot());
+
+		/*
+		 * final UsernamePasswordCredential usernamePasswordCredential = new
+		 * UsernamePasswordCredentialBuilder()
+		 * .clientId("bccaebb1-43bd-49fa-aa3e-6e8b48037100").username(
+		 * "admin@kgmerp.onmicrosoft.com") .password("Kgm@123$").build();
+		 */
+     	
+     	final GraphServiceClient<Request> graphClient=	AuthenticationService.getInstance();
+		/*
+		 * final TokenCredentialAuthProvider tokenCredentialAuthProvider = new
+		 * TokenCredentialAuthProvider( usernamePasswordCredential);
+		 */
+		
+		
+		System.out.println("creating new chat group");
+
+		/*
+		 * final GraphServiceClient<Request> graphClient = GraphServiceClient.builder()
+		 * .authenticationProvider(tokenCredentialAuthProvider).buildClient();
+		 * System.out.println(graphClient.getServiceRoot());
+		 */
 
 		Chat chat = new Chat();
 		chat.chatType = ChatType.GROUP;
-		chat.topic = "Tkt #".concat(tkt.getTicketNumber());
+		chat.topic = "Tkt #".concat(tkt.getTicketNumber()+" "+tkt.getTicketTitle());
 		
 		
 		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
+		
+		// 42160820-8445-4775-830b-c6fe29603480
 		
 		AadUserConversationMember members = new AadUserConversationMember();
 		LinkedList<String> rolesList = new LinkedList<String>();
 		rolesList.add("owner");
 		members.roles = rolesList;
 		members.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('13ed2180-6b1b-4cfd-95ff-f32fe5172a46')"));
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('42160820-8445-4775-830b-c6fe29603480')"));
 		members.additionalDataManager().put("@odata.type",
 				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 		membersList.add(members);
@@ -342,7 +374,7 @@ public class TicketQualityService {
 		rolesList1.add("owner");
 		members1.roles = rolesList1;
 		members1.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('30b9b579-d896-430d-895b-2cf043ac2dbf')"));
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('2d35cd72-8402-46e3-9782-a0e3cc79f675')"));
 		members1.additionalDataManager().put("@odata.type",
 				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 		membersList.add(members1);
@@ -355,23 +387,23 @@ public class TicketQualityService {
 		rolesList2.add("owner");
 		members2.roles = rolesList2;
 		members2.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('a7174103-852f-4780-a953-b6214fbf449c')"));
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('be35539f-1ca1-442b-b609-e3c6a4af7104')"));
 		members2.additionalDataManager().put("@odata.type",
 				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 		membersList.add(members2);
 		
 		
 		
-
-		AadUserConversationMember members3 = new AadUserConversationMember();
-		LinkedList<String> rolesList3 = new LinkedList<String>();
-		rolesList3.add("owner");
-		members3.roles = rolesList3;
-		members3.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('74acad78-c073-4d6c-b2ba-f9ab67ee0500')"));
-		members3.additionalDataManager().put("@odata.type",
-				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-		membersList.add(members3);
+		/*
+		 * AadUserConversationMember members3 = new AadUserConversationMember();
+		 * LinkedList<String> rolesList3 = new LinkedList<String>();
+		 * rolesList3.add("owner"); members3.roles = rolesList3;
+		 * members3.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
+		 * "https://graph.microsoft.com/v1.0/users('74acad78-c073-4d6c-b2ba-f9ab67ee0500')"
+		 * )); members3.additionalDataManager().put("@odata.type", new
+		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		 * membersList.add(members3);
+		 */
 		
 		
 		
@@ -416,41 +448,54 @@ public class TicketQualityService {
 
 			// graphClient.applications().buildRequest().post(application);
 			Chat cli = graphClient.chats().buildRequest().post(chat);
-			tkt.setChatGroupId(cli.id);
-			tkt.setStatuscycleId("sfarm_cloud_env_11");
-			ticketRepo.save(tkt);
 			
-			System.out.println("test");
-			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+			chaturl =cli.webUrl;
 			
-			Container con = new Container();
-			con.setType("Container");
-
-			Item it1 = new Item();
-			it1.setType("TextBlock");
-			it1.setText("New chat group created with ticket #".concat(tkt.getTicketNumber()).concat(" to ESCALATE the Issue"));
-			it1.setWeight("bolder");
-			it1.setSize("medium");
-			it1.setWrap(true);
-
-			ArrayList<Item> item = new ArrayList<>();
-			ArrayList<Container> conlist = new ArrayList<>();
-
-			item.add(it1);
-			con.setItems(item);
-
-			conlist.add(con);
-			adcard.setBody(conlist);
-
-			// ============= Thanks Json structure done =======================
-
-			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
-			try {
-				json = ow.writeValueAsString(adcard);
-			} catch (JsonProcessingException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			System.out.println(cli);
+			
+			ChatMessage chatMessage = new ChatMessage();
+			ItemBody body = new ItemBody();
+			body.content = "<br/><strong>Hello All, New chat group created with ticket #".concat(tkt.getTicketNumber())+" !! for discussion </strong><br/><strong>Issue Details : "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were added to this Chat Group</strong>";
+			body.contentType=BodyType.HTML;
+			chatMessage.body = body;
+			
+			
+			graphClient.chats(cli.id).messages().buildRequest().post(chatMessage);
+			
+			Attachment cardAttachment = new Attachment();
+			Activity activity = MessageFactory.attachment(cardAttachment);
+			ChatSendActivityNotificationParameterSet  hhdd=new ChatSendActivityNotificationParameterSet();
+			graphClient.chats("").sendActivityNotification(hhdd);
+			
+			
+			//graphClient.teams(turnContext.getActivity().teamsGetTeamId()).channels(cli.id).messages().buildRequest().post(chatMessage);
+			
+			/*
+			 * tkt.setChatGroupId(cli.id); tkt.setStatuscycleId("sfarm_cloud_env_11");
+			 * ticketRepo.save(tkt);
+			 * 
+			 * System.out.println("test"); AdaptiveCardsRequest adcard = new
+			 * AdaptiveCardsRequest();
+			 * 
+			 * Container con = new Container(); con.setType("Container");
+			 * 
+			 * Item it1 = new Item(); it1.setType("TextBlock");
+			 * it1.setText("New chat group created with ticket #".concat(tkt.getTicketNumber
+			 * ())); it1.setWeight("bolder"); it1.setSize("medium"); it1.setWrap(true);
+			 * 
+			 * ArrayList<Item> item = new ArrayList<>(); ArrayList<Container> conlist = new
+			 * ArrayList<>();
+			 * 
+			 * item.add(it1); con.setItems(item);
+			 * 
+			 * conlist.add(con); adcard.setBody(conlist);
+			 * 
+			 * // ============= Thanks Json structure done =======================
+			 * 
+			 * ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter(); try
+			 * { json = ow.writeValueAsString(adcard); } catch (JsonProcessingException e) {
+			 * // TODO Auto-generated catch block e.printStackTrace(); }
+			 */
 
 			System.out.println(cli.id);
 			System.out.println(cli.tenantId);
@@ -462,7 +507,7 @@ public class TicketQualityService {
 			// logger.debug("" + e.getMessage());
 		}
 		
-		return json;
+		return chaturl;
 
 	}
 	
@@ -472,13 +517,12 @@ public class TicketQualityService {
 		Ticket_296 tkt = null;
 		tkt = ticket.get(turnContext.getActivity().getFrom().getId());
 
-
 		if (((botResponseMap).get("Remarks")) != null) {
 			tkt.setTicketQualityComments((String) ((botResponseMap).get("Remarks")));
 		}
 
 		if (((botResponseMap).get("QualityRate")) != null) {
-			tkt.setTicketQualityRate((String)((botResponseMap).get("QualityRate")));
+			tkt.setTicketQualityRate((String) ((botResponseMap).get("QualityRate")));
 
 		} else if (((botResponseMap).get("secondColumn")) != null) {
 			tkt.setTicketQualityRate("2");
@@ -499,7 +543,6 @@ public class TicketQualityService {
 		return createThanksAdaptiveCard();
 
 	}
-	
 	
 	
 	public String createThanksAdaptiveCard() {

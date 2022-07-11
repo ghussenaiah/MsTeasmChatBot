@@ -24,6 +24,8 @@ public class ActionSet {
 	private String userIds;
 	private ActionData data;
 	private Actionfallback fallback;
+	private String method;
+	private String url;
 	
 	
 	/*

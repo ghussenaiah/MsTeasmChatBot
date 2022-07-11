@@ -13,6 +13,7 @@ import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
+import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper; 
@@ -29,6 +30,10 @@ public class DepartmentService {
 	
 	@Autowired
 	DepartmentImpl departmentImpl;
+	
+	/*
+	 * @Autowired AuthenticationService authService;
+	 */
 	
 
 	
@@ -90,6 +95,58 @@ public class DepartmentService {
 		actList.add(action);
 
 		adcard.setActions(actList);
+
+		// ============= create department Json structure done =======================
+
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		try {
+			json = ow.writeValueAsString(adcard);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		return json;
+
+		/*
+		 * List<Department_23> departmentList = departmentImpl.findAll();
+		 * System.out.println(departmentList);
+		 */
+
+	}
+	
+	public String ShowHelpDeskImage() {
+		
+		/*
+		 * { "$schema": "http://adaptivecards.io/schemas/adaptive-card.json", "type":
+		 * "AdaptiveCard", "version": "1.0", "body": [ { "type": "Image", "url":
+		 * "https://adaptivecards.io/content/cats/1.png", "altText": "Cat" } ] }
+		 */
+		
+		
+		// ============= create department Json structure done =======================
+
+		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		List<Container> conlist = new ArrayList<>();
+		
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
+
+		String json = null;
+
+		Container con = new Container();
+		con.setType("Image");
+		//con.setUrl("https://www.w3schools.com/css/paris.jpg");
+		// srinivasa_help_desk.png 
+		con.setUrl("https://ess.kagamierp.com/kagami-generated_HRMS_GROUP/assets/images/report_icons/stackedcolumnchart.png");
+
+		con.setAltText("Helpdesk Image");
+
+		conlist.add(con);
+
+		adcard.setBody(conlist);
+		
+		adcard.setMsTeams(mst);
 
 		// ============= create department Json structure done =======================
 
