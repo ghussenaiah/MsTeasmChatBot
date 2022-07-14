@@ -26,6 +26,7 @@ public class ActionSet {
 	private Actionfallback fallback;
 	private String method;
 	private String url;
+	private String extraData;
 	
 	
 	/*

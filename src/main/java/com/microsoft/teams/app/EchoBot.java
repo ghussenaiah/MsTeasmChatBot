@@ -5,15 +5,19 @@ import com.azure.identity.UsernamePasswordCredential;
 import com.azure.identity.UsernamePasswordCredentialBuilder;
 import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.bot.builder.teams.TeamsActivityHandler;
+import com.microsoft.bot.connector.Async;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.schema.ActionTypes;
 import com.microsoft.bot.schema.Activity;
+import com.microsoft.bot.schema.AdaptiveCardInvokeResponse;
+import com.microsoft.bot.schema.AdaptiveCardInvokeValue;
 import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.CardAction;
 import com.microsoft.bot.schema.CardImage;
@@ -55,6 +59,7 @@ import com.microsoft.teams.app.entity.ChatHistory_299;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
+import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Ticket_296;
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
@@ -167,10 +172,11 @@ public class EchoBot extends TeamsActivityHandler {
 	 
 	 
 
+	    // user method
 	
 		protected CompletableFuture<Void> checkonMessageActivity(TurnContext turnContext) {
-			
-	        processTurnContext(turnContext);
+
+			processTurnContext(turnContext);
 
 			// return turnContext.sendActivity(activity).th
 			return CompletableFuture.completedFuture(null);
@@ -181,9 +187,10 @@ public class EchoBot extends TeamsActivityHandler {
 
 		}
 	
+		// user method 
 		private void processTurnContext(TurnContext turnContext) {
-			
-			List<Activity> activityList=new ArrayList<>();
+
+			List<Activity> activityList = new ArrayList<>();
 			logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
 			logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
 			logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
@@ -284,7 +291,6 @@ public class EchoBot extends TeamsActivityHandler {
 				}
 
 			} else {
-			
 
 				/*
 				 * List<Department_23> departmentList=departmentImpl.findAll();
@@ -309,8 +315,6 @@ public class EchoBot extends TeamsActivityHandler {
 			// \"TextBlock\",\"text\": \"PublishAdaptiveCard schema\"}],\"actions\": []}";
 
 			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
-			
-			
 
 			// 16547 63426 661
 			Activity activity = MessageFactory.attachment(cardAttachment);
@@ -336,7 +340,7 @@ public class EchoBot extends TeamsActivityHandler {
 			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
 			try {
 				ResourceResponse rr = resourceresponse.get();
-				ticketQualityService.updateCloseTicketMessageId(rr.getId(), ticket, turnContext);
+				//ticketQualityService.updateCloseTicketMessageId(rr.getId(), ticket, turnContext);
 
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
@@ -345,7 +349,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 		}
 
-
+        // user method
 		private void callShowImage(TurnContext turnContext) {
 			Attachment showImage = new Attachment();
 
@@ -364,6 +368,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 	protected CompletableFuture<Void> onMessageReactionActivity(TurnContext turnContext) {
 	        CompletableFuture<Void> task = null;
+	        System.out.println("helo");
 
 	        if (turnContext.getActivity().getReactionsAdded() != null) {
 	            task = onReactionsAdded(turnContext.getActivity().getReactionsAdded(), turnContext);
@@ -390,6 +395,7 @@ public class EchoBot extends TeamsActivityHandler {
 		@Override
 		protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
 			
+			System.out.println("helo");
 			
 			logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
 			logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
@@ -456,33 +462,33 @@ public class EchoBot extends TeamsActivityHandler {
 	 
 	
 
-	@Override
-	protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(TurnContext turnContextt,
-			AppBasedLinkQuery query) {
+		@Override
+		protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(TurnContext turnContextt,
+				AppBasedLinkQuery query) {
+			System.out.println("helo");
+			ThumbnailCard card = new ThumbnailCard();
+			card.setTitle("CodeProject");
+			card.setText(query.getUrl());
 
-		ThumbnailCard card = new ThumbnailCard();
-		card.setTitle("CodeProject");
-		card.setText(query.getUrl());
+			final String logoLink = "https://codeproject.freetls.fastly.net/App_Themes/CodeProject/Img/logo250x135.gif";
+			CardImage cardImage = new CardImage(logoLink);
+			card.setImages(Collections.singletonList(cardImage));
 
-		final String logoLink = "https://codeproject.freetls.fastly.net/App_Themes/CodeProject/Img/logo250x135.gif";
-		CardImage cardImage = new CardImage(logoLink);
-		card.setImages(Collections.singletonList(cardImage));
+			// Create attachments
+			MessagingExtensionAttachment attachments = new MessagingExtensionAttachment();
+			attachments.setContentType(HeroCard.CONTENTTYPE);
+			attachments.setContent(card);
 
-		// Create attachments
-		MessagingExtensionAttachment attachments = new MessagingExtensionAttachment();
-		attachments.setContentType(HeroCard.CONTENTTYPE);
-		attachments.setContent(card);
+			// Result
+			MessagingExtensionResult result = new MessagingExtensionResult();
+			result.setAttachmentLayout("list");
+			result.setType("result");
+			result.setAttachments(Collections.singletonList(attachments));
 
-		// Result
-		MessagingExtensionResult result = new MessagingExtensionResult();
-		result.setAttachmentLayout("list");
-		result.setType("result");
-		result.setAttachments(Collections.singletonList(attachments));
+			// MessagingExtensionResponse
+			return CompletableFuture.completedFuture(new MessagingExtensionResponse(result));
 
-		// MessagingExtensionResponse
-		return CompletableFuture.completedFuture(new MessagingExtensionResponse(result));
-
-	}
+		}
 
 	@Override
 	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
@@ -495,191 +501,196 @@ public class EchoBot extends TeamsActivityHandler {
 				.map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
 				.collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
 	}
-	
-	private Attachment createAdaptiveCardAttachment() throws URISyntaxException, IOException {     
-		
-		String filePath ="./src/main/resources/card.json";
-		    try {
-		        // Read JSON
-		        InputStream inputStream =
-		            this.getClass().getClassLoader().getResourceAsStream(filePath);
-		        String adaptiveCardJson = IOUtils.toString(inputStream,
-		            StandardCharsets.UTF_8);
-		        // Replace placeholders with the actual values
-		        adaptiveCardJson = StringUtils.replace(adaptiveCardJson,
-		            "<USER_ID>", "Akash");
-		        adaptiveCardJson = StringUtils.replace(adaptiveCardJson,
-		            "<ID>", "Akash");
-		        adaptiveCardJson = StringUtils.replace(adaptiveCardJson,
-		            "<TITLE>", "Akash");
-		        adaptiveCardJson = StringUtils.replace(adaptiveCardJson,
-		            "<COMPLETED>", "Akash");
-		        // Create attachment
-		        Attachment attachment = new Attachment();
-		        attachment.setContentType("application/vnd.microsoft.card.adaptive");
-		        attachment.setContent(Serialization.jsonToTree(adaptiveCardJson));
-		        return attachment;
-		    }
-		    catch(Exception e) {
-		        e.printStackTrace();
-		        return new Attachment();
-		    }
-		}
-	
-	
-		@Override
-		protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
-			System.out.println("onConversationUpdateActivity");
-			return CompletableFuture.completedFuture(null);
+	// user method
+	private Attachment createAdaptiveCardAttachment() throws URISyntaxException, IOException {
 
+		String filePath = "./src/main/resources/card.json";
+		try {
+			// Read JSON
+			InputStream inputStream = this.getClass().getClassLoader().getResourceAsStream(filePath);
+			String adaptiveCardJson = IOUtils.toString(inputStream, StandardCharsets.UTF_8);
+			// Replace placeholders with the actual values
+			adaptiveCardJson = StringUtils.replace(adaptiveCardJson, "<USER_ID>", "Akash");
+			adaptiveCardJson = StringUtils.replace(adaptiveCardJson, "<ID>", "Akash");
+			adaptiveCardJson = StringUtils.replace(adaptiveCardJson, "<TITLE>", "Akash");
+			adaptiveCardJson = StringUtils.replace(adaptiveCardJson, "<COMPLETED>", "Akash");
+			// Create attachment
+			Attachment attachment = new Attachment();
+			attachment.setContentType("application/vnd.microsoft.card.adaptive");
+			attachment.setContent(Serialization.jsonToTree(adaptiveCardJson));
+			return attachment;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return new Attachment();
 		}
+	}
+	
+	
+	@Override
+	protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
+		System.out.println("onConversationUpdateActivity");
+		return CompletableFuture.completedFuture(null);
+
+	}
 		
 	
+	// if we turn on then invoked when we call onMessageActivity 
 	/*
 	 * @Override public CompletableFuture<Void> onTurn(TurnContext turnContext) {
 	 * System.out.println("onTurn"); return CompletableFuture.completedFuture(null);
 	 * 
 	 * }
-	 * 
-	
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onMembersRemoved(List<ChannelAccount> membersRemoved, TurnContext
-	 * turnContext) { System.out.println("onMembersRemoved"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onMessageReactionActivity(TurnContext turnContext) {
-	 * System.out.println("onMessageReactionActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onReactionsAdded(List<MessageReaction> messageReactions, TurnContext
-	 * turnContext) { System.out.println("onReactionsAdded"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onReactionsRemoved(List<MessageReaction> messageReactions, TurnContext
-	 * turnContext) { System.out.println("onReactionsRemoved"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onEventActivity(TurnContext
-	 * turnContext) { System.out.println("onEventActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<InvokeResponse>
-	 * onInvokeActivity(TurnContext turnContext) {
-	 * System.out.println("onInvokeActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onSignInInvoke(TurnContext
-	 * turnContext) { System.out.println("onSignInInvoke"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * protected static InvokeResponse createInvokeResponse(Object body) {
-	 * System.out.println("createInvokeResponse"); return new
-	 * InvokeResponse(HttpURLConnection.HTTP_OK, body); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onTokenResponseEvent(TurnContext
-	 * turnContext) { System.out.println("onTokenResponseEvent"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onEvent(TurnContext turnContext)
-	 * { System.out.println("onEvent"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onInstallationUpdate(TurnContext
-	 * turnContext) { System.out.println("onInstallationUpdate"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onCommandActivity(TurnContext
-	 * turnContext) { System.out.println("onCommandActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onCommandResultActivity(TurnContext turnContext) {
-	 * System.out.println("onCommandResultActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onInstallationUpdateAdd(TurnContext turnContext) {
-	 * System.out.println("onInstallationUpdateAdd"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onInstallationUpdateRemove(TurnContext turnContext) {
-	 * System.out.println("onInstallationUpdateRemove"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<AdaptiveCardInvokeResponse>
-	 * onAdaptiveCardInvoke(TurnContext turnContext, AdaptiveCardInvokeValue
-	 * invokeValue) { System.out.println("onAdaptiveCardInvoke"); return
-	 * Async.completeExceptionally(new
-	 * InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED)); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onEndOfConversationActivity(TurnContext turnContext) {
-	 * System.out.println("onEndOfConversationActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void> onTypingActivity(TurnContext
-	 * turnContext) { System.out.println("onTypingActivity"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * @Override protected CompletableFuture<Void>
-	 * onUnrecognizedActivityType(TurnContext turnContext) {
-	 * System.out.println("onUnrecognizedActivityType"); return
-	 * CompletableFuture.completedFuture(null); }
-	 * 
-	 * private AdaptiveCardInvokeValue getAdaptiveCardInvokeValue(Activity activity)
-	 * throws InvokeResponseException {
-	 * System.out.println("getAdaptiveCardInvokeValue"); if (activity.getValue() ==
-	 * null) { AdaptiveCardInvokeResponse response =
-	 * createAdaptiveCardInvokeErrorResponse( HttpURLConnection.HTTP_BAD_REQUEST,
-	 * "BadRequest", "Missing value property"); throw new
-	 * InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response); }
-	 * 
-	 * Object obj = activity.getValue(); JsonNode node = null; if (obj instanceof
-	 * JsonNode) { node = (JsonNode) obj; } else { AdaptiveCardInvokeResponse
-	 * response = createAdaptiveCardInvokeErrorResponse(
-	 * HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest",
-	 * "Value property instanceof not properly formed"); throw new
-	 * InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response); }
-	 * 
-	 * AdaptiveCardInvokeValue invokeValue = Serialization.treeToValue(node,
-	 * AdaptiveCardInvokeValue.class); if (invokeValue == null) {
-	 * AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
-	 * HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest",
-	 * "Value property instanceof not properly formed"); throw new
-	 * InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response); }
-	 * 
-	 * if (invokeValue.getAction() == null) { AdaptiveCardInvokeResponse response =
-	 * createAdaptiveCardInvokeErrorResponse( HttpURLConnection.HTTP_BAD_REQUEST,
-	 * "BadRequest", "Missing action property"); throw new
-	 * InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response); }
-	 * 
-	 * if (!invokeValue.getAction().getType().equals("Action.Execute")) {
-	 * AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
-	 * HttpURLConnection.HTTP_BAD_REQUEST, "NotSupported",
-	 * String.format("The action '%s'is not supported.",
-	 * invokeValue.getAction().getType())); throw new
-	 * InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response); }
-	 * 
-	 * return invokeValue; }
-	 * 
-	 * private AdaptiveCardInvokeResponse
-	 * createAdaptiveCardInvokeErrorResponse(Integer statusCode, String code, String
-	 * message) { System.out.println("getAdaptiveCardInvokeValue");
-	 * AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new
-	 * AdaptiveCardInvokeResponse();
-	 * adaptiveCardInvokeResponse.setStatusCode(statusCode);
-	 * adaptiveCardInvokeResponse.setType("application/vnd.getmicrosoft().error");
-	 * com.microsoft.bot.schema.Error error = new com.microsoft.bot.schema.Error();
-	 * error.setCode(code); error.setMessage(message);
-	 * adaptiveCardInvokeResponse.setValue(error); return
-	 * adaptiveCardInvokeResponse; }
 	 */
-		
+	@Override
+	protected CompletableFuture<Void> onMembersRemoved(List<ChannelAccount> membersRemoved, TurnContext turnContext) {
+		System.out.println("onMembersRemoved");
+		return CompletableFuture.completedFuture(null);
+	}
+	  
+
+	  
+	
+	  
+	@Override
+	protected CompletableFuture<Void> onEventActivity(TurnContext turnContext) {
+		System.out.println("onEventActivity");
+		return CompletableFuture.completedFuture(null);
+	}
+	  
+
+	  
+	@Override
+	protected CompletableFuture<Void> onSignInInvoke(TurnContext turnContext) {
+		System.out.println("onSignInInvoke");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	protected static InvokeResponse createInvokeResponse(Object body) {
+		System.out.println("createInvokeResponse");
+		return new InvokeResponse(HttpURLConnection.HTTP_OK, body);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onTokenResponseEvent(TurnContext turnContext) {
+		System.out.println("onTokenResponseEvent");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onEvent(TurnContext turnContext) {
+		System.out.println("onEvent");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onInstallationUpdate(TurnContext turnContext) {
+		System.out.println("onInstallationUpdate");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onCommandActivity(TurnContext turnContext) {
+		System.out.println("onCommandActivity");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onCommandResultActivity(TurnContext turnContext) {
+		System.out.println("onCommandResultActivity");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onInstallationUpdateAdd(TurnContext turnContext) {
+		System.out.println("onInstallationUpdateAdd");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onInstallationUpdateRemove(TurnContext turnContext) {
+		System.out.println("onInstallationUpdateRemove");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<AdaptiveCardInvokeResponse> onAdaptiveCardInvoke(TurnContext turnContext,
+			AdaptiveCardInvokeValue invokeValue) {
+		System.out.println("onAdaptiveCardInvoke");
+		return Async.completeExceptionally(new InvokeResponseException(HttpURLConnection.HTTP_NOT_IMPLEMENTED));
+	}
+
+	@Override
+	protected CompletableFuture<Void> onEndOfConversationActivity(TurnContext turnContext) {
+		System.out.println("onEndOfConversationActivity");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onTypingActivity(TurnContext turnContext) {
+		System.out.println("onTypingActivity");
+		return CompletableFuture.completedFuture(null);
+	}
+
+	@Override
+	protected CompletableFuture<Void> onUnrecognizedActivityType(TurnContext turnContext) {
+		System.out.println("onUnrecognizedActivityType");
+		return CompletableFuture.completedFuture(null);
+	}
+	  
+	private AdaptiveCardInvokeValue getAdaptiveCardInvokeValue(Activity activity) throws InvokeResponseException {
+		System.out.println("getAdaptiveCardInvokeValue");
+		if (activity.getValue() == null) {
+			AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+					HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Missing value property");
+			throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+		}
+
+		Object obj = activity.getValue();
+		JsonNode node = null;
+		if (obj instanceof JsonNode) {
+			node = (JsonNode) obj;
+		} else {
+			AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+					HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
+			throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+		}
+
+		AdaptiveCardInvokeValue invokeValue = Serialization.treeToValue(node, AdaptiveCardInvokeValue.class);
+		if (invokeValue == null) {
+			AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+					HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Value property instanceof not properly formed");
+			throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+		}
+
+		if (invokeValue.getAction() == null) {
+			AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+					HttpURLConnection.HTTP_BAD_REQUEST, "BadRequest", "Missing action property");
+			throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+		}
+
+		if (!invokeValue.getAction().getType().equals("Action.Execute")) {
+			AdaptiveCardInvokeResponse response = createAdaptiveCardInvokeErrorResponse(
+					HttpURLConnection.HTTP_BAD_REQUEST, "NotSupported",
+					String.format("The action '%s'is not supported.", invokeValue.getAction().getType()));
+			throw new InvokeResponseException(HttpURLConnection.HTTP_BAD_REQUEST, response);
+		}
+
+		return invokeValue;
+	}
+	  
+	private AdaptiveCardInvokeResponse createAdaptiveCardInvokeErrorResponse(Integer statusCode, String code,
+			String message) {
+		System.out.println("getAdaptiveCardInvokeValue");
+		AdaptiveCardInvokeResponse adaptiveCardInvokeResponse = new AdaptiveCardInvokeResponse();
+		adaptiveCardInvokeResponse.setStatusCode(statusCode);
+		adaptiveCardInvokeResponse.setType("application/vnd.getmicrosoft().error");
+		com.microsoft.bot.schema.Error error = new com.microsoft.bot.schema.Error();
+		error.setCode(code);
+		error.setMessage(message);
+		adaptiveCardInvokeResponse.setValue(error);
+		return adaptiveCardInvokeResponse;
+	}
+	 		
 		  // @PostConstruct 
 				public void test() throws Exception {
 			    	
@@ -730,10 +741,6 @@ public class EchoBot extends TeamsActivityHandler {
 					
 					User user = graphClient.me().buildRequest().get();
 					System.out.println(user);
-					
-					
-					
-				
 					
 					DriveItemCollectionPage children = graphClient.me().drive().root().children()
 							.buildRequest()
@@ -1010,16 +1017,81 @@ public class EchoBot extends TeamsActivityHandler {
 					adcard.setBody(conlist);
 					
 					
+			    // http://localhost:3978/api/redis/employee/getall
+					
+				//trial one 
+					
+				
+				
+				 // ActionSet action = new ActionSet(); 
+				 // action.setType("Action.OpenUrl");
+				 // action.setTitle("Action.OpenUrl");
+				 // action.setId("http_request");
+				 // action.setMethod("GET"); 
+				 // action.setUrl("https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
+				 
+				 
+					
+			     //trial two 		
+					
+					
+					/*
+					 * ActionSet action = new ActionSet(); action.setType("Action.Http");
+					 * action.setTitle("Action.Http"); action.setId("http_request");
+					 * 
+					 * action.setUrl(
+					 * "https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
+					 */
+					 
+					
+				// trial three	
+					
+					
+				/*
+				 * ActionSet action = new ActionSet(); 
+				 * action.setType("Action.Submit");
+				 * action.setTitle("Call Java"); 
+				 * action.setId("http_request"); 
+				 * MsTeams msteams=new MsTeams();
+				 * msteams.setType("signin");
+				 * msteams.setValue("https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
+				  
+				 * ActionData data=new ActionData(); 
+				 * data.setMsteams(msteams);
+				 * data.setExtraData("(this will be ignored)");
+				   action.setData(data);
+				 */
+					  
+				// trial four	
+					  
+					  
+					  
+				ActionSet action = new ActionSet();
+				action.setType("Action.Submit");
+				action.setTitle("Call Java"); // action.setId("http_request"); 
+				MsTeams msteams = new MsTeams();
+				msteams.setType("signin");
+				msteams.setValue("https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
 
-					ActionSet action = new ActionSet();
-			/*		action.setType("Action.OpenUrl");
-					action.setTitle("Action.OpenUrl");*/
-					action.setType("Action.Http");
-					action.setTitle("Call Java");
-					action.setMethod("POST");
-					action.setId("http_request");
-					//action.setUrl("https://teams.microsoft.com/l/chat/19%3A74da5e499f9244c6b12293e120db4af8%40thread.v2/0?tenantId=763706a2-6782-4219-92ae-f812a8e130f8");
-					action.setUrl("https://0974-115-246-202-106.ngrok.io/api/redis/employee/getall");
+				ActionData data = new ActionData();
+				data.setMsteams(msteams);
+				data.setExtraData("(this will be ignored)");
+				action.setData(data);
+						 
+					  
+					
+					
+					
+				
+					/*
+					 * { "type": "Action.Submit", "title": "Click me for signin", 
+					 * "data": {
+					 * "msteams": { "type": "signin", "value":
+					 * "https://yoursigninurl.com/signinpath?parames=values", }, 
+					 * "extraData": "(this will be ignored)" } 
+					 * 
+					 * }
+					 */
 					
 					
 					/*
@@ -1080,6 +1152,225 @@ public class EchoBot extends TeamsActivityHandler {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
+					
+					json="{\n"
+							+ "    \"type\": \"AdaptiveCard\",\n"
+							+ "    \"body\": [\n"
+							+ "        {\n"
+							+ "            \"type\": \"Container\",\n"
+							+ "            \"id\": \"353b659f-b668-fac0-5b7f-5d2f1bdb46ac\",\n"
+							+ "            \"padding\": \"Default\",\n"
+							+ "            \"items\": [\n"
+							+ "                {\n"
+							+ "                    \"type\": \"ActionSet\",\n"
+							+ "                    \"actions\": [\n"
+							+ "                        {\n"
+							+ "                            \"type\": \"Action.Http\",\n"
+							+ "                            \"id\": \"accept\",\n"
+							+ "                            \"title\": \"Accept\",\n"
+							+ "                            \"method\": \"POST\",\n"
+							+ "                            \"url\": \"https://www.microsoft.com\",\n"
+							+ "                            \"body\": \"{}\",\n"
+							+ "                            \"isPrimary\": true,\n"
+							+ "                            \"style\": \"positive\"\n"
+							+ "                        },\n"
+							+ "                        {\n"
+							+ "                            \"type\": \"Action.ShowCard\",\n"
+							+ "                            \"id\": \"e1487cbc-66b0-037e-cdc4-045fb7d8d0b8\",\n"
+							+ "                            \"title\": \"Reject\",\n"
+							+ "                            \"card\": {\n"
+							+ "                                \"type\": \"AdaptiveCard\",\n"
+							+ "                                \"body\": [\n"
+							+ "                                    {\n"
+							+ "                                        \"type\": \"Input.Text\",\n"
+							+ "                                        \"id\": \"Comment\",\n"
+							+ "                                        \"placeholder\": \"Add a comment\",\n"
+							+ "                                        \"isMultiline\": true\n"
+							+ "                                    },\n"
+							+ "                                    {\n"
+							+ "                                        \"type\": \"ActionSet\",\n"
+							+ "                                        \"id\": \"1e77f639-e5a8-320f-c6de-4291227db6b3\",\n"
+							+ "                                        \"actions\": [\n"
+							+ "                                            {\n"
+							+ "                                                \"type\": \"Action.Submit\",\n"
+							+ "                                                \"id\": \"1ca3a888-ebfb-1feb-064b-928960616e52\",\n"
+							+ "                                                \"title\": \"Submit\",\n"
+							+ "                                                \"method\": \"POST\",\n"
+							+ "                                                \"url\": \"https://dev3.kagamierp.com:3978/api/redis/employee/getall\",\n"
+							+ "                                                 \"body\": \"{}\",\n"
+							+ "                                            }\n"
+							+ "                                        ]\n"
+							+ "                                    }\n"
+							+ "                                ],\n"
+							+ "                                \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+							+ "                                \"fallbackText\": \"Unable to render the card\",\n"
+							+ "                                \"padding\": \"None\"\n"
+							+ "                            }\n"
+							+ "                        }\n"
+							+ "                    ],\n"
+							+ "                    \"spacing\": \"None\"\n"
+							+ "                }\n"
+							+ "            ],\n"
+							+ "            \"spacing\": \"None\",\n"
+							+ "            \"separator\": true\n"
+							+ "        }\n"
+							+ "    ],\n"
+							+ "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+							+ "    \"version\": \"1.0\",\n"
+							+ "    \"padding\": \"None\"\n"
+							+ "}";
+					
+					json ="{\n"
+							+ "    \"@type\": \"MessageCard\",\n"
+							+ "    \"@context\": \"http://schema.org/extensions\",\n"
+							+ "    \"themeColor\": \"0076D7\",\n"
+							+ "    \"summary\": \"Larry Bryant created a new task\",\n"
+							+ "    \"sections\": [{\n"
+							+ "        \"activityTitle\": \"Larry Bryant created a new task\",\n"
+							+ "        \"activitySubtitle\": \"On Project Tango\",\n"
+							+ "        \"activityImage\": \"https://teamsnodesample.azurewebsites.net/static/img/image5.png\",\n"
+							+ "        \"facts\": [{\n"
+							+ "            \"name\": \"Assigned to\",\n"
+							+ "            \"value\": \"Unassigned\"\n"
+							+ "        }, {\n"
+							+ "            \"name\": \"Due date\",\n"
+							+ "            \"value\": \"Mon May 01 2017 17:07:18 GMT-0700 (Pacific Daylight Time)\"\n"
+							+ "        }, {\n"
+							+ "            \"name\": \"Status\",\n"
+							+ "            \"value\": \"Not started\"\n"
+							+ "        }],\n"
+							+ "        \"markdown\": true\n"
+							+ "    }],\n"
+							+ "    \"potentialAction\": [{\n"
+							+ "        \"@type\": \"ActionCard\",\n"
+							+ "        \"name\": \"Add a comment\",\n"
+							+ "        \"inputs\": [{\n"
+							+ "            \"@type\": \"TextInput\",\n"
+							+ "            \"id\": \"comment\",\n"
+							+ "            \"isMultiline\": false,\n"
+							+ "            \"title\": \"Add a comment here for this task\"\n"
+							+ "        }],\n"
+							+ "        \"actions\": [{\n"
+							+ "            \"@type\": \"HttpPOST\",\n"
+							+ "            \"name\": \"Add comment\",\n"
+							+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
+							+ "        }]\n"
+							+ "    }, {\n"
+							+ "        \"@type\": \"ActionCard\",\n"
+							+ "        \"name\": \"Set due date\",\n"
+							+ "        \"inputs\": [{\n"
+							+ "            \"@type\": \"DateInput\",\n"
+							+ "            \"id\": \"dueDate\",\n"
+							+ "            \"title\": \"Enter a due date for this task\"\n"
+							+ "        }],\n"
+							+ "        \"actions\": [{\n"
+							+ "            \"@type\": \"HttpPOST\",\n"
+							+ "            \"name\": \"Save\",\n"
+							+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
+							+ "        }]\n"
+							+ "    }, {\n"
+							+ "        \"@type\": \"OpenUri\",\n"
+							+ "        \"name\": \"Learn More\",\n"
+							+ "        \"targets\": [{\n"
+							+ "            \"os\": \"default\",\n"
+							+ "            \"uri\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
+							+ "        }]\n"
+							+ "    }, {\n"
+							+ "        \"@type\": \"ActionCard\",\n"
+							+ "        \"name\": \"Change status\",\n"
+							+ "        \"inputs\": [{\n"
+							+ "            \"@type\": \"MultichoiceInput\",\n"
+							+ "            \"id\": \"list\",\n"
+							+ "            \"title\": \"Select a status\",\n"
+							+ "            \"isMultiSelect\": \"false\",\n"
+							+ "            \"choices\": [{\n"
+							+ "                \"display\": \"In Progress\",\n"
+							+ "                \"value\": \"1\"\n"
+							+ "            }, {\n"
+							+ "                \"display\": \"Active\",\n"
+							+ "                \"value\": \"2\"\n"
+							+ "            }, {\n"
+							+ "                \"display\": \"Closed\",\n"
+							+ "                \"value\": \"3\"\n"
+							+ "            }]\n"
+							+ "        }],\n"
+							+ "        \"actions\": [{\n"
+							+ "            \"@type\": \"HttpPOST\",\n"
+							+ "            \"name\": \"Save\",\n"
+							+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
+							+ "        }]\n"
+							+ "    }]\n"
+							+ "}";
+					
+					json="\n"
+							+ "\n"
+							+ "{\n"
+							+ "    \"type\": \"AdaptiveCard\",\n"
+							+ "    \"body\": [\n"
+							+ "        {\n"
+							+ "            \"type\": \"Container\",\n"
+							+ "            \"id\": \"353b659f-b668-fac0-5b7f-5d2f1bdb46ac\",\n"
+							+ "            \"padding\": \"Default\",\n"
+							+ "            \"items\": [\n"
+							+ "                {\n"
+							+ "                    \"type\": \"ActionSet\",\n"
+							+ "                    \"actions\": [\n"
+							+ "                        {\n"
+							+ "                            \"type\": \"Action.Submit\",\n"
+							+ "                            \"id\": \"accept\",\n"
+							+ "                            \"title\": \"Accept\",\n"
+							+ "                            \"method\": \"POST\",\n"
+							+ "                            \"url\": \"https://www.microsoft.com\",\n"
+							+ "                            \"body\": \"{}\",\n"
+							+ "                            \"isPrimary\": true,\n"
+							+ "                            \"style\": \"positive\"\n"
+							+ "                        },\n"
+							+ "                        {\n"
+							+ "                            \"type\": \"Action.ShowCard\",\n"
+							+ "                            \"id\": \"e1487cbc-66b0-037e-cdc4-045fb7d8d0b8\",\n"
+							+ "                            \"title\": \"Reject\",\n"
+							+ "                            \"card\": {\n"
+							+ "                                \"type\": \"AdaptiveCard\",\n"
+							+ "                                \"body\": [\n"
+							+ "                                    {\n"
+							+ "                                        \"type\": \"Input.Text\",\n"
+							+ "                                        \"id\": \"Comment\",\n"
+							+ "                                        \"placeholder\": \"Add a comment\",\n"
+							+ "                                        \"isMultiline\": true\n"
+							+ "                                    },\n"
+							+ "                                    {\n"
+							+ "                                        \"type\": \"ActionSet\",\n"
+							+ "                                        \"id\": \"1e77f639-e5a8-320f-c6de-4291227db6b3\",\n"
+							+ "                                        \"actions\": [\n"
+							+ "                                            {\n"
+							+ "                                                \"type\": \"Action.Submit\",\n"
+							+ "                                                \"id\": \"1ca3a888-ebfb-1feb-064b-928960616e52\",\n"
+							+ "                                                \"title\": \"Submit\",\n"
+							+ "                                                \"method\": \"POST\",\n"
+							+ "                                                \"url\": \"https://04f9-115-246-202-106.ngrok.io/api/redis/employee/post\",\n"
+							+ "                                                \"body\": \"{comment : {{Comment.value}}}\"\n"
+							+ "                                            }\n"
+							+ "                                        ]\n"
+							+ "                                    }\n"
+							+ "                                ],\n"
+							+ "                                \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+							+ "                                \"fallbackText\": \"Unable to render the card\",\n"
+							+ "                                \"padding\": \"None\"\n"
+							+ "                            }\n"
+							+ "                        }\n"
+							+ "                    ],\n"
+							+ "                    \"spacing\": \"None\"\n"
+							+ "                }\n"
+							+ "            ],\n"
+							+ "            \"spacing\": \"None\",\n"
+							+ "            \"separator\": true\n"
+							+ "        }\n"
+							+ "    ],\n"
+							+ "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+							+ "    \"version\": \"1.0\",\n"
+							+ "    \"padding\": \"None\"\n"
+							+ "}";
+					
 					ChatMessage chatMessage = new ChatMessage();
 					chatMessage.subject = null;
 					ItemBody body = new ItemBody();
@@ -1089,21 +1380,20 @@ public class EchoBot extends TeamsActivityHandler {
 					LinkedList<ChatMessageAttachment> attachmentsList = new LinkedList<ChatMessageAttachment>();
 					ChatMessageAttachment attachments = new ChatMessageAttachment();
 					attachments.id = "74d20c7f34aa4a7fb74e2b30004247c5";
-					//attachments.contentType = "application/vnd.microsoft.card.thumbnail";
+					
 					attachments.contentType = "application/vnd.microsoft.card.adaptive";
 					attachments.contentUrl = null;
-				//	attachments.content = "{\r\n  \"title\": \"This is an example of posting a card\",\r\n  \"subtitle\": \"<h3>This is the subtitle</h3>\",\r\n  \"text\": \"Here is some body text. <br>\\r\\nAnd a <a href=\\\"http://microsoft.com/\\\">hyperlink</a>. <br>\\r\\nAnd below that is some buttons:\",\r\n  \"buttons\": [\r\n    {\r\n      \"type\": \"messageBack\",\r\n      \"title\": \"Login to FakeBot\",\r\n      \"text\": \"login\",\r\n      \"displayText\": \"login\",\r\n      \"value\": \"login\"\r\n    }\r\n  ]\r\n}";
 					attachments.content = json;
 					attachments.name = null;
 					attachments.thumbnailUrl = null;
 					attachmentsList.add(attachments);
 					chatMessage.attachments = attachmentsList;
-					
-	
-				
-
 					graphClient.chats("19:f5835314d2ee4193bf1222771de863a9@thread.v2").messages().buildRequest().post(chatMessage);
 					
+				
+					
+					//attachments.contentType = "application/vnd.microsoft.card.thumbnail";
+					//	attachments.content = "{\r\n  \"title\": \"This is an example of posting a card\",\r\n  \"subtitle\": \"<h3>This is the subtitle</h3>\",\r\n  \"text\": \"Here is some body text. <br>\\r\\nAnd a <a href=\\\"http://microsoft.com/\\\">hyperlink</a>. <br>\\r\\nAnd below that is some buttons:\",\r\n  \"buttons\": [\r\n    {\r\n      \"type\": \"messageBack\",\r\n      \"title\": \"Login to FakeBot\",\r\n      \"text\": \"login\",\r\n      \"displayText\": \"login\",\r\n      \"value\": \"login\"\r\n    }\r\n  ]\r\n}";
 					//ChatMessage chatMessage = new ChatMessage();
 					//ItemBody body = new ItemBody();
 					//body.content = "<br/><strong>Hello All, New chat group created with ticket !! for discussion </strong><br/><strong>Issue Details : "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were added to this Chat Group</strong>";

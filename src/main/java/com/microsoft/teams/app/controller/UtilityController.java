@@ -27,6 +27,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.microsoft.teams.app.entity.AdpCardRequest;
+
 
  
 // In this class, we have left the caching approach for tutorial simplicity.
@@ -35,7 +37,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/api/redis/employee")
 public class UtilityController {
  
-    private static final Logger LOG = LoggerFactory.getLogger(UtilityController.class);
+    private static final Logger log = LoggerFactory.getLogger(UtilityController.class);
  
     
     
@@ -43,7 +45,7 @@ public class UtilityController {
 	@CrossOrigin(origins = "*")
 	public String getmsteamauthcode(@RequestParam("code") final String code, @RequestParam("state") final String state,
 			@RequestParam("session_state") final String session) throws IOException {
-		LOG.info("Saving the new employee to the redis.");
+		log.info("Saving the new employee to the redis.");
 
 		// FileWriter fout = new FileWriter("/home/husenaiah/Downloads/2022/card.txt");
 
@@ -63,12 +65,13 @@ public class UtilityController {
 		return "Successfully added. Employee with id= ";
 	}
 	
-	  @GetMapping("/getall")
-	    public String findAll() {
-	        LOG.info("Fetching all employees from the redis.");
-	        
-	        return "";
-	    }
+	@PostMapping("/post")
+	public String postBody(@RequestBody AdpCardRequest comment) {
+		log.info("Fetching all employees from the redis.");
+		log.info("Fetching employee from the redis.%s", comment.getComment());
+		System.out.println("comment is " + comment.getComment());
+		return "Hello " + comment;
+	}
 	 
  
 	/*

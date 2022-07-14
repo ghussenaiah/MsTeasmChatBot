@@ -16,4 +16,6 @@ import lombok.Setter;
 public class MsTeams {
 
 	private String width;
+	private String type;
+	private String value;
 }

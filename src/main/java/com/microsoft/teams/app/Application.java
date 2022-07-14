@@ -36,15 +36,16 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan(basePackages = "com.microsoft.teams.app")
 @EnableScheduling
 @EnableTransactionManagement
-public class SpringBoot extends BotDependencyConfiguration {
+public class Application extends BotDependencyConfiguration {
 	
 
 
 	public static void main(String[] args) {
-		SpringApplication.run(SpringBoot.class, args);
+		SpringApplication.run(Application.class, args);
 		System.out.println("Application started");
 	}
 	
+	 
 	/**
      * Returns the Bot for this application.
      *

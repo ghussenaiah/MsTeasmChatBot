@@ -393,6 +393,17 @@ public class EscalateTicketQualityService {
 		membersList.add(members2);
 		
 		
+		AadUserConversationMember members3 = new AadUserConversationMember();
+		LinkedList<String> rolesList3 = new LinkedList<String>();
+		rolesList3.add("owner");
+		members3.roles = rolesList3;
+		members3.additionalDataManager().put("user@odata.bind",
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('42160820-8445-4775-830b-c6fe29603480')"));
+		members3.additionalDataManager().put("@odata.type",
+				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		membersList.add(members3);
+		
+		
 		
 		/*
 		 * AadUserConversationMember members3 = new AadUserConversationMember();
