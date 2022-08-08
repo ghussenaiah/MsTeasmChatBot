@@ -1,6 +1,7 @@
 package com.microsoft.teams.app;
 
 
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -14,6 +15,7 @@ import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
+import com.microsoft.teams.app.repository.SupportRepo;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper; 
@@ -30,6 +32,11 @@ public class DepartmentService {
 	
 	@Autowired
 	DepartmentImpl departmentImpl;
+	
+	@Autowired
+	SupportRepo supportRepo;
+	
+	
 	
 	/*
 	 * @Autowired AuthenticationService authService;
@@ -138,7 +145,30 @@ public class DepartmentService {
 		con.setType("Image");
 		//con.setUrl("https://www.w3schools.com/css/paris.jpg");
 		// srinivasa_help_desk.png 
-		con.setUrl("https://ess.kagamierp.com/kagami-generated_HRMS_GROUP/assets/images/report_icons/stackedcolumnchart.png");
+		// stackedcolumnchart.png
+		// https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/
+		
+		URL resource = getClass().getClassLoader().getResource("srinivaslogo.png");
+		
+		System.out.println(resource);
+		
+		//con.setUrl(resource.getFile());
+	//	con.setUrl("https://ess.kagamierp.com/kagami-generated_HRMS_GROUP/assets/images/report_icons/stackedcolumnchart.png");
+	//	con.setUrl("https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/assets/images/report_icons/srinivaslogo.png");
+		//con.setUrl("https://adaptivecards.io/content/cats/1.png");
+		
+	//	https://thumbs.dreamstime.com/b/beautiful-rain-forest-ang-ka-nature-trail-doi-inthanon-national-park-thailand-36703721.jpg
+		
+		//con.setUrl("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTe4SbTvUMHFpg5yI-p1ONBNewWPA6Rp4vH_Q&usqp=CAU");
+		
+// https://lh3.googleusercontent.com/86_CXv2VK9Q-z9h96NShC3sfXNvXPF2pLOb638IMp1zb5MzqRRL9iPDCbXDbI4mtz0eS0Q=s170
+	//	con.setUrl("https://lh3.googleusercontent.com/cebdtLR-fF_74roBaUvtIMS0rVRPksapPTIQjea6UWztw7tX1HCG52RLcFQcgG6zmhQ1FSw=s170");
+		
+		//con.setUrl("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiZ999Ee26EBiVgSrX0wGDCbfNGkJWG62nO8TmbonZG8nFy_EfkYOxjcNSQARu-JDNmtqsZSpMQ4Grq3ahtHnOALEMxss4T1WW__o4GF3eXOs5RUE6Su6-K4EVHQmndFPCdXwdUpFlsTjG06r-gYBKIk1tXh2lchWPiVLzO0h6QlWgGahOr4hF8ADZg/w463-h130/srinivasa_help_desk.png");
+		con.setUrl("https://blogger.googleusercontent.com/img/b/R29vZ2xl/AVvXsEiZ999Ee26EBiVgSrX0wGDCbfNGkJWG62nO8TmbonZG8nFy_EfkYOxjcNSQARu-JDNmtqsZSpMQ4Grq3ahtHnOALEMxss4T1WW__o4GF3eXOs5RUE6Su6-K4EVHQmndFPCdXwdUpFlsTjG06r-gYBKIk1tXh2lchWPiVLzO0h6QlWgGahOr4hF8ADZg/w916-h130/srinivasa_help_desk.png");
+		//
+	
+	//	con.setUrl("https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/assets/images/bitkemylogo.png");
 
 		con.setAltText("Helpdesk Image");
 

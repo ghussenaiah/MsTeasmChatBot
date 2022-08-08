@@ -8,6 +8,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.JsonPrimitive;
 import com.microsoft.bot.builder.InvokeResponse;
 import com.microsoft.bot.builder.MessageFactory;
 import com.microsoft.bot.builder.TurnContext;
@@ -24,23 +25,31 @@ import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.ResourceResponse;
+import com.microsoft.bot.schema.ResultPair;
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.ThumbnailCard;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
 import com.microsoft.bot.schema.teams.MessagingExtensionAttachment;
 import com.microsoft.bot.schema.teams.MessagingExtensionResponse;
 import com.microsoft.bot.schema.teams.MessagingExtensionResult;
+import com.microsoft.bot.schema.teams.TeamsChannelData;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.core.CustomRequestBuilder;
 import com.microsoft.graph.httpcore.HttpClients;
+import com.microsoft.graph.models.AadUserConversationMember;
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.ChatMessage;
 import com.microsoft.graph.models.ChatMessageAttachment;
+import com.microsoft.graph.models.ChatMessageMention;
+import com.microsoft.graph.models.ChatMessageMentionedIdentitySet;
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.DriveItem;
+import com.microsoft.graph.models.Identity;
 import com.microsoft.graph.models.ItemBody;
 import com.microsoft.graph.models.ResponseType;
 import com.microsoft.graph.models.Site;
+import com.microsoft.graph.models.TeamsAppInstallation;
+import com.microsoft.graph.models.TeamworkUserIdentityType;
 import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
 import com.microsoft.graph.requests.DriveCollectionPage;
@@ -50,12 +59,14 @@ import com.microsoft.graph.requests.DriveRecentCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.SiteCollectionPage;
 import com.microsoft.graph.requests.UserRequestBuilder;
+import com.microsoft.graph.serializer.OffsetDateTimeSerializer;
 import com.microsoft.teams.app.entity.ActionData;
 import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.Actionfallback;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.ChatHistory_299;
+import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
@@ -97,6 +108,7 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
@@ -132,6 +144,8 @@ public class EchoBot extends TeamsActivityHandler {
 	
 	@Autowired
 	SupportService supportService;
+	
+
 	
 	@Autowired
 	DepartmentService depService;
@@ -173,8 +187,8 @@ public class EchoBot extends TeamsActivityHandler {
 	 
 
 	    // user method
-	
-		protected CompletableFuture<Void> checkonMessageActivity(TurnContext turnContext) {
+		@Override
+		protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
 
 			processTurnContext(turnContext);
 
@@ -223,10 +237,11 @@ public class EchoBot extends TeamsActivityHandler {
 
 			logger.info("getActivity().getConversation().getAadObjectId()=> "
 					+ turnContext.getActivity().getConversation().getAadObjectId());
-
+			
 			Attachment cardAttachment = null;
-
+			Attachment newcardAttachment = null;
 			if (turnContext.getActivity().getValue() != null) {
+
 				LinkedHashMap botResponseMap = (LinkedHashMap) turnContext.getActivity().getValue();
 				// String triggerClicked = (String) ((Map)
 				// botResponseMap).get("ActionResponse");
@@ -234,11 +249,24 @@ public class EchoBot extends TeamsActivityHandler {
 				if (((botResponseMap).get("Department")) != null) {
 					cardAttachment = new Attachment();
 					try {
+						
+						
+						newcardAttachment = new Attachment();
+						newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("Department")),"Department",botResponseMap)));
+						newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+						Activity newactivity = MessageFactory.attachment(newcardAttachment);
+						newactivity.setId(turnContext.getActivity().getReplyToId());
+
+						
+						CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+						System.out.println(resourceresponse);
+
 						// supportService
 						cardAttachment.setContent(Serialization.jsonToTree(supportService.createSupportAdaptiveCard(
 								((String) (botResponseMap).get("Department")), botResponseMap, ticket, turnContext)));
 						// cardAttachment.setContent(Serialization.jsonToTree(supportTyp));
 
+					
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -247,7 +275,16 @@ public class EchoBot extends TeamsActivityHandler {
 					cardAttachment = new Attachment();
 
 					try {
-						// cardAttachment.setContent(Serialization.jsonToTree(Ticket));
+						
+						newcardAttachment = new Attachment();
+						newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("SupportType")),"Functional",botResponseMap)));
+						newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+						Activity newactivity = MessageFactory.attachment(newcardAttachment);
+						newactivity.setId(turnContext.getActivity().getReplyToId());
+						CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+						System.out.println(resourceresponse);
+						
+						// returning adaptive card to create ticket from user
 						cardAttachment.setContent(Serialization.jsonToTree(ticketService.createTicketAdaptiveCard(
 								((String) (botResponseMap).get("SupportType")), botResponseMap, ticket, turnContext)));
 					} catch (IOException e) {
@@ -257,6 +294,17 @@ public class EchoBot extends TeamsActivityHandler {
 				} else if (((botResponseMap).get("IssueTitle")) != null) {
 					cardAttachment = new Attachment();
 					try {
+
+						
+						newcardAttachment = new Attachment();
+						newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("IssueTitle")),"Ticket",botResponseMap)));
+						newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+						Activity newactivity = MessageFactory.attachment(newcardAttachment);
+						newactivity.setId(turnContext.getActivity().getReplyToId());
+						CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+						System.out.println(resourceresponse);
+						// create ticket in database and creating the new chat with department people
+						// response contains go to chat button (new chat button)
 						cardAttachment.setContent(Serialization
 								.jsonToTree(ticketService.createTicket(botResponseMap, ticket, turnContext)));
 					} catch (IOException e) {
@@ -314,6 +362,8 @@ public class EchoBot extends TeamsActivityHandler {
 			// \"type\":\"AdaptiveCard\",\"version\": \"1.0\",\"body\": [{\"type\":
 			// \"TextBlock\",\"text\": \"PublishAdaptiveCard schema\"}],\"actions\": []}";
 
+			// 16547 63426 661
+
 			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 
 			// 16547 63426 661
@@ -340,7 +390,7 @@ public class EchoBot extends TeamsActivityHandler {
 			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
 			try {
 				ResourceResponse rr = resourceresponse.get();
-				//ticketQualityService.updateCloseTicketMessageId(rr.getId(), ticket, turnContext);
+				 //ticketQualityService.updateCloseTicketMessageId(rr.getId(), ticket,turnContext);
 
 			} catch (InterruptedException | ExecutionException e) {
 				// TODO Auto-generated catch block
@@ -349,9 +399,11 @@ public class EchoBot extends TeamsActivityHandler {
 
 		}
 
-        // user method
-		private void callShowImage(TurnContext turnContext) {
+		// user method
+		private Activity callShowImage(TurnContext turnContext) {
 			Attachment showImage = new Attachment();
+			
+			
 
 			try {
 				showImage.setContent(Serialization.jsonToTree(depService.ShowHelpDeskImage()));
@@ -361,42 +413,51 @@ public class EchoBot extends TeamsActivityHandler {
 			}
 			showImage.setContentType("application/vnd.microsoft.card.adaptive");
 			Activity imgAct = MessageFactory.attachment(showImage);
-			turnContext.sendActivity(imgAct);
+			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(imgAct);
+
+			try {
+				ResourceResponse rr = resourceresponse.get();
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return imgAct;
+
+			// turnContext.sendActivity(imgAct);
 
 		}
+		
+		
 
+		protected CompletableFuture<Void> onMessageReactionActivity(TurnContext turnContext) {
+			CompletableFuture<Void> task = null;
+			// System.out.println("helo");
 
-	protected CompletableFuture<Void> onMessageReactionActivity(TurnContext turnContext) {
-	        CompletableFuture<Void> task = null;
-	        System.out.println("helo");
+			if (turnContext.getActivity().getReactionsAdded() != null) {
+				task = onReactionsAdded(turnContext.getActivity().getReactionsAdded(), turnContext);
+			}
 
-	        if (turnContext.getActivity().getReactionsAdded() != null) {
-	            task = onReactionsAdded(turnContext.getActivity().getReactionsAdded(), turnContext);
-	        }
+			if (turnContext.getActivity().getReactionsRemoved() != null) {
+				if (task != null) {
+					task.thenApply(
+							result -> onReactionsRemoved(turnContext.getActivity().getReactionsRemoved(), turnContext));
+				} else {
+					task = onReactionsRemoved(turnContext.getActivity().getReactionsRemoved(), turnContext);
+				}
+			}
 
-	        if (turnContext.getActivity().getReactionsRemoved() != null) {
-	            if (task != null) {
-	                task.thenApply(
-	                    result -> onReactionsRemoved(
-	                        turnContext.getActivity().getReactionsRemoved(), turnContext
-	                    )
-	                );
-	            } else {
-	                task = onReactionsRemoved(
-	                    turnContext.getActivity().getReactionsRemoved(), turnContext
-	                );
-	            }
-	        }
-
-	        return task == null ? CompletableFuture.completedFuture(null) : task;
-	    }
-	
+			return task == null ? CompletableFuture.completedFuture(null) : task;
+		}
 
 		@Override
 		protected CompletableFuture<InvokeResponse> onInvokeActivity(TurnContext turnContext) {
-			
+
 			System.out.println("helo");
-			
+
 			logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
 			logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
 			logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
@@ -423,45 +484,87 @@ public class EchoBot extends TeamsActivityHandler {
 			logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
 			logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
 			logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
-			
+
 			logger.info("getActivityId=> " + turnContext.getActivity().getId());
 			logger.info("getActivityName=> " + turnContext.getActivity().getName());
-			
-			logger.info("getActivity().getConversation().getAadObjectId()=> " + turnContext.getActivity().getConversation().getAadObjectId());
+
+			logger.info("getActivity().getConversation().getAadObjectId()=> "
+					+ turnContext.getActivity().getConversation().getAadObjectId());
+
+			String ChatId = turnContext.getActivity().getConversation().getId();
+
+			Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
 
 			Attachment cardAttachment = null;
+			Attachment updatetriggerAttachment = null;
+			
 			if (turnContext.getActivity().getValue() != null) {
+				
 				LinkedHashMap botResponseMap = (LinkedHashMap) turnContext.getActivity().getValue();
 				LinkedHashMap actionObj = (LinkedHashMap) botResponseMap.get("action");
 				String triggerClicked = (String) ((Map) actionObj).get("title");
-				cardAttachment = new Attachment();
-				try {
-					cardAttachment.setContent(Serialization
-							.jsonToTree(ticketQualityService.ticketStatusUpdate(triggerClicked, ticket, turnContext)));
-				} catch (IOException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
+
+				if ("CLOSE TICKET".equalsIgnoreCase(triggerClicked)) {
+
+					updatetriggerAttachment = new Attachment();
+					try {
+						updatetriggerAttachment.setContent(Serialization.jsonToTree(ticketService.ButtonHide(tkt,triggerClicked)));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					updatetriggerAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+					Activity newactivity = MessageFactory.attachment(updatetriggerAttachment);
+					newactivity.setId(turnContext.getActivity().getReplyToId());
+					CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+					System.out.println(resourceresponse);
+					
+				} else if ("ESCALATE".equalsIgnoreCase(triggerClicked)) {
+
+					updatetriggerAttachment = new Attachment();
+					try {
+						updatetriggerAttachment.setContent(Serialization.jsonToTree(ticketService.ButtonHide(tkt,triggerClicked)));
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					updatetriggerAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+					Activity newactivity = MessageFactory.attachment(updatetriggerAttachment);
+					newactivity.setId(turnContext.getActivity().getReplyToId());
+					CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+					System.out.println(resourceresponse);
+
+				}
+
+				String feedback = ticketQualityService.ticketStatusUpdate(triggerClicked, ticket, turnContext);
+				if (feedback != null) {
+					cardAttachment = new Attachment();
+					try {
+
+						cardAttachment.setContent(Serialization.jsonToTree(feedback));
+						cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+						Activity activity = MessageFactory.attachment(cardAttachment);
+						// activity.setId(turnContext.getActivity().getReplyToId());
+						// turnContext.updateActivity(activity);
+
+						logger.info(turnContext.getActivity().getChannelData().toString());
+
+						turnContext.sendActivity(activity).thenApply(sendResult -> null);
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+
 				}
 
 			}
 
-			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
-			Activity activity = MessageFactory.attachment(cardAttachment);
-			// activity.setId(turnContext.getActivity().getReplyToId());
-			// turnContext.updateActivity(activity);
-
-			logger.info(turnContext.getActivity().getChannelData().toString());
-			
-		
-
-			return turnContext.sendActivity(activity).thenApply(sendResult -> null);
+			return CompletableFuture.completedFuture(null);
 			// String triggerClicked = (String) ((Map)
 			// botResponseMap).get("ActionResponse");
 			// return CompletableFuture.completedFuture(null);
 		}
-	 
 	
-
 		@Override
 		protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(TurnContext turnContextt,
 				AppBasedLinkQuery query) {
@@ -490,17 +593,50 @@ public class EchoBot extends TeamsActivityHandler {
 
 		}
 
-	@Override
-	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+		@Override
+		protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
 
-		System.out.println("user getAadObjectId => " + membersAdded.get(0).getAadObjectId());
-		System.out.println("user getId => " + membersAdded.get(0).getId());
+			System.out.println("user getAadObjectId => " + membersAdded.get(0).getAadObjectId());
+			System.out.println("user getId => " + membersAdded.get(0).getId());
+			System.out.println("onMembersAdded");
+			String ChatId = turnContext.getActivity().getConversation().getId();
 
-		return membersAdded.stream()
-				.filter(member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
-				.map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
-				.collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
-	}
+			Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
+
+			Attachment cardAttachment = new Attachment();
+			try {
+				// cardAttachment.setContent(Serialization.jsonToTree(Department));
+				cardAttachment
+						.setContent(Serialization.jsonToTree(ticketService.SendChatInitialMessage(turnContext, tkt)));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+			Activity activity = MessageFactory.attachment(cardAttachment);
+			logger.info(turnContext.getActivity().getChannelData().toString());
+
+			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
+
+			try {
+				ResourceResponse rr = resourceresponse.get();
+
+				// we need to update ticket with turncontext and welcomemessage status
+
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (ExecutionException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+
+			return membersAdded.stream().filter(
+					member -> !StringUtils.equals(member.getId(), turnContext.getActivity().getRecipient().getId()))
+					.map(channel -> turnContext.sendActivity(MessageFactory.text("Hello and welcome!")))
+					.collect(CompletableFutures.toFutureList()).thenApply(resourceResponses -> null);
+		}
 	// user method
 	private Attachment createAdaptiveCardAttachment() throws URISyntaxException, IOException {
 
@@ -525,10 +661,44 @@ public class EchoBot extends TeamsActivityHandler {
 		}
 	}
 	
-	
 	@Override
 	protected CompletableFuture<Void> onConversationUpdateActivity(TurnContext turnContext) {
+
+		System.out.println(turnContext.getActivity().getMembersRemoved());
 		System.out.println("onConversationUpdateActivity");
+		String ChatId = turnContext.getActivity().getConversation().getId();
+
+		Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
+
+		Attachment cardAttachment = new Attachment();
+		try {
+			// cardAttachment.setContent(Serialization.jsonToTree(Department));
+			cardAttachment.setContent(Serialization.jsonToTree(ticketService.SendChatInitialMessage(turnContext, tkt)));
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+		cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+		Activity activity = MessageFactory.attachment(cardAttachment);
+		logger.info(turnContext.getActivity().getChannelData().toString());
+
+		CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
+
+		try {
+			ResourceResponse rr = resourceresponse.get();
+
+			System.out.println(rr.getId());
+			// we need to update ticket with turncontext and welcomemessage status
+
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (ExecutionException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		return CompletableFuture.completedFuture(null);
 
 	}
@@ -546,17 +716,14 @@ public class EchoBot extends TeamsActivityHandler {
 		System.out.println("onMembersRemoved");
 		return CompletableFuture.completedFuture(null);
 	}
-	  
 
 	  
 	
-	  
 	@Override
 	protected CompletableFuture<Void> onEventActivity(TurnContext turnContext) {
 		System.out.println("onEventActivity");
 		return CompletableFuture.completedFuture(null);
 	}
-	  
 
 	  
 	@Override
@@ -964,12 +1131,54 @@ public class EchoBot extends TeamsActivityHandler {
 
 				}
 				
-				@Override
-				protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
+			
+				
+				protected CompletableFuture<Void> checkonMessageActivity(TurnContext turnContext) {
 					
+					System.out.println(turnContext.getActivity().teamsGetTeamInfo().getId());
 					
 					final GraphServiceClient<Request> graphClient=	AuthenticationService.getInstance();
+					
+		
+					//19:eca7f96d290345839c15dd17c90c6188@thread.v2
+					
+					
+					//be35539f-1ca1-442b-b609-e3c6a4af7104 srikanth sir
+					
+					// husen@kgmerp.onmicrosoft.com
+					//8b42a2ad-56cd-4bad-9d80-70ec4e26b8fc app id 
+					//e1b93005-1542-459b-b628-b060441097a7
+					
+					AadUserConversationMember members2 = new AadUserConversationMember();
+					LinkedList<String> rolesList2 = new LinkedList<String>();
+					rolesList2.add("owner");
+					members2.roles = rolesList2;
+					members2.additionalDataManager().put("user@odata.bind",
+							new JsonPrimitive("https://graph.microsoft.com/v1.0/users('be35539f-1ca1-442b-b609-e3c6a4af7104')"));
+					members2.additionalDataManager().put("@odata.type",
+							new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+					//graphClient.chats("19:ba85d447b1b54e2e985acbbbddb8ee6c@thread.v2").members().buildRequest().post(members2);
+					
+					
+					/*
+					 * POST https://graph.microsoft.com/v1.0/users/{user-id}/teamwork/installedApps
+					 * Content-Type: application/json
+					 * 
+					 * { "teamsApp@odata.bind" :
+					 * "https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/{teamsAppId}" }
+					 */
+					// 1dd4d81c-d6c2-4c24-829c-a7e4e93daff0
+					//e1d4c9c7-bf4c-45d0-9b89-8cf9b3385355
+					
+					TeamsAppInstallation teamsAppInstallation = new TeamsAppInstallation();
+					teamsAppInstallation.additionalDataManager().put("teamsApp@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e1d4c9c7-bf4c-45d0-9b89-8cf9b3385355"));
+
+					graphClient.chats("19:31a22228c75443e69e44631081ff47d6@thread.v2").installedApps().buildRequest().post(teamsAppInstallation);
+
+					
+					
 					String json=null;
+					String json100=null;
 					AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 					List<Container> conlist = new ArrayList<>();
 					List<ActionSet> actList = new ArrayList<>();
@@ -1070,19 +1279,14 @@ public class EchoBot extends TeamsActivityHandler {
 				action.setType("Action.Submit");
 				action.setTitle("Call Java"); // action.setId("http_request"); 
 				MsTeams msteams = new MsTeams();
-				msteams.setType("signin");
-				msteams.setValue("https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
+				//msteams.setType("signin");
+				//msteams.setValue("https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
 
 				ActionData data = new ActionData();
 				data.setMsteams(msteams);
 				data.setExtraData("(this will be ignored)");
 				action.setData(data);
 						 
-					  
-					
-					
-					
-				
 					/*
 					 * { "type": "Action.Submit", "title": "Click me for signin", 
 					 * "data": {
@@ -1139,7 +1343,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 					ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 					try {
-						json = ow.writeValueAsString(adcard);
+						json100 = ow.writeValueAsString(adcard);
 					} catch (JsonProcessingException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1147,7 +1351,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 					cardAttachment = new Attachment();
 					try {
-						cardAttachment.setContent(Serialization.jsonToTree(json));
+						cardAttachment.setContent(Serialization.jsonToTree(json100));
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
@@ -1371,25 +1575,6 @@ public class EchoBot extends TeamsActivityHandler {
 							+ "    \"padding\": \"None\"\n"
 							+ "}";
 					
-					ChatMessage chatMessage = new ChatMessage();
-					chatMessage.subject = null;
-					ItemBody body = new ItemBody();
-					body.contentType = BodyType.HTML;
-					body.content = "<attachment id=\"74d20c7f34aa4a7fb74e2b30004247c5\"></attachment>";
-					chatMessage.body = body;
-					LinkedList<ChatMessageAttachment> attachmentsList = new LinkedList<ChatMessageAttachment>();
-					ChatMessageAttachment attachments = new ChatMessageAttachment();
-					attachments.id = "74d20c7f34aa4a7fb74e2b30004247c5";
-					
-					attachments.contentType = "application/vnd.microsoft.card.adaptive";
-					attachments.contentUrl = null;
-					attachments.content = json;
-					attachments.name = null;
-					attachments.thumbnailUrl = null;
-					attachmentsList.add(attachments);
-					chatMessage.attachments = attachmentsList;
-					graphClient.chats("19:f5835314d2ee4193bf1222771de863a9@thread.v2").messages().buildRequest().post(chatMessage);
-					
 				
 					
 					//attachments.contentType = "application/vnd.microsoft.card.thumbnail";
@@ -1404,11 +1589,118 @@ public class EchoBot extends TeamsActivityHandler {
 					//graphClient.chats("").messages().buildRequest().post(chatMessage);
 					
 					
+
+					
+
+					AdaptiveCardsRequest adcard1 = new AdaptiveCardsRequest();
+					List<Container> conlist1 = new ArrayList<>();
+					List<ActionSet> actList1 = new ArrayList<>();
+
+				
+
+					Container con1 = new Container();
+					con1.setType("Container");
+					Item it11 = new Item();
+					it11.setType("TextBlock");
+					it11.setText("Ticket # is CLOSED");
+					it11.setWeight("bolder");
+					it11.setSize("medium");
+					it11.setWrap(true);
+					it11.setColor("Attention");
+					ArrayList<Item> item1 = new ArrayList<>();
+					item1.add(it11);
+					con1.setItems(item1);
+					conlist1.add(con1);
+					
+	
+					
+					
+					Container con5 = new Container();
+					con5.setType("Container");
+
+					Item it5 = new Item();
+					it5.setType("TextBlock");
+					it5.setText("Default rating of 5 will be posted if feedback is not provided with in 1 hour");
+					it5.setWeight("bolder");
+					it5.setSize("medium");
+					it5.setWrap(true);
+
+					ArrayList<Item> item5 = new ArrayList<>();
+					item5.add(it5);
+					con5.setItems(item5);
+					
+					conlist1.add(con5);
+					
+					
+					Container con6 = new Container();
+					con6.setType("TextBlock");
+					con6.setText("Remarks");
+					con6.setWeight("bolder");
+					con6.setSize("medium");
+			
+					conlist1.add(con6);
+					
+					Container con7 = new Container();
+					con7.setType("Input.Text");
+					con7.setId("Remarks");
+					con7.setPlaceholder("enter text here");
+					con7.setMaxLength("500");
+					con7.setIsMultiline(true);
+					
+					conlist1.add(con7);
+
+					adcard1.setBody(conlist1);
+
+					ActionSet action1 = new ActionSet();
+					action1.setType("Action.Submit");
+					action1.setTitle("Done");
+
+					actList1.add(action1);
+
+					adcard1.setActions(actList1);
+					
+					
+					ObjectWriter ow1 = new ObjectMapper().writer().withDefaultPrettyPrinter();
+					try {
+						json = ow1.writeValueAsString(adcard1);
+					} catch (JsonProcessingException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					
+					/*
+					 * ChatMessage chatMessage = new ChatMessage(); chatMessage.subject = null;
+					 * ItemBody body = new ItemBody(); body.contentType = BodyType.HTML;
+					 * body.content =
+					 * "<attachment id=\"74d20c7f34aa4a7fb74e2b30004247c5\"></attachment>";
+					 * chatMessage.body = body; LinkedList<ChatMessageAttachment> attachmentsList =
+					 * new LinkedList<ChatMessageAttachment>(); ChatMessageAttachment attachments =
+					 * new ChatMessageAttachment(); attachments.id =
+					 * "74d20c7f34aa4a7fb74e2b30004247c5";
+					 * 
+					 * attachments.contentType = "application/vnd.microsoft.card.adaptive";
+					 * attachments.contentUrl = null; attachments.content = json100;
+					 * attachments.name = null; attachments.thumbnailUrl = null;
+					 * attachmentsList.add(attachments); chatMessage.attachments = attachmentsList;
+					 * 
+					 * 
+					 * graphClient.chats("19:eca7f96d290345839c15dd17c90c6188@thread.v2").messages()
+					 * .buildRequest().post(chatMessage);
+					 */
+
+					/*
+					 * graphClient.teams("fbe2bf47-16c8-47cf-b4a5-4b9b187c508b")
+					 * .channels("19:4a95f7d8db4c4e7fae857bcebe0623e6@thread.tacv2").messages().
+					 * buildRequest() .post(chatMessage1);
+					 */
+					
+					
 					cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 					Activity activity = MessageFactory.attachment(cardAttachment);
 					turnContext.sendActivity(activity);
 				//	processTurnContext(turnContext);
-
+					
+					
 					// return turnContext.sendActivity(activity).th
 					return CompletableFuture.completedFuture(null);
 					// return turnContext.sendActivity(activity).thenApply(sendResult -> null);

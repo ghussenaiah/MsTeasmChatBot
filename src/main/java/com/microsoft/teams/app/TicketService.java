@@ -12,6 +12,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import com.microsoft.bot.builder.TurnContext;
+import com.microsoft.graph.models.TeamsAppInstallation;
+import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.teams.app.entity.ActionData;
 import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.Actionfallback;
@@ -30,9 +32,13 @@ import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.microsoft.teams.app.service.impl.TicketImpl;
 import com.microsoft.teams.app.utility.Utility;
+
+import okhttp3.Request;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper; 
-import com.fasterxml.jackson.databind.ObjectWriter; 
+import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.JsonPrimitive;
 import com.microsoft.teams.app.repository.DepartmentRepo;
 
 @Component
@@ -49,6 +55,9 @@ public class TicketService {
 	
 	@Autowired
 	TicketRepo ticketRepo;
+	
+	
+	
 	
 	@Autowired
 	AutoGenerationRepo autoGenerationRepo;
@@ -116,15 +125,74 @@ public class TicketService {
 		if (tkt != null) {
 			tkt.setSupportId(supportTypeId);
 		} 
+	
+		return TicketAdaptiveCard("","");
+	
+		
 
+
+		/*
+		 * AdaptiveCardsRequest adcard = new AdaptiveCardsRequest(); List<Container>
+		 * conlist = new ArrayList<>(); List<ActionSet> actList = new ArrayList<>();
+		 * 
+		 * MsTeams mst=new MsTeams(); mst.setWidth("full");
+		 * 
+		 * adcard.setMsTeams(mst);
+		 * 
+		 * String json = null;
+		 * 
+		 * Container con = new Container(); con.setType("TextBlock");
+		 * con.setText("One line description of issue (Ticket Title)");
+		 * con.setWeight("bolder"); con.setSize("medium");
+		 * 
+		 * Container con2 = new Container(); con2.setType("Input.Text");
+		 * con2.setId("IssueTitle"); con2.setPlaceholder("enter text here");
+		 * //con2.setMaxLength("500");
+		 * 
+		 * 
+		 * Container con3 = new Container(); con3.setType("TextBlock");
+		 * con3.setText("Detailed description of issue"); con3.setWeight("bolder");
+		 * con3.setSize("medium");
+		 * 
+		 * Container con4 = new Container(); con4.setType("Input.Text");
+		 * con4.setId("IssueDescription"); con4.setPlaceholder("enter text here");
+		 * //con4.setMaxLength("1000"); con4.setIsMultiline(true);
+		 * 
+		 * conlist.add(con); conlist.add(con2); conlist.add(con3); conlist.add(con4);
+		 * 
+		 * adcard.setBody(conlist);
+		 * 
+		 * ActionSet action = new ActionSet(); action.setType("Action.Submit");
+		 * action.setTitle("OK");
+		 * 
+		 * actList.add(action);
+		 * 
+		 * adcard.setActions(actList);
+		 * 
+		 * 
+		 * 
+		 * // ============= create ticket Json structure done =======================
+		 * 
+		 * ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter(); try
+		 * { json = ow.writeValueAsString(adcard); } catch (JsonProcessingException e) {
+		 * // TODO Auto-generated catch block e.printStackTrace(); }
+		 * 
+		 * return json;
+		 * 
+		 */
+
+	}
+	
+	
+	public String TicketAdaptiveCard(String issueTitle, String issueDescription) {
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 		List<Container> conlist = new ArrayList<>();
 		List<ActionSet> actList = new ArrayList<>();
-		
-		MsTeams mst=new MsTeams();
+
+		MsTeams mst = new MsTeams();
 		mst.setWidth("full");
-		
+
 		adcard.setMsTeams(mst);
 
 		String json = null;
@@ -134,45 +202,51 @@ public class TicketService {
 		con.setText("One line description of issue (Ticket Title)");
 		con.setWeight("bolder");
 		con.setSize("medium");
-		
+
 		Container con2 = new Container();
 		con2.setType("Input.Text");
 		con2.setId("IssueTitle");
-		con2.setPlaceholder("enter text here");
-		//con2.setMaxLength("500");
-		
-		
+
+		if (issueTitle != null && !issueTitle.isEmpty()) {
+			con2.setValue(issueTitle);
+
+		} else {
+			con2.setPlaceholder("enter text here");
+			ActionSet action = new ActionSet();
+			action.setType("Action.Submit");
+			action.setTitle("OK");
+
+			actList.add(action);
+
+			adcard.setActions(actList);
+		}
+
+		// con2.setMaxLength("500");
+
 		Container con3 = new Container();
 		con3.setType("TextBlock");
 		con3.setText("Detailed description of issue");
 		con3.setWeight("bolder");
 		con3.setSize("medium");
-		
+
 		Container con4 = new Container();
 		con4.setType("Input.Text");
 		con4.setId("IssueDescription");
-		con4.setPlaceholder("enter text here");
-		//con4.setMaxLength("1000");
+
+		if (issueDescription != null && !issueDescription.isEmpty()) {
+			con4.setValue(issueDescription);
+		} else {
+			con4.setPlaceholder("enter text here");
+		}
+		// con4.setMaxLength("1000");
 		con4.setIsMultiline(true);
-		
+
 		conlist.add(con);
 		conlist.add(con2);
 		conlist.add(con3);
 		conlist.add(con4);
 
 		adcard.setBody(conlist);
-
-		ActionSet action = new ActionSet();
-		action.setType("Action.Submit");
-		action.setTitle("OK");
-
-		actList.add(action);
-
-		adcard.setActions(actList);
-		
-		
-
-		// ============= create ticket Json structure done =======================
 
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		try {
@@ -181,14 +255,7 @@ public class TicketService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
 		return json;
-
-		/*
-		 * List<Department_23> departmentList = departmentImpl.findAll();
-		 * System.out.println(departmentList);
-		 */
-
 	}
 
 	public String createTicket(LinkedHashMap botResponseMap, ConcurrentHashMap<String, Ticket_296> ticket,
@@ -242,7 +309,9 @@ public class TicketService {
 
 			Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
 			
-			String chatUrl=ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,dep.get().getDeptName());
+			final GraphServiceClient<Request> graphClient=	AuthenticationService.getInstance();
+			
+			String chatUrl=ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,dep.get().getDeptName(), graphClient);
 
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 			List<Container> conlist = new ArrayList<>();
@@ -295,6 +364,8 @@ public class TicketService {
 			action.setTitle("Open New Chat");
 			action.setUrl(chatUrl);
 
+			
+			
 			/*
 			 * ActionSet action = new ActionSet(); action.setType("Action.Execute");
 			 * action.setTitle("CLOSE TICKET"); action.setVerb("personalDetailsFormSubmit");
@@ -338,7 +409,214 @@ public class TicketService {
 		return json;
 
 	}
+	
+	
+	
+	public String SendChatInitialMessage(TurnContext turnContext,Ticket_296 tkt) {
+
+		String json = null;
+
+		Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+
+		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		List<Container> conlist = new ArrayList<>();
+		List<ActionSet> actList = new ArrayList<>();
+
+		Container con = new Container();
+		con.setType("Container");
+
+		Item it1 = new Item();
+		it1.setType("TextBlock");
+		// body.content = "<br/><strong>Hello All, New chat group created with ticket
+		// #".concat(tkt.getTicketNumber())+" !! for discussion
+		// </strong><br/><strong>Issue Details :
+		// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
+		// added to this Chat Group</strong>";
+		it1.setText("Hello All, New chat group created with ticket #" + (tkt.getTicketNumber()) + " !! for discussion");
+		it1.setWeight("bolder");
+		it1.setSize("medium");
+		it1.setWrap(true);
+
+		ArrayList<Item> item = new ArrayList<>();
+		item.add(it1);
+		con.setItems(item);
+
+		conlist.add(con);
+
+		Container con2 = new Container();
+		con2.setType("Container");
+
+		Item it2 = new Item();
+		it2.setType("TextBlock");
+		it2.setText("Issue Details : " + tkt.getDescription() + "" + dep.get().getDeptName()+ "Department people were added to this Chat Group");
+		it2.setWeight("bolder");
+		it2.setSize("medium");
+		it2.setWrap(true);
+
+		ArrayList<Item> itemList2 = new ArrayList<>();
+		itemList2.add(it2);
+		con2.setItems(itemList2);
+
+		conlist.add(con2);
+
+		/*
+		 * Container con3 = new Container(); con3.setType("TextBlock");
+		 * con3.setText("They will revert back to you soon."); con3.setWeight("bolder");
+		 * con3.setSize("medium");
+		 * 
+		 * conlist.add(con3);
+		 */
+
+		adcard.setBody(conlist);
+
+		ActionSet action = new ActionSet();
+		action.setType("Action.Execute");
+		action.setTitle("CLOSE TICKET");
+		action.setVerb("personalDetailsFormSubmit");
+		action.setId("ReplyYes");
+
+		ActionData ad = new ActionData();
+		ad.setKey1(true);
+		ad.setKey2("okay");
+
+		Actionfallback af = new Actionfallback();
+		af.setType("Action.Submit");
+		af.setTitle("CLOSE TICKET");
+
+		action.setData(ad);
+		action.setFallback(af);
+
+		ActionSet action2 = new ActionSet();
+		action2.setType("Action.Execute");
+		action2.setTitle("ESCALATE");
+		action2.setVerb("personalDetailsFormSubmit");
+		action2.setId("ReplyNo");
+
+		ActionData ad2 = new ActionData();
+		ad2.setKey1(true);
+		ad2.setKey2("okay");
+
+		Actionfallback af2 = new Actionfallback();
+		af2.setType("Action.Submit");
+		af2.setTitle("ESCALATE");
+
+		action2.setData(ad2);
+		action2.setFallback(af2);
+
+		actList.add(action);
+		actList.add(action2);
 		
+		adcard.setActions(actList);
+
+		// ============= create ticket Json structure done =======================
+
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		try {
+			json = ow.writeValueAsString(adcard);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
+
+	}
+	
+	public String ButtonHide(Ticket_296 tkt,String triggerClicked) {
+	 
+	
+		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		List<Container> conlist = new ArrayList<>();
+		List<ActionSet> actList = new ArrayList<>();
+		
+		Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+		
+		String json=null;
+
+		Container con = new Container();
+		con.setType("Container");
+
+		Item it1 = new Item();
+		it1.setType("TextBlock");
+		// body.content = "<br/><strong>Hello All, New chat group created with ticket
+		// #".concat(tkt.getTicketNumber())+" !! for discussion
+		// </strong><br/><strong>Issue Details :
+		// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
+		// added to this Chat Group</strong>";
+		it1.setText("Hello All, New chat group created with ticket #" + (tkt.getTicketNumber()) + " !! for discussion");
+		it1.setWeight("bolder");
+		it1.setSize("medium");
+		it1.setWrap(true);
+
+		ArrayList<Item> item = new ArrayList<>();
+		item.add(it1);
+		con.setItems(item);
+
+		conlist.add(con);
+
+		Container con2 = new Container();
+		con2.setType("Container");
+
+		Item it2 = new Item();
+		it2.setType("TextBlock");
+		it2.setText("Issue Details : " + tkt.getDescription() + "" + dep.get().getDeptName()+ "Department people were added to this Chat Group");
+		it2.setWeight("bolder");
+		it2.setSize("medium");
+		it2.setWrap(true);
+
+		ArrayList<Item> itemList2 = new ArrayList<>();
+		itemList2.add(it2);
+		con2.setItems(itemList2);
+
+		conlist.add(con2);
+
+		/*
+		 * Container con3 = new Container(); con3.setType("TextBlock");
+		 * con3.setText("They will revert back to you soon."); con3.setWeight("bolder");
+		 * con3.setSize("medium");
+		 * 
+		 * conlist.add(con3);
+		 */
+
+		adcard.setBody(conlist);
+		
+		if ("ESCALATE".equalsIgnoreCase(triggerClicked)) {
+
+			ActionSet action = new ActionSet();
+			action.setType("Action.Execute");
+			action.setTitle("CLOSE TICKET");
+			action.setVerb("personalDetailsFormSubmit");
+			action.setId("ReplyYes");
+
+			ActionData ad = new ActionData();
+			ad.setKey1(true);
+			ad.setKey2("okay");
+
+			Actionfallback af = new Actionfallback();
+			af.setType("Action.Submit");
+			af.setTitle("CLOSE TICKET");
+
+			action.setData(ad);
+			action.setFallback(af);
+
+			actList.add(action);
+
+			adcard.setActions(actList);
+
+		}
+	
+
+		// ============= create ticket Json structure done =======================
+
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		try {
+			json = ow.writeValueAsString(adcard);
+		} catch (JsonProcessingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return json;
+		
+	}
 	
 	
 	

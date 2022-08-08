@@ -12,9 +12,8 @@ import com.microsoft.graph.requests.GraphServiceClient;
 
 import okhttp3.Request;
 
-
 public class AuthenticationService {
-  
+
 	private static GraphServiceClient<Request> graphClient = null;
 
 	public static GraphServiceClient<Request> getInstance() {
@@ -30,11 +29,10 @@ public class AuthenticationService {
 		}
 		return graphClient;
 	}
-	
-	
+
 	@Scheduled(cron = "*/50 * * * *")
 	public void currentTime() throws Exception {
 		graphClient = null;
 	}
-	
+
 }

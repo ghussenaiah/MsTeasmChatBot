@@ -36,7 +36,6 @@ public class SupportImpl  implements SupportRepo{
 
 	@Override
 	public List<Support_298> findAllById(Iterable<String> ids) {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -102,8 +101,7 @@ public class SupportImpl  implements SupportRepo{
 
 	@Override
 	public Optional<Support_298> findById(String id) {
-		// TODO Auto-generated method stub
-		return null;
+		return supportRepo.findById(id);
 	}
 
 	@Override
