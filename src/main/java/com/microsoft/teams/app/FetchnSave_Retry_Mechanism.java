@@ -91,7 +91,7 @@ public class FetchnSave_Retry_Mechanism {
 	//@Scheduled(cron = "*/1 * * * * *")
 	
 	//@Scheduled(cron = "0 * * ? * *")
-   // @Scheduled(cron = "*/1 * * * * *")
+    @Scheduled(cron = "*/1 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
 		 updateTeamsMsgToDatabase();
@@ -229,7 +229,7 @@ public class FetchnSave_Retry_Mechanism {
 										String date = message.createdDateTime.format(customFormatter);
 										chatNumber = chatNumber + 1;
 										updateRecordToDatabase(chatId, fileMap.get("fileName"), fromuser, messgeId, date, tkt.getId(),
-												fileMap.get("ImportedfileId"), chatNumber, lastNumberObj);
+												fileMap.get("fileId"), chatNumber, lastNumberObj);
 
 										// https://kgmerp-my.sharepoint.com/personal/admin_kgmerp_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/apache-jmeter-5.5.zip
 

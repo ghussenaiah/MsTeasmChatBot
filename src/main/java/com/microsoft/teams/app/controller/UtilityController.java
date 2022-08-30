@@ -34,7 +34,7 @@ import com.microsoft.teams.app.entity.AdpCardRequest;
 // In this class, we have left the caching approach for tutorial simplicity.
 // If users which they can enable caching in this application.
 @RestController
-@RequestMapping(value = "/api/redis/employee")
+@RequestMapping(value = "/api")
 public class UtilityController {
  
     private static final Logger log = LoggerFactory.getLogger(UtilityController.class);
@@ -71,6 +71,12 @@ public class UtilityController {
 		log.info("Fetching employee from the redis.%s", comment.getComment());
 		System.out.println("comment is " + comment.getComment());
 		return "Hello " + comment;
+	}
+	
+	
+	@RequestMapping("/getHello")
+	public String getHello() {
+		return "Hello ";
 	}
 	 
  

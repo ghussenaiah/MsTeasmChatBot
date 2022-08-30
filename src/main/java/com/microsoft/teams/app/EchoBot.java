@@ -145,8 +145,6 @@ public class EchoBot extends TeamsActivityHandler {
 	@Autowired
 	SupportService supportService;
 	
-
-	
 	@Autowired
 	DepartmentService depService;
 	
@@ -184,9 +182,7 @@ public class EchoBot extends TeamsActivityHandler {
 	 * }
 	 */
 	 
-	 
-
-	    // user method
+	 	// user method
 		@Override
 		protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
 
