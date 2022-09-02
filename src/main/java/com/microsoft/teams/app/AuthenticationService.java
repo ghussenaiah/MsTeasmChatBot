@@ -5,6 +5,8 @@ import javax.annotation.PostConstruct;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.azure.identity.ClientSecretCredential;
+import com.azure.identity.ClientSecretCredentialBuilder;
 import com.azure.identity.UsernamePasswordCredential;
 import com.azure.identity.UsernamePasswordCredentialBuilder;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
@@ -18,17 +20,32 @@ public class AuthenticationService {
 
 	public static GraphServiceClient<Request> getInstance() {
 		if (graphClient == null) {
-			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
-					.clientId("bccaebb1-43bd-49fa-aa3e-6e8b48037100").username("admin@kgmerp.onmicrosoft.com")
-					.password("Kgm@123$").build();
+			final ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder().clientId("")
+					.clientSecret("").tenantId("").build();
+
 			final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
-					usernamePasswordCredential);
+					clientSecretCredential);
 
 			graphClient = GraphServiceClient.builder().authenticationProvider(tokenCredentialAuthProvider)
 					.buildClient();
 		}
 		return graphClient;
 	}
+	
+	/* working code for username and pasword
+	 * public static GraphServiceClient<Request> getInstance() { if (graphClient ==
+	 * null) { final UsernamePasswordCredential usernamePasswordCredential = new
+	 * UsernamePasswordCredentialBuilder()
+	 * .clientId("bccaebb1-43bd-49fa-aa3e-6e8b48037100").username(
+	 * "admin@kgmerp.onmicrosoft.com") .password("Kgm@123$").build(); final
+	 * TokenCredentialAuthProvider tokenCredentialAuthProvider = new
+	 * TokenCredentialAuthProvider( usernamePasswordCredential);
+	 * 
+	 * graphClient = GraphServiceClient.builder().authenticationProvider(
+	 * tokenCredentialAuthProvider) .buildClient(); } return graphClient; }
+	 */
+	
+
 
 	@Scheduled(cron = "*/50 * * * *")
 	public void currentTime() throws Exception {
