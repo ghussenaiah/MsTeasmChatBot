@@ -11,26 +11,23 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Component;
 
 import com.microsoft.teams.app.entity.Support_298;
-import com.microsoft.teams.app.repository.DepartmentRepo;
 import com.microsoft.teams.app.repository.SupportRepo;
 
-
-
 @Component
-public class SupportImpl  implements SupportRepo{
-	
+public class SupportImpl implements SupportRepo {
+
 	@Autowired
 	SupportRepo supportRepo;
 
 	@Override
 	public List<Support_298> findAll() {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
 	@Override
 	public List<Support_298> findAll(Sort sort) {
-		// TODO Auto-generated method stub
+
 		return null;
 	}
 
@@ -48,7 +45,7 @@ public class SupportImpl  implements SupportRepo{
 	@Override
 	public void flush() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -60,13 +57,13 @@ public class SupportImpl  implements SupportRepo{
 	@Override
 	public void deleteInBatch(Iterable<Support_298> entities) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteAllInBatch() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -119,25 +116,25 @@ public class SupportImpl  implements SupportRepo{
 	@Override
 	public void deleteById(String id) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void delete(Support_298 entity) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteAll(Iterable<? extends Support_298> entities) {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
 	public void deleteAll() {
 		// TODO Auto-generated method stub
-		
+
 	}
 
 	@Override
@@ -169,5 +166,4 @@ public class SupportImpl  implements SupportRepo{
 		return supportRepo.findAllByDepartmentId(departmentId);
 	}
 
-	
 }

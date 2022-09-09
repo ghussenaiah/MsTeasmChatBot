@@ -1,26 +1,21 @@
 package com.microsoft.teams.app;
 
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.azure.identity.UsernamePasswordCredential;
-import com.azure.identity.UsernamePasswordCredentialBuilder;
-import com.microsoft.bot.schema.Attachment;
-import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.models.ChatMessage;
 import com.microsoft.graph.models.ChatMessageAttachment;
-import com.microsoft.graph.models.ChatMessageHostedContent;
+
 import com.microsoft.graph.models.Drive;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
-import com.microsoft.graph.requests.ChatMessageHostedContentCollectionPage;
-import com.microsoft.graph.requests.DriveCollectionRequestBuilder;
+
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
@@ -31,34 +26,30 @@ import com.microsoft.teams.app.repository.TicketRepo;
 
 import okhttp3.Request;
 
-import java.io.BufferedInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.MalformedURLException;
+
 import java.net.URL;
-import java.nio.channels.Channels;
-import java.nio.channels.ReadableByteChannel;
-import java.sql.Types;
+
 import java.text.SimpleDateFormat;
 import java.time.Instant;
-import java.time.LocalDate;
+
 import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
-import java.util.Calendar;
+
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
+import javax.annotation.PostConstruct;
 import javax.transaction.Transactional;
 import com.microsoft.teams.app.entity.DocumentModel;
 import com.microsoft.teams.app.service.impl.DocumentServiceModel;
 import org.apache.commons.lang3.StringUtils;
+import com.microsoft.teams.app.repository.UserRepository;
+import com.microsoft.teams.app.entity.User;
 
 @Component
 public class FetchnSave_Retry_Mechanism {
@@ -68,9 +59,9 @@ public class FetchnSave_Retry_Mechanism {
 
 	@Autowired
 	JdbcTemplate jdbcTemplate;
-	
-	//@Autowired
-	//AuthenticationService authService;
+
+	// @Autowired
+	// AuthenticationService authService;
 
 	@Autowired
 	AutoGenerationRepo autoGenerationRepo;
@@ -81,21 +72,38 @@ public class FetchnSave_Retry_Mechanism {
 	@Autowired
 	DocumentServiceModel documentservicemodel;
 
-	FetchnSave_Retry_Mechanism() {
+	@Autowired
+	UserRepository userRepo;
 
-	}
-// * * * * *  every one minutes 
-// 	*/1 * * * * *  every second
+	
+	/*
+	 * @PostConstruct public void testcodeHere() {
+	 * 
+	 * // List<User> userList = userRepo.findAllByDepartmentId("sfarm_cloud_env_9");
+	 * 
+	 * List<User> userList = userRepo.findAll("sfarm_cloud_env_9");
+	 * 
+	 * //userRepo.findAllByDepartmentIdAndRoleName(null)
+	 * 
+	 * for (int i = 0; i < userList.size(); i++) {
+	 * 
+	 * System.out.println(userList.get(0).getTeamsId());
+	 * 
+	 * } }
+	 */
+	 
+	// * * * * * every one minutes
+	// */1 * * * * * every second
 	// * * * * * *
-	
+
+	// @Scheduled(cron = "*/1 * * * * *")
+
+	// @Scheduled(cron = "0 * * ? * *")
 	//@Scheduled(cron = "*/1 * * * * *")
-	
-	//@Scheduled(cron = "0 * * ? * *")
-    @Scheduled(cron = "*/1 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
-		 updateTeamsMsgToDatabase();
-		//updateTicketQualityAfter5Hours();
+		updateTeamsMsgToDatabase();
+		// updateTicketQualityAfter5Hours();
 	}
 
 	public synchronized void updateTicketQualityAfter5Hours() throws Exception {
@@ -163,7 +171,7 @@ public class FetchnSave_Retry_Mechanism {
 				List<ChatMessage> mm = messages.getCurrentPage();
 
 				Instant instant = null;
-			    Boolean lastmessageTime=true;
+				Boolean lastmessageTime = true;
 
 				try {
 					for (ChatMessage message : mm) {
@@ -184,7 +192,7 @@ public class FetchnSave_Retry_Mechanism {
 									instant = message.createdDateTime.toInstant();
 									lastmessageTime = false;
 								}
-								
+
 								String date = message.createdDateTime.format(customFormatter);
 								// Date messageDate = (Date) customFormatter.parse(date);
 								String actualmessage = textdata.replaceAll("<[^>]*>", "");
@@ -216,7 +224,7 @@ public class FetchnSave_Retry_Mechanism {
 
 									if (!cmA.contentType.equalsIgnoreCase("application/vnd.microsoft.card.adaptive")) {
 
-										Map<String,String> fileMap = DownloadFileUsingUrl(graphClient, cmA);
+										Map<String, String> fileMap = DownloadFileUsingUrl(graphClient, cmA);
 										System.out.println(cmA);
 										String messgeId = message.id;
 										String chatId = String.valueOf(chatNumber);
@@ -225,10 +233,11 @@ public class FetchnSave_Retry_Mechanism {
 											instant = message.createdDateTime.toInstant();
 											lastmessageTime = false;
 										}
-										
+
 										String date = message.createdDateTime.format(customFormatter);
 										chatNumber = chatNumber + 1;
-										updateRecordToDatabase(chatId, fileMap.get("fileName"), fromuser, messgeId, date, tkt.getId(),
+										updateRecordToDatabase(chatId, fileMap.get("fileName"), fromuser, messgeId,
+												date, tkt.getId(),
 												fileMap.get("fileId"), chatNumber, lastNumberObj);
 
 										// https://kgmerp-my.sharepoint.com/personal/admin_kgmerp_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/apache-jmeter-5.5.zip
@@ -321,7 +330,7 @@ public class FetchnSave_Retry_Mechanism {
 	}
 
 	public void updateRecordToDatabase(String chatId, String actualmessage, String fromuser, String messgeId,
-			String date, String tktId, String fileId,int chatNumber,AutoGenarationCode lastNumberObj) {
+			String date, String tktId, String fileId, int chatNumber, AutoGenarationCode lastNumberObj) {
 		try {
 			if (fileId != null) {
 
@@ -340,20 +349,21 @@ public class FetchnSave_Retry_Mechanism {
 			jdbcTemplate.update("insert into ticket_296__chathistory_299 (ticket_296id, chathistory_299id) VALUES ("
 					+ tktId + "," + chatId + ")");
 		} catch (Exception e) {
-			
+
 			lastNumberObj.setAutoCodeNo(chatNumber);
 			autoGenerationRepo.save(lastNumberObj);
-			
+
 			log.info("Exception while the chat data = {}", e.fillInStackTrace());
 		}
 	}
-	
-	public Map<String,String> DownloadFileUsingUrl(GraphServiceClient<Request> graphClient, ChatMessageAttachment chatMsgAttachment)
+
+	public Map<String, String> DownloadFileUsingUrl(GraphServiceClient<Request> graphClient,
+			ChatMessageAttachment chatMsgAttachment)
 			throws Exception {
 
 		// pending in this method is
-		
-		Map<String,String> fileMap=new HashMap<>();
+
+		Map<String, String> fileMap = new HashMap<>();
 
 		// drive id
 		String fileId = chatMsgAttachment.id;
@@ -395,10 +405,10 @@ public class FetchnSave_Retry_Mechanism {
 				is = crunchifyRobotsURL.openStream();
 				byte[] imageBytes = IOUtils.toByteArray(is);
 
-				 ImportedfileId = uploadDocument(imageBytes, fileExtension, chatMsgAttachment.name);
-				 fileMap.put("fileName", chatMsgAttachment.name);
-				 fileMap.put("fileId", ImportedfileId);
-				 fileMap.put("fileext", fileExtension);
+				ImportedfileId = uploadDocument(imageBytes, fileExtension, chatMsgAttachment.name);
+				fileMap.put("fileName", chatMsgAttachment.name);
+				fileMap.put("fileId", ImportedfileId);
+				fileMap.put("fileext", fileExtension);
 			} catch (IOException e) {
 				System.err.printf("Failed while reading bytes from %s: %s", crunchifyRobotsURL.toExternalForm(),
 						e.getMessage());
@@ -427,12 +437,10 @@ public class FetchnSave_Retry_Mechanism {
 		return fileMap;
 
 	}
-	
 
 	public String uploadDocument(byte[] fileContent, String filetype, String fileName) throws Exception {
 		long timeStamp = new Date().getTime();
 		String docId = String.valueOf(timeStamp);
-	
 
 		if (fileContent != null) {
 			DocumentModel docmodel = new DocumentModel(fileName, filetype, fileContent, docId);

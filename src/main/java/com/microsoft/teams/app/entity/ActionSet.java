@@ -1,7 +1,5 @@
 package com.microsoft.teams.app.entity;
 
-import java.util.ArrayList;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -9,10 +7,8 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 
-
-
 @JsonInclude(Include.NON_NULL)
-@JsonIgnoreProperties(ignoreUnknown=true)
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Getter
 @Setter
 public class ActionSet {
@@ -27,10 +23,9 @@ public class ActionSet {
 	private String method;
 	private String url;
 	private String extraData;
-	
-	
+
 	/*
-	 * {\n" + "      \"type\": \"Action.Execute\",\n" +
+	 * {\n" + " \"type\": \"Action.Execute\",\n" +
 	 * "      \"title\": \"CLOSE TICKET\",\n" +
 	 * "      \"verb\": \"personalDetailsFormSubmit\",\n" +
 	 * "      \"id\": \"surveyReplyYes\",\n" + "      \"userIds\": \"\" ,\n" +

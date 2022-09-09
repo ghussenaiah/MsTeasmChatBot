@@ -3,7 +3,6 @@
 
 package com.microsoft.teams.app;
 
-
 import com.microsoft.bot.builder.Bot;
 import com.microsoft.bot.integration.AdapterWithErrorHandler;
 import com.microsoft.bot.integration.BotFrameworkHttpAdapter;
@@ -11,10 +10,6 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 
-import java.util.Timer;
-import java.util.TimerTask;
-
-import org.springframework.boot.CommandLineRunner;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -28,30 +23,27 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 // Use the default BotController to receive incoming Channel messages. A custom
 // controller could be used by eliminating this import and creating a new
 // org.springframework.web.bind.annotation.RestController.
-// The default controller is created by the Spring Boot container using 
+// The default controller is created by the Spring Boot container using
 // dependency injection. The default route is /api/messages.
-@Import({BotController.class})
-
+@Import({ BotController.class })
 
 @ComponentScan(basePackages = "com.microsoft.teams.app")
 @EnableScheduling
 @EnableTransactionManagement
 public class Application extends BotDependencyConfiguration {
-	
 
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+        System.out.println("Application started");
+    }
 
-	public static void main(String[] args) {
-		SpringApplication.run(Application.class, args);
-		System.out.println("Application started");
-	}
-	
-	 
-	/**
+    /**
      * Returns the Bot for this application.
      *
      * <p>
-     *     The @Component annotation could be used on the Bot class instead of this method
-     *     with the @Bean annotation.
+     * The @Component annotation could be used on the Bot class instead of this
+     * method
+     * with the @Bean annotation.
      * </p>
      *
      * @return The Bot implementation for this application.

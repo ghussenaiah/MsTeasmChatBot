@@ -1,12 +1,7 @@
 package com.microsoft.teams.app;
 
-import javax.annotation.PostConstruct;
-
 import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
-import com.azure.identity.ClientSecretCredential;
-import com.azure.identity.ClientSecretCredentialBuilder;
 import com.azure.identity.UsernamePasswordCredential;
 import com.azure.identity.UsernamePasswordCredentialBuilder;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
@@ -18,21 +13,44 @@ public class AuthenticationService {
 
 	private static GraphServiceClient<Request> graphClient = null;
 
+	/*
+	 * public static GraphServiceClient<Request> getInstance() {
+	 * if (graphClient == null) {
+	 * final ClientSecretCredential clientSecretCredential = new
+	 * ClientSecretCredentialBuilder().clientId(
+	 * "096d823c-fe93-4fd5-b30e-be4f5b4ee461")
+	 * .clientSecret("").tenantId("").build();
+	 * 
+	 * final TokenCredentialAuthProvider tokenCredentialAuthProvider = new
+	 * TokenCredentialAuthProvider(
+	 * clientSecretCredential);
+	 * 
+	 * graphClient = GraphServiceClient.builder().authenticationProvider(
+	 * tokenCredentialAuthProvider)
+	 * .buildClient();
+	 * }
+	 * return graphClient;
+	 * }
+	 */
+
 	public static GraphServiceClient<Request> getInstance() {
 		if (graphClient == null) {
-			final ClientSecretCredential clientSecretCredential = new ClientSecretCredentialBuilder().clientId("")
-					.clientSecret("").tenantId("").build();
+			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
 
+					.clientId("096d823c-fe93-4fd5-b30e-be4f5b4ee461").username(
+							"sf_helpdesk@srinivasa.co")
+					.password("Jhills@45").build();
 			final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
-					clientSecretCredential);
+					usernamePasswordCredential);
 
-			graphClient = GraphServiceClient.builder().authenticationProvider(tokenCredentialAuthProvider)
-					.buildClient();
+			graphClient = GraphServiceClient.builder().authenticationProvider(
+					tokenCredentialAuthProvider).buildClient();
 		}
 		return graphClient;
 	}
-	
-	/* working code for username and pasword
+
+	/*
+	 * working code for username and pasword
 	 * public static GraphServiceClient<Request> getInstance() { if (graphClient ==
 	 * null) { final UsernamePasswordCredential usernamePasswordCredential = new
 	 * UsernamePasswordCredentialBuilder()
@@ -44,8 +62,6 @@ public class AuthenticationService {
 	 * graphClient = GraphServiceClient.builder().authenticationProvider(
 	 * tokenCredentialAuthProvider) .buildClient(); } return graphClient; }
 	 */
-	
-
 
 	@Scheduled(cron = "*/50 * * * *")
 	public void currentTime() throws Exception {

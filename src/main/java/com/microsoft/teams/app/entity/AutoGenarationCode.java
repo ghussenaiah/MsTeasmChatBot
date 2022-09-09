@@ -1,18 +1,16 @@
 package com.microsoft.teams.app.entity;
-import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
+
 import javax.persistence.Id;
 import javax.persistence.Table;
-import javax.persistence.UniqueConstraint;
-import org.hibernate.annotations.GenericGenerator;
+
 import org.jetbrains.annotations.NotNull;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+
 @Entity
 @Table(name = "autogenarationcode")
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -22,33 +20,33 @@ public class AutoGenarationCode implements java.io.Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 8392594118966858070L;
-	
 
 	@Column(name = "id")
 	@Id
 	private Long id;
-	
+
 	@Column(name = "entityid")
 	@JsonProperty("entityid")
 	private String entityId;
-	
+
 	@NotNull
 	@Column(name = "coloumnid")
 	@JsonProperty("coloumnId")
 	private String coloumnId;
-	
+
 	@Column(name = "autocodeno")
 	@JsonProperty("autoCodeNo")
 	private int autoCodeNo;
-	
+
 	@Column(name = "type")
 	@JsonProperty("type")
 	private String type;
-	
+
 	@JsonIgnore
 	public String getType() {
 		return type;
 	}
+
 	@JsonIgnore
 	public void setType(String type) {
 		this.type = type;
@@ -93,9 +91,6 @@ public class AutoGenarationCode implements java.io.Serializable {
 	public void setAutoCodeNo(int autoCodeNo) {
 		this.autoCodeNo = autoCodeNo;
 	}
-
-
-
 
 	@Override
 	public int hashCode() {

@@ -1,6 +1,5 @@
 package com.microsoft.teams.app.entity;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -28,6 +27,7 @@ public class Container {
 	private String style;
 	private Boolean isMultiSelect;
 	private Boolean isMultiline;
+	private Boolean bleed;
 	private String size;
 	private String value;
 	private String weight;
@@ -40,9 +40,7 @@ public class Container {
 	private Boolean wrap;
 	private String url;
 	private String altText;
-
+	private String color;
 	
-	
-
 
 }

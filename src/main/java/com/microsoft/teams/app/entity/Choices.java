@@ -1,6 +1,6 @@
 package com.microsoft.teams.app.entity;
 
-import java.util.ArrayList;
+
 
 import lombok.Getter;
 import lombok.Setter;

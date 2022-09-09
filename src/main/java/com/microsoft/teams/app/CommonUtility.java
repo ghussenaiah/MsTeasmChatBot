@@ -3,7 +3,7 @@ package com.microsoft.teams.app;
 import java.util.Date;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Component;
 
 import com.microsoft.bot.builder.TurnContext;

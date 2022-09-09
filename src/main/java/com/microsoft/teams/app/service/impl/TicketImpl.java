@@ -12,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
-import com.microsoft.teams.app.repository.SupportRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
 
 

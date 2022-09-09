@@ -13,10 +13,6 @@ import com.microsoft.teams.app.utility.Utility;
 
 import org.springframework.jdbc.core.JdbcTemplate;
 
-
-
-
-
 @Component
 public class DataConn {
 	

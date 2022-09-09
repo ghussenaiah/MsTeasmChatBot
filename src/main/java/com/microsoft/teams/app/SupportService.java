@@ -13,49 +13,38 @@ import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
-import com.microsoft.teams.app.service.impl.DepartmentImpl;
+
 import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper; 
-import com.fasterxml.jackson.databind.ObjectWriter; 
-
-
-
-
-
-
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.ObjectWriter;
 
 @Component
 public class SupportService {
-	
+
 	@Autowired
 	SupportImpl supportImpl;
-	
+
 	/*
 	 * @Autowired AuthenticationService authService;
 	 */
-	
-	
-	
+
 	public String createSupportAdaptiveCard(String departmentId, LinkedHashMap botResponseMap,
-			ConcurrentHashMap<String, Ticket_296> ticket,TurnContext turnContext) {
+			ConcurrentHashMap<String, Ticket_296> ticket, TurnContext turnContext) {
 
 		// ============= create department Json structure done =======================
-		
-		
-		
+
 		Ticket_296 tkt = ticket.get(turnContext.getActivity().getFrom().getId());
-	
+
 		if (tkt != null) {
 			tkt.setDepartmentId(departmentId);
 		} else {
-			Ticket_296 t=new Ticket_296();
+			Ticket_296 t = new Ticket_296();
 			t.setDepartmentId(departmentId);
-			ticket.put(turnContext.getActivity().getFrom().getId(),t);
+			ticket.put(turnContext.getActivity().getFrom().getId(), t);
 		}
 
 		List<Support_298> supportList = supportImpl.findAllByDepartmentId(departmentId);
@@ -119,7 +108,6 @@ public class SupportService {
 		try {
 			json = ow.writeValueAsString(adcard);
 		} catch (JsonProcessingException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 
@@ -131,8 +119,5 @@ public class SupportService {
 		 */
 
 	}
-	
-	
-	
-}
 
+}
