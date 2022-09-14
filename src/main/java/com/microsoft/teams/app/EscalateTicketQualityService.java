@@ -39,6 +39,7 @@ import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
+import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
 import com.microsoft.teams.app.repository.TicketRepo;
@@ -106,6 +107,8 @@ public class EscalateTicketQualityService {
 
 			Container con = new Container();
 			con.setType("Container");
+			MsTeams mst=new MsTeams();
+			mst.setWidth("full");
 			Item it1 = new Item();
 			it1.setType("TextBlock");
 			it1.setText("Ticket #".concat(tkt.getTicketNumber().concat(" is CLOSED")));
@@ -140,31 +143,35 @@ public class EscalateTicketQualityService {
 			con3.setValue("0");  // for default selection
 
 			ArrayList<Choices> choiceList = new ArrayList<>();
+			
+			Choices choice005 = new Choices();
+			choice005.setTitle("5. OUTSTANDING-Issue resolved in less than expected time.");
+			choice005.setValue("5");
+			choiceList.add(choice005);
+			
+
+			Choices choice004 = new Choices();
+			choice004.setTitle("4. EXCELLENT-Issue resolved within expected time.");
+			choice004.setValue("4");
+			choiceList.add(choice004);
+			
+			Choices choice003 = new Choices();
+			choice003.setTitle("3. GOOD-Issue resolved in reasonable time.");
+			choice003.setValue("3");
+			choiceList.add(choice003);
+			
+
+			Choices choice002 = new Choices();
+			choice002.setTitle("2. NEEDS IMPROVEMENT-Delay in Issue resolution.");
+			choice002.setValue("2");
+			choiceList.add(choice002);
+			
 
 			Choices choice001 = new Choices();
-			choice001.setTitle("1");
+			choice001.setTitle("1. POOR-Significant delay in Issue resolution.");
 			choice001.setValue("1");
 			choiceList.add(choice001);
 
-			Choices choice002 = new Choices();
-			choice002.setTitle("2");
-			choice002.setValue("2");
-			choiceList.add(choice002);
-
-			Choices choice003 = new Choices();
-			choice003.setTitle("3");
-			choice003.setValue("3");
-			choiceList.add(choice003);
-
-			Choices choice004 = new Choices();
-			choice004.setTitle("4");
-			choice004.setValue("4");
-			choiceList.add(choice004);
-
-			Choices choice005 = new Choices();
-			choice005.setTitle("5");
-			choice005.setValue("5");
-			choiceList.add(choice005);
 
 			con3.setChoices(choiceList);
 
@@ -199,6 +206,8 @@ public class EscalateTicketQualityService {
 			Container con7 = new Container();
 			con7.setType("Input.Text");
 			con7.setId("Remarks");
+			con7.setIsRequired(true);
+			con7.setErrorMessage("pls enter remarks");
 			con7.setPlaceholder("enter text here");
 			con7.setMaxLength("700");
 			con7.setIsMultiline(true);
@@ -214,6 +223,8 @@ public class EscalateTicketQualityService {
 			actList.add(action);
 
 			adcard.setActions(actList);
+			
+			adcard.setMsTeams(mst);
 
 			ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 			try {
@@ -238,7 +249,7 @@ public class EscalateTicketQualityService {
 			ChatMessage chatMessage = new ChatMessage();
 			ItemBody body = new ItemBody();
 			body.contentType = BodyType.HTML;
-			body.content = "<at id=\"0\">"+appuser.getUserName()+"</at> Hai sir, Issue has been escalated !!";
+			body.content = "<at id=\"0\">"+appuser.getUserName()+"</at> Issue has been escalated !!";
 			chatMessage.body = body;
 			LinkedList<ChatMessageMention> mentionsList = new LinkedList<ChatMessageMention>();
 			ChatMessageMention mentions = new ChatMessageMention();
@@ -519,6 +530,9 @@ public class EscalateTicketQualityService {
 			con.setType("Container");
 			
 
+			MsTeams mst=new MsTeams();
+			mst.setWidth("full");
+
 			Item it1 = new Item();
 			it1.setType("TextBlock");
 			it1.setText("Selected Department Name : " + dep.get().getDeptName());
@@ -533,6 +547,7 @@ public class EscalateTicketQualityService {
 			con.setItems(item);
 
 			conlist.add(con);
+			adcard.setMsTeams(mst);
 			adcard.setBody(conlist);
 
 		} else if (requestType == "Functional") {
@@ -542,6 +557,9 @@ public class EscalateTicketQualityService {
 
 			Container con = new Container();
 			con.setType("Container");
+			
+			MsTeams mst=new MsTeams();
+			mst.setWidth("full");
 
 			Item it1 = new Item();
 			it1.setType("TextBlock");
@@ -558,6 +576,7 @@ public class EscalateTicketQualityService {
 
 			conlist.add(con);
 			adcard.setBody(conlist);
+			adcard.setMsTeams(mst);
 		} else if (requestType == "Ticket") {
 
 			if ((botResponseMap).get("IssueTitle") != null && (botResponseMap).get("IssueDescription") != null) {
@@ -594,6 +613,8 @@ public class EscalateTicketQualityService {
 		Container con = new Container();
 		con.setType("Container");
 		con.setStyle("good");
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 		con.setBleed(true);
 
 		Item it1 = new Item();
@@ -611,6 +632,7 @@ public class EscalateTicketQualityService {
 
 		conlist.add(con);
 		adcard.setBody(conlist);
+		adcard.setMsTeams(mst);
 
 		// ============= Thanks Json structure done =======================
 

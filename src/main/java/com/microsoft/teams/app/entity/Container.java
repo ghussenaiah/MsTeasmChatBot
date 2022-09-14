@@ -41,6 +41,11 @@ public class Container {
 	private String url;
 	private String altText;
 	private String color;
+	private Boolean isRequired;
+	private String errorMessage;
+	private int maxLines;
+	
+
 	
 
 }

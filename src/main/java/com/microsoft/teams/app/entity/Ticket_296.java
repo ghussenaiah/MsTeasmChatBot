@@ -25,6 +25,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.persistence.Lob;
+
 
 import lombok.Data;
 
@@ -108,6 +110,11 @@ public class Ticket_296 implements Serializable {
         @JsonProperty("welmsg")
         private String welmsg;
         
+        @Column(name = "issuedetails")
+        @Lob
+        @JsonProperty("issuedetails")
+        private String issuedetails;
+        
         @JsonIgnore
         public String getWelmsg() {
                 return welmsg;
@@ -117,6 +124,18 @@ public class Ticket_296 implements Serializable {
         public void setWelmsg(String welmsg) {
                 this.welmsg = welmsg;
         }
+        
+        @JsonIgnore
+        public String getIssuedetails() {
+                return issuedetails;
+        }
+
+        @JsonIgnore
+        public void setIssuedetails(String issuedetails) {
+                this.issuedetails = issuedetails;
+        }
+
+
 
 
 

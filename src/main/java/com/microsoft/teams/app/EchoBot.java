@@ -496,7 +496,7 @@ public class EchoBot extends TeamsActivityHandler {
 	@Override
 	protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(TurnContext turnContextt,
 			AppBasedLinkQuery query) {
-		System.out.println("helo");
+		//System.out.println("helo");
 		ThumbnailCard card = new ThumbnailCard();
 		card.setTitle("CodeProject");
 		card.setText(query.getUrl());
@@ -525,13 +525,15 @@ public class EchoBot extends TeamsActivityHandler {
 	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
 
 		System.out.println("user getAadObjectId => " + membersAdded.get(0).getAadObjectId());
+		
 		System.out.println("user getId => " + membersAdded.get(0).getId());
+		
 		System.out.println("onMembersAdded");
 		String ChatId = turnContext.getActivity().getConversation().getId();
 
 		Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
-		
-		if (tkt.getWelmsg()==null) {
+
+		if (tkt.getWelmsg() == null) {
 
 			Attachment cardAttachment = new Attachment();
 			try {
@@ -563,7 +565,7 @@ public class EchoBot extends TeamsActivityHandler {
 			}
 
 		}
-		
+
 		return CompletableFuture.completedFuture(null);
 
 		/*

@@ -10,6 +10,8 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 
+import java.io.IOException;
+
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -32,9 +34,18 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @EnableTransactionManagement
 public class Application extends BotDependencyConfiguration {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
         SpringApplication.run(Application.class, args);
         System.out.println("Application started");
+        
+        
+        
+        
+  //  	String command=String.format("disown -h %1");
+
+		//logger.info("-----------------------------executing jar : {}", command);
+	//	 Runtime.getRuntime().exec(command);
+		//System.out.println("Command Executed");
     }
 
     /**

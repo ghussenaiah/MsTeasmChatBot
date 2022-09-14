@@ -14,6 +14,7 @@ import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Item;
+import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
 
@@ -58,6 +59,8 @@ public class SupportService {
 
 		Container con = new Container();
 		con.setType("Container");
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 
 		Item it1 = new Item();
 		it1.setType("TextBlock");
@@ -99,6 +102,7 @@ public class SupportService {
 		action.setTitle("OK");
 
 		actList.add(action);
+		adcard.setMsTeams(mst);
 
 		adcard.setActions(actList);
 

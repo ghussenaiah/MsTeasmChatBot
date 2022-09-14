@@ -100,6 +100,9 @@ public class FetchnSave_Retry_Mechanism {
 
 	// @Scheduled(cron = "0 * * ? * *")
 	//@Scheduled(cron = "*/1 * * * * *")
+	
+	
+	@Scheduled(cron = "*/10 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
 		updateTeamsMsgToDatabase();
@@ -164,154 +167,159 @@ public class FetchnSave_Retry_Mechanism {
 
 				// ChatMessageCollectionPage messages =
 				// graphClient.chats("19:1d13e45f1c94414cb73baee6c68e27d0@thread.v2").messages().buildRequest().top(2).get();
-				ChatMessageCollectionPage messages = graphClient.chats(tkt.getChatGroupId()).messages().buildRequest()
-						.top(50).get();// 50 is the maximum limit for graph api
-				OffsetDateTime erplastmsgupdate = tkt.getUpdateDateTime().toInstant().atOffset(ZoneOffset.UTC);
 
-				List<ChatMessage> mm = messages.getCurrentPage();
+				if (tkt.getChatGroupId() != null) {
+					ChatMessageCollectionPage messages = graphClient.chats(tkt.getChatGroupId()).messages()
+							.buildRequest().top(50).get();// 50 is the maximum limit for graph api
+					OffsetDateTime erplastmsgupdate = tkt.getUpdateDateTime().toInstant().atOffset(ZoneOffset.UTC);
 
-				Instant instant = null;
-				Boolean lastmessageTime = true;
+					List<ChatMessage> mm = messages.getCurrentPage();
 
-				try {
-					for (ChatMessage message : mm) {
+					Instant instant = null;
+					Boolean lastmessageTime = true;
 
-						if (message.createdDateTime.compareTo(erplastmsgupdate) > 0) {
+					try {
+						for (ChatMessage message : mm) {
 
-							ChatHistory_299 ch = new ChatHistory_299();
-							System.out.println("Id: " + message.id);
-							System.out.println("CreatedTime: " + message.createdDateTime);
-							DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
+							if (message.createdDateTime.compareTo(erplastmsgupdate) > 0) {
 
-							if (message.body.content != null && message.attachments.size() == 0
-									&& message.from != null) {
-								String textdata = message.body.content;
-								String fromuser = message.from.user.displayName;
-								String messgeId = message.id;
-								if (lastmessageTime) {
-									instant = message.createdDateTime.toInstant();
-									lastmessageTime = false;
-								}
+								ChatHistory_299 ch = new ChatHistory_299();
+								System.out.println("Id: " + message.id);
+								System.out.println("CreatedTime: " + message.createdDateTime);
+								DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 
-								String date = message.createdDateTime.format(customFormatter);
-								// Date messageDate = (Date) customFormatter.parse(date);
-								String actualmessage = textdata.replaceAll("<[^>]*>", "");
-								System.out.println(actualmessage);
+								if (message.body.content != null && message.attachments.size() == 0
+										&& message.from != null) {
+									String textdata = message.body.content;
+									String fromuser = message.from.user.displayName;
+									String messgeId = message.id;
+									if (lastmessageTime) {
+										instant = message.createdDateTime.toInstant();
+										lastmessageTime = false;
+									}
 
-								System.out.println();
-								// System.out.println(erplastmsgupdate.compareTo(message.createdDateTime));
-								// messageDate.after();
-								ch.setId(String.valueOf(chatNumber));
-								ch.setMessage(actualmessage);
-								ch.setReceiverId(actualmessage);
-								ch.setSenderId(actualmessage);
-								ch.setTeamsmessageId(actualmessage);
+									String date = message.createdDateTime.format(customFormatter);
+									// Date messageDate = (Date) customFormatter.parse(date);
+									String actualmessage = textdata.replaceAll("<[^>]*>", "");
+									System.out.println(actualmessage);
 
-								// tkt.getUpdateDateTime().
+									System.out.println();
+									// System.out.println(erplastmsgupdate.compareTo(message.createdDateTime));
+									// messageDate.after();
+									ch.setId(String.valueOf(chatNumber));
+									ch.setMessage(actualmessage);
+									ch.setReceiverId(actualmessage);
+									ch.setSenderId(actualmessage);
+									ch.setTeamsmessageId(actualmessage);
 
-								String chatId = String.valueOf(chatNumber);
+									// tkt.getUpdateDateTime().
 
-								chatNumber = chatNumber + 1;
+									String chatId = String.valueOf(chatNumber);
 
-								updateRecordToDatabase(chatId, actualmessage, fromuser, messgeId, date, tkt.getId(),
-										null, chatNumber, lastNumberObj);
+									chatNumber = chatNumber + 1;
 
-							} else {
+									updateRecordToDatabase(chatId, actualmessage, fromuser, messgeId, date, tkt.getId(),
+											null, chatNumber, lastNumberObj);
 
-								List<ChatMessageAttachment> chatMsgAttachList = message.attachments;
+								} else {
 
-								for (ChatMessageAttachment cmA : chatMsgAttachList) {
+									List<ChatMessageAttachment> chatMsgAttachList = message.attachments;
 
-									if (!cmA.contentType.equalsIgnoreCase("application/vnd.microsoft.card.adaptive")) {
+									for (ChatMessageAttachment cmA : chatMsgAttachList) {
 
-										Map<String, String> fileMap = DownloadFileUsingUrl(graphClient, cmA);
-										System.out.println(cmA);
-										String messgeId = message.id;
-										String chatId = String.valueOf(chatNumber);
-										String fromuser = message.from.user.displayName;
-										if (lastmessageTime) {
-											instant = message.createdDateTime.toInstant();
-											lastmessageTime = false;
+										if (!cmA.contentType
+												.equalsIgnoreCase("application/vnd.microsoft.card.adaptive")) {
+
+											Map<String, String> fileMap = DownloadFileUsingUrl(graphClient, cmA);
+											System.out.println(cmA);
+											String messgeId = message.id;
+											String chatId = String.valueOf(chatNumber);
+											String fromuser = message.from.user.displayName;
+											if (lastmessageTime) {
+												instant = message.createdDateTime.toInstant();
+												lastmessageTime = false;
+											}
+
+											String date = message.createdDateTime.format(customFormatter);
+											chatNumber = chatNumber + 1;
+											updateRecordToDatabase(chatId, fileMap.get("fileName"), fromuser, messgeId,
+													date, tkt.getId(), fileMap.get("fileId"), chatNumber,
+													lastNumberObj);
+
+											// https://kgmerp-my.sharepoint.com/personal/admin_kgmerp_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/apache-jmeter-5.5.zip
+
+											// ChatMessageHostedContentCollectionPage hostedContents =
+											// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents().buildRequest().get();
+
+											// System.out.println(hostedContents.getCurrentPage().get(0));
+
+											// ChatMessageHostedContent cmHA =
+											// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents(cmA.id).buildRequest().get();
+
+											// cmA.contentUrl=
+											// "https://kgmip-my.sharepoint.com/:x:/g/personal/husenaiah_g_kgmip_onmicrosoft_com/EZgbvc5oTghIglTxP5X2fFAB7lQZZJQGmQFMvTBbuVKsmw?login_hint=admin%40kgmip.onmicrosoft.com&ct=1654852547269&wdOrigin=OFFICECOM-WEB.MAIN.OTHER&cid=65b2135c-9b23-41ab-a221-ef07d83d0ecf";
+
+											// String downloadLink =
+											// "https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/dms/downloadDocument?docId=1654509082354";
+
+											// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft
+											// Teams Chat Files/Screenshot from 2022-06-05 22-28-36.png
+											// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png
+
+											// File packageFile = new
+											// File("/home/husenaiah/Downloads/avadhootTemplates/employee.png");
+
+											/*
+											 * try (BufferedInputStream in = new BufferedInputStream(new URL(
+											 * "https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"
+											 * ).openStream()); FileOutputStream fileOutputStream = new
+											 * FileOutputStream("")) { byte dataBuffer[] = new byte[1024]; int
+											 * bytesRead; while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
+											 * fileOutputStream.write(dataBuffer, 0, bytesRead); }
+											 * uploadDocument(dataBuffer, "xlsx", cmA.name); } catch (IOException e) {
+											 * 
+											 * log.info("Current Time = {}", e); }
+											 */
+
+											// FileUtils.copyURLToFile(new
+											// URL("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"),
+											// packageFile);
+
+											// FileInputStream fl = new FileInputStream(packageFile);
+											// Now creating byte array of same length as file
+											// byte[] arr = new byte[(int) packageFile.length()];
+											// fl.read(arr);
+											// fl.close();
+
+											// Random rd = new Random(); byte[] arrtest = new byte[7];
+											// rd.nextBytes(arr);
+											// System.out.println(arr);
+											// uploadDocument(arr, "xlsx", cmA.name);
 										}
 
-										String date = message.createdDateTime.format(customFormatter);
-										chatNumber = chatNumber + 1;
-										updateRecordToDatabase(chatId, fileMap.get("fileName"), fromuser, messgeId,
-												date, tkt.getId(),
-												fileMap.get("fileId"), chatNumber, lastNumberObj);
-
-										// https://kgmerp-my.sharepoint.com/personal/admin_kgmerp_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/apache-jmeter-5.5.zip
-
-										// ChatMessageHostedContentCollectionPage hostedContents =
-										// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents().buildRequest().get();
-
-										// System.out.println(hostedContents.getCurrentPage().get(0));
-
-										// ChatMessageHostedContent cmHA =
-										// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents(cmA.id).buildRequest().get();
-
-										// cmA.contentUrl=
-										// "https://kgmip-my.sharepoint.com/:x:/g/personal/husenaiah_g_kgmip_onmicrosoft_com/EZgbvc5oTghIglTxP5X2fFAB7lQZZJQGmQFMvTBbuVKsmw?login_hint=admin%40kgmip.onmicrosoft.com&ct=1654852547269&wdOrigin=OFFICECOM-WEB.MAIN.OTHER&cid=65b2135c-9b23-41ab-a221-ef07d83d0ecf";
-
-										// String downloadLink =
-										// "https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/dms/downloadDocument?docId=1654509082354";
-
-										// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft
-										// Teams Chat Files/Screenshot from 2022-06-05 22-28-36.png
-										// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png
-
-										// File packageFile = new
-										// File("/home/husenaiah/Downloads/avadhootTemplates/employee.png");
-
-										/*
-										 * try (BufferedInputStream in = new BufferedInputStream(new URL(
-										 * "https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"
-										 * ).openStream()); FileOutputStream fileOutputStream = new
-										 * FileOutputStream("")) { byte dataBuffer[] = new byte[1024]; int bytesRead;
-										 * while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-										 * fileOutputStream.write(dataBuffer, 0, bytesRead); }
-										 * uploadDocument(dataBuffer, "xlsx", cmA.name); } catch (IOException e) {
-										 * 
-										 * log.info("Current Time = {}", e); }
-										 */
-
-										// FileUtils.copyURLToFile(new
-										// URL("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"),
-										// packageFile);
-
-										// FileInputStream fl = new FileInputStream(packageFile);
-										// Now creating byte array of same length as file
-										// byte[] arr = new byte[(int) packageFile.length()];
-										// fl.read(arr);
-										// fl.close();
-
-										// Random rd = new Random(); byte[] arrtest = new byte[7]; rd.nextBytes(arr);
-										// System.out.println(arr);
-										// uploadDocument(arr, "xlsx", cmA.name);
 									}
 
 								}
 
 							}
 
+							// tkt.getChatHistory_299().add(ch);
+
 						}
+					} catch (Exception e) {
 
-						// tkt.getChatHistory_299().add(ch);
-
+						log.error("error while reading the chat message ,", e.fillInStackTrace());
+						if (instant != null) {
+							tkt.setUpdateDateTime(Date.from(instant));
+							ticketRepo.save(tkt);
+						}
 					}
-				} catch (Exception e) {
-
-					log.error("error while reading the chat message ,", e.fillInStackTrace());
 					if (instant != null) {
 						tkt.setUpdateDateTime(Date.from(instant));
 						ticketRepo.save(tkt);
 					}
-				}
-				if (instant != null) {
-					tkt.setUpdateDateTime(Date.from(instant));
-					ticketRepo.save(tkt);
-				}
 
+				}
 			}
 		} catch (Exception e) {
 			log.error("error while reading the tickets for chat reading ,", e.fillInStackTrace());

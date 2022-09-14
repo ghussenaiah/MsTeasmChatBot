@@ -36,10 +36,13 @@ public class AuthenticationService {
 	public static GraphServiceClient<Request> getInstance() {
 		if (graphClient == null) {
 			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
-
-					.clientId("096d823c-fe93-4fd5-b30e-be4f5b4ee461").username(
-							"sf_helpdesk@srinivasa.co")
-					.password("Jhills@45").build();
+                    // production 
+			   .clientId("3afa6722-1ab9-4bde-9824-fb727a612eb2").username("sf_helpdesk@srinivasa.co").password("Jhills@45").build();
+					
+					// testing purpose 
+			//  .clientId("d9c45a22-46b6-4c1f-b78d-b909f3649434").username("sf_helpdesk@srinivasa.co").password("Jhills@45").build();
+			
+			
 			final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
 					usernamePasswordCredential);
 

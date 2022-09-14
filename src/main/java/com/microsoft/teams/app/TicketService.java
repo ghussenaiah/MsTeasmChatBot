@@ -209,13 +209,21 @@ public class TicketService {
 		con.setWeight("bolder");
 		con.setSize("medium");
 		con.setColor("accent");
+	
 
 		Container con2 = new Container();
 		con2.setType("Input.Text");
 		con2.setId("IssueTitle");
+		con2.setIsRequired(true);
+		con2.setErrorMessage("pls enter issue max 200 char..");
+
 
 		if (issueTitle != null && !issueTitle.isEmpty()) {
-			con2.setValue(issueTitle);
+			con2.setType("TextBlock");
+			con2.setText(issueTitle);
+			
+			
+		
 
 		} else {
 			con2.setPlaceholder("enter text here");
@@ -242,7 +250,11 @@ public class TicketService {
 		con4.setId("IssueDescription");
 
 		if (issueDescription != null && !issueDescription.isEmpty()) {
-			con4.setValue(issueDescription);
+			con4.setType("TextBlock");
+			con4.setText(issueDescription);
+			con4.setMaxLength("700");
+			con4.setIsMultiline(true);
+			con4.setMaxLines(8);
 		} else {
 			con4.setPlaceholder("enter text here");
 		}
@@ -292,6 +304,8 @@ public class TicketService {
 	
 		Container con = new Container();
 		con.setType("Container");
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 		Item it1 = new Item();
 		it1.setType("TextBlock");
 		it1.setText("Ticket #".concat(tkt.getTicketNumber().concat(" is CLOSED")));
@@ -326,57 +340,75 @@ public class TicketService {
 		con3.setValue(qualityrate); // for default selection
 
 		ArrayList<Choices> choiceList = new ArrayList<>();
+		
+		if (qualityrate.equalsIgnoreCase("1")) {
+			Choices choice001 = new Choices();
+			choice001.setTitle("1");
+			choice001.setValue("1");
+			choiceList.add(choice001);
 
-		Choices choice001 = new Choices();
-		choice001.setTitle("1");
-		choice001.setValue("1");
-		choiceList.add(choice001);
+		} else if (qualityrate.equalsIgnoreCase("2")) {
+			
+			Choices choice002 = new Choices();
+			choice002.setTitle("2");
+			choice002.setValue("2");
+			choiceList.add(choice002);
 
-		Choices choice002 = new Choices();
-		choice002.setTitle("2");
-		choice002.setValue("2");
-		choiceList.add(choice002);
+		} else if (qualityrate.equalsIgnoreCase("3")) {
+			
 
-		Choices choice003 = new Choices();
-		choice003.setTitle("3");
-		choice003.setValue("3");
-		choiceList.add(choice003);
 
-		Choices choice004 = new Choices();
-		choice004.setTitle("4");
-		choice004.setValue("4");
-		choiceList.add(choice004);
+			Choices choice003 = new Choices();
+			choice003.setTitle("3");
+			choice003.setValue("3");
+			choiceList.add(choice003);
 
-		Choices choice005 = new Choices();
-		choice005.setTitle("5");
-		choice005.setValue("5");
-		choiceList.add(choice005);
 
+		} else if (qualityrate.equalsIgnoreCase("4")) {
+			
+			Choices choice004 = new Choices();
+			choice004.setTitle("4");
+			choice004.setValue("4");
+			choiceList.add(choice004);
+
+		} else if (qualityrate.equalsIgnoreCase("5")) {
+			
+			Choices choice005 = new Choices();
+			choice005.setTitle("5");
+			choice005.setValue("5");
+			choiceList.add(choice005);
+
+		}
+		
+		
 		con3.setChoices(choiceList);
 
 		/// work in progresss =============================================
 
 		conlist.add(con3);
 
-		Container con5 = new Container();
-		con5.setType("Container");
+		
+		//Container con5 = new Container();
+		//con5.setType("Container");
 
-		Item it5 = new Item();
-		it5.setType("TextBlock");
-		it5.setText("Default rating of 5 will be posted if feedback is not provided");
-		it5.setWeight("bolder");
-		it5.setSize("medium");
-		it5.setWrap(true);
+		//Item it5 = new Item();
+		//it5.setType("TextBlock");
+		//it5.setText("Default rating of 5 will be posted if feedback is not provided");
+		//it5.setWeight("bolder");
+		//it5.setSize("medium");
+		//it5.setWrap(true);
 
-		ArrayList<Item> item5 = new ArrayList<>();
-		item5.add(it5);
-		con5.setItems(item5);
+		//ArrayList<Item> item5 = new ArrayList<>();
+		//item5.add(it5);
 
-		conlist.add(con5);
+		//con5.setItems(item5);
+
+		//conlist.add(con5);
+		 
 
 		Container con6 = new Container();
 		con6.setType("TextBlock");
-		con6.setText("Pls provide remarks");
+		con6.setText("Provided remarks");
 		con6.setWeight("bolder");
 		con6.setSize("medium");
 
@@ -388,10 +420,12 @@ public class TicketService {
 		con7.setText(remarks);
 		con7.setMaxLength("700");
 		con7.setIsMultiline(true);
+		con7.setMaxLines(7);
 
 		conlist.add(con7);
 
 		adcard.setBody(conlist);
+		adcard.setMsTeams(mst);
 
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		try {
@@ -426,7 +460,8 @@ public class TicketService {
 
 		if (tkt != null) {
 			tkt.setTicketTitle((String) (botResponseMap).get("IssueTitle"));
-			tkt.setDescription((String) (botResponseMap).get("IssueDescription"));
+			//tkt.setDescription((String) (botResponseMap).get("IssueDescription"));
+			tkt.setIssuedetails((String) (botResponseMap).get("IssueDescription"));
 			tkt.setStatuscycleId("27");
 			tkt.setCreateDateTime(dt);
 			tkt.setUpdateDateTime(dt);
@@ -467,6 +502,8 @@ public class TicketService {
 
 			Container con = new Container();
 			con.setType("Container");
+			MsTeams mst=new MsTeams();
+			mst.setWidth("full");
 
 			Item it1 = new Item();
 			it1.setType("TextBlock");
@@ -506,10 +543,11 @@ public class TicketService {
 			 */
 
 			adcard.setBody(conlist);
+			adcard.setMsTeams(mst);
 
 			ActionSet action = new ActionSet();
 			action.setType("Action.OpenUrl");
-			action.setTitle("Open New Chat");
+			action.setTitle("Go To Ticket");
 			action.setUrl(chatUrl);
 
 			/*
@@ -568,6 +606,8 @@ public class TicketService {
 
 		Container con = new Container();
 		con.setType("Container");
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 		con.setStyle("good");
 		con.setBleed(true);
 		Item it1 = new Item();
@@ -596,7 +636,7 @@ public class TicketService {
 
 		Item it2 = new Item();
 		it2.setType("TextBlock");
-		it2.setText("Issue Details : " + tkt.getDescription() + " " + dep.get().getDeptName()
+		it2.setText("Issue Details : " + tkt.getIssuedetails()+ " " + dep.get().getDeptName()
 				+ " Department people were added to this Chat Group");
 		it2.setWeight("bolder");
 		it2.setSize("medium");
@@ -616,7 +656,7 @@ public class TicketService {
 		 * 
 		 * conlist.add(con3);
 		 */
-
+        adcard.setMsTeams(mst);
 		adcard.setBody(conlist);
 
 		ActionSet action = new ActionSet();
@@ -771,6 +811,8 @@ public class TicketService {
 		String json = null;
 
 		Container con = new Container();
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 		con.setType("Container");
 		con.setStyle("good");
 		con.setBleed(true);
@@ -794,8 +836,8 @@ public class TicketService {
 		con2.setBleed(true);
 		Item it2 = new Item();
 		it2.setType("TextBlock");
-		it2.setText("Issue Details : " + tkt.getDescription() + "" + dep.get().getDeptName()
-				+ "Department people were added to this Chat Group");
+		it2.setText("Issue Details : " + tkt.getIssuedetails()+ " " + dep.get().getDeptName()
+				+ " Department people were added to this Chat Group");
 		it2.setWeight("bolder");
 		it2.setSize("medium");
 		it2.setWrap(true);
@@ -812,6 +854,7 @@ public class TicketService {
 		// if issue is escalated then need to add close trigger only 
 
 		adcard.setBody(conlist);
+		adcard.setMsTeams(mst);
 
 		if ("ESCALATE".equalsIgnoreCase(triggerClicked)) {
 

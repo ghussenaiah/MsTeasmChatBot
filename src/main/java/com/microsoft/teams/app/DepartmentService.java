@@ -59,6 +59,10 @@ public class DepartmentService {
 
 		Container con = new Container();
 		con.setType("Container");
+		
+
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
 
 		Item it1 = new Item();
 		it1.setType("TextBlock");
@@ -94,6 +98,8 @@ public class DepartmentService {
 		conlist.add(con2);
 
 		adcard.setBody(conlist);
+		
+		adcard.setMsTeams(mst);
 
 		ActionSet action = new ActionSet();
 		action.setType("Action.Submit");
@@ -148,9 +154,9 @@ public class DepartmentService {
 		// stackedcolumnchart.png
 		// https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/
 		
-		URL resource = getClass().getClassLoader().getResource("srinivaslogo.png");
+	//	URL resource = getClass().getClassLoader().getResource("srinivaslogo.png");
 		
-		System.out.println(resource);
+	//	System.out.println(resource);
 		
 		//con.setUrl(resource.getFile());
 	//	con.setUrl("https://ess.kagamierp.com/kagami-generated_HRMS_GROUP/assets/images/report_icons/stackedcolumnchart.png");

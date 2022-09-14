@@ -13,6 +13,10 @@ import org.springframework.stereotype.Service;
 public class Utility {
 	
 	
+	 //1  Before live deploy for jar application we have to add https and /botapp context app in application.properties file
+	
+	 //2 authentication also need to change
+	
 	 /*   Bot Related Tasks
 	 
 	 
@@ -26,6 +30,10 @@ public class Utility {
 	  *    
 	  *    ramamohan.rachamsetty@srinivasa.co =>21dbd337-e1f9-4d49-9f72-d5a23ff417bb
 	  *    vasu.chitturi@srinivasa.co         =>6e2cd812-7f9f-4cc0-8572-5c48b1b1b4bb
+	  *    
+	  *    Venkata R Subrahmanyam Batchu      =>dc4b37af-3ca2-4049-989b-069589d57e72
+	  *    
+	  *    Sudhiranjan                        =>9975030e-1d48-438c-b92d-9f8cef2a6fca
 	  *    
 	  *    In Srinivas Teams 
 	  *    
@@ -64,7 +72,77 @@ public class Utility {
 	 */
 	
 	
+	/* Improvements asked on Sep 09 2022
+	 * 
+	 * 
+	 * 1 All adaptive cards will be width full screen  ==============================>  done
+	 * 
+	 * 2 online description should be 200     validation need to be added
+	 * 
+	 * 3 description should be 500 character  validation need to be added
+	 * 
+	 * 4 pin hello all message in new chat   ms teams people working on it 
+	 * 
+	 * 5 open new chat to Go To Ticket           ======================================> done
+	 * 
+	 * 6 Hai sir need to remove from escalation message   =============================> done
+	 * 
+	 * 7 when text is wrapping then date should come at top level it should not go down and it should be left side 
+	 * 
+	 * 8 Description should be below of Issue
+	 * 
+	 * 9 oneline and description should not be editable again  ========================> done 
+	 * 
+	 * 10 filter conditions need to be updated for view in runtime for it department only it it people will see it issues 
+	 * 
+	 * 11 Show feedback form only eligible support types 
+	 * 
+	 * 12 quality rate order need to display in reverse order 
+	 * 
+	 * 
+	 * /* Improvements asked on Sep 14 202
+	 * 
+	 * 1 pls need to remove from lable dont use shortforms 
+	 * 
+	 * 2 issue description should come with full display after ticket creation 
+	 * 
+	 * 3 icon descript changes srinivasformshelpdesk 
+	 * 
+	 * 4 loading symbol aftrer click afrer every click 
+	 * 
+	 * 5 Ticklet tle : one 
+	 * 
+	 * 6 Enter text here E caps 
+	 * 
+	 * 7 Deatiled Description 
+	 * 
+	 * 8 department need to remove from open chat
+	 *  
+	 * 9 Hello all need to remve  
+	 * 
+	 * 10 Desctipon > issue description need to remove 
+	 * 
+	 * 11 leave otption need to remove 
+	 * 
+	 * 12 helpdesk need to remove should not apper 
+	 * 
+	 * 13 default rating 5 should come 
+	 * 
+	 * 14 pls -> Please 
+	 * 
+	 * 15 E cap leter 
+	 * 
+	 * 16 Servive rated 
+	 * 
+	 * 17 remarks 
+	 * 
+	 * 18 removal of chats unpi and loading should come for   tech issue 
+	 * 
+	 */
 	
+	
+	
+	private static final String ESCALATE_ISSUE_STATUS = "sfarm_cloud_env_11";
 	
 	
 	
@@ -158,6 +236,17 @@ public class Utility {
 		nodeId = nodeId & maxNodeId;
 		return nodeId;
 	}
+	
+	 /*
+	        server.ssl.key-store=classpath:keystore.p12
+			server.ssl.key-store-password=kagami
+			server.ssl.keyStoreType = PKCS12
+			server.ssl.keyAlias = tomcat
+			server.servlet.session.cookie.secure=true
+			server.ssl.enabled=true
+			server.http2.enabled=true
+			
+	 */		
 
 
 }
