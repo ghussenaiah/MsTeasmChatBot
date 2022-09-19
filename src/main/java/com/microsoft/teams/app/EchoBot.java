@@ -225,9 +225,9 @@ public class EchoBot extends TeamsActivityHandler {
 				try {
 
 					newcardAttachment = new Attachment();
-					newcardAttachment
-							.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(
-									((String) (botResponseMap).get("Department")), "Department", botResponseMap, turnContext)));
+					newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService
+							.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("Department")),
+									"Department", botResponseMap, turnContext)));
 					newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 					Activity newactivity = MessageFactory.attachment(newcardAttachment);
 					newactivity.setId(turnContext.getActivity().getReplyToId());
@@ -250,9 +250,9 @@ public class EchoBot extends TeamsActivityHandler {
 				try {
 
 					newcardAttachment = new Attachment();
-					newcardAttachment
-							.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(
-									((String) (botResponseMap).get("SupportType")), "Functional", botResponseMap, turnContext)));
+					newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService
+							.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("SupportType")),
+									"Functional", botResponseMap, turnContext)));
 					newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 					Activity newactivity = MessageFactory.attachment(newcardAttachment);
 					newactivity.setId(turnContext.getActivity().getReplyToId());
@@ -267,51 +267,47 @@ public class EchoBot extends TeamsActivityHandler {
 					e.printStackTrace();
 				}
 			} else if (((botResponseMap).get("IssueTitle")) != null) {
-				
+
 				cardAttachment = new Attachment();
 				try {
 
 					newcardAttachment = new Attachment();
-					newcardAttachment
-							.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(
-									((String) (botResponseMap).get("IssueTitle")), "Ticket", botResponseMap, turnContext)));
+					newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService
+							.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("IssueTitle")), "Ticket",
+									botResponseMap, turnContext)));
 					newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 					Activity newactivity = MessageFactory.attachment(newcardAttachment);
 					newactivity.setId(turnContext.getActivity().getReplyToId());
 					CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
 					System.out.println(resourceresponse);
-					
-					
+
 					// create ticket in database and creating the new chat with department people
 					// response contains go to chat button (new chat button)
-					cardAttachment.setContent(Serialization
-							.jsonToTree(ticketService.createTicket(botResponseMap, ticket, turnContext)));
+					cardAttachment.setContent(
+							Serialization.jsonToTree(ticketService.createTicket(botResponseMap, ticket, turnContext)));
 				} catch (IOException e) {
 
 					e.printStackTrace();
 				}
-				
-				
+
 			} else if (((botResponseMap).get("Remarks")) != null) {
 				cardAttachment = new Attachment();
 				try {
-					
-					
+
 					newcardAttachment = new Attachment();
-					newcardAttachment
-							.setContent(Serialization.jsonToTree(ticketQualityService.AdaptiveCardForPreviousSelection(
-									((String) (botResponseMap).get("Remarks")), "StatusUpdate", botResponseMap, turnContext)));
+					newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService
+							.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("Remarks")),
+									"StatusUpdate", botResponseMap, turnContext)));
 					newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 					Activity newactivity = MessageFactory.attachment(newcardAttachment);
 					newactivity.setId(turnContext.getActivity().getReplyToId());
 					CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
 					System.out.println(resourceresponse);
-					
-					
-					
-					// ticket close update here and thanks adaptive card will go 
-					cardAttachment.setContent(Serialization.jsonToTree(
-							ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext)));
+
+					ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext);
+
+					// ticket close update here and thanks adaptive card will go
+					// cardAttachment.setContent(Serialization.jsonToTree();
 				} catch (IOException e) {
 
 					e.printStackTrace();
@@ -336,11 +332,6 @@ public class EchoBot extends TeamsActivityHandler {
 
 		} else {
 
-			/*
-			 * List<Department_23> departmentList=departmentImpl.findAll();
-			 * System.out.println(departmentList.get(0));
-			 */
-
 			cardAttachment = new Attachment();
 			commonUtility.removeContextData(ticket, turnContext);
 			callShowImage(turnContext);
@@ -353,45 +344,15 @@ public class EchoBot extends TeamsActivityHandler {
 			}
 		}
 
-		// String adaptiveCardString="{\"$schema\":
-		// \"http://adaptivecards.io/schemas/adaptive-card.json\",
-		// \"type\":\"AdaptiveCard\",\"version\": \"1.0\",\"body\": [{\"type\":
-		// \"TextBlock\",\"text\": \"PublishAdaptiveCard schema\"}],\"actions\": []}";
-
-		// 16547 63426 661
-
-		cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
-
-		// 16547 63426 661
-		Activity activity = MessageFactory.attachment(cardAttachment);
-
-		// activity.setReplyToId(activity.getId());
-		/*
-		 * Activity activity = Activity.clone(turnContext.getActivity());
-		 * activity.setAttachment(cardAttachment);
-		 * activity.setId(turnContext.getActivity().getReplyToId());
-		 * 
-		 * // activity.setReplyToId(turnContext.getActivity().getId());
-		 * 
-		 * logger.info("before retrun getReplyToId()=> " + activity.getReplyToId()); //
-		 * activity.setId(turnContext.getActivity().getReplyToId()); //
-		 * turnContext.updateActivity(activity);
-		 * 
-		 * logger.info(turnContext.getActivity().getChannelData().toString());
-		 */
-
-		// ResourceResponse rp = turnContext.sendActivity(activity).join();
-		// activity.setId(rp.getId());
-
-		CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
-		try {
-			ResourceResponse rr = resourceresponse.get();
-			// ticketQualityService.updateCloseTicketMessageId(rr.getId(),
-			// ticket,turnContext);
-
-		} catch (InterruptedException | ExecutionException e) {
-
-			e.printStackTrace();
+		if (cardAttachment.getContent() != null) {
+			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+			Activity activity = MessageFactory.attachment(cardAttachment);
+			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
+			try {
+				ResourceResponse rr = resourceresponse.get();
+			} catch (InterruptedException | ExecutionException e) {
+				e.printStackTrace();
+			}
 		}
 
 	}
@@ -525,9 +486,9 @@ public class EchoBot extends TeamsActivityHandler {
 	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
 
 		System.out.println("user getAadObjectId => " + membersAdded.get(0).getAadObjectId());
-		
+
 		System.out.println("user getId => " + membersAdded.get(0).getId());
-		
+
 		System.out.println("onMembersAdded");
 		String ChatId = turnContext.getActivity().getConversation().getId();
 
@@ -553,6 +514,10 @@ public class EchoBot extends TeamsActivityHandler {
 
 			try {
 				ResourceResponse rr = resourceresponse.get();
+				
+				tkt.setClstktreplyId(rr.getId());
+				
+				ticketRepo.save(tkt);
 
 				// we need to update ticket with turncontext and welcomemessage status
 
@@ -610,9 +575,8 @@ public class EchoBot extends TeamsActivityHandler {
 		String ChatId = turnContext.getActivity().getConversation().getId();
 
 		Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
-		
-		
-		if (tkt.getWelmsg()==null) {
+
+		if (tkt.getWelmsg() == null) {
 
 			Attachment cardAttachment = new Attachment();
 			try {
@@ -633,7 +597,11 @@ public class EchoBot extends TeamsActivityHandler {
 			try {
 				ResourceResponse rr = resourceresponse.get();
 
-				System.out.println(rr.getId());
+				tkt.setClstktreplyId(rr.getId());
+
+				ticketRepo.save(tkt);
+
+				// System.out.println(rr.getId());
 				// we need to update ticket with turncontext and welcomemessage status
 
 			} catch (InterruptedException e) {

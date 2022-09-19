@@ -140,7 +140,7 @@ public class EscalateTicketQualityService {
 			con3.setId("QualityRate");
 			con3.setIsMultiSelect(false);
 			con3.setStyle("expanded");
-			con3.setValue("0");  // for default selection
+			con3.setValue("5");  // for default selection
 
 			ArrayList<Choices> choiceList = new ArrayList<>();
 			
@@ -197,7 +197,7 @@ public class EscalateTicketQualityService {
 
 			Container con6 = new Container();
 			con6.setType("TextBlock");
-			con6.setText("Pls provide remarks");
+			con6.setText("Please provide remarks");
 			con6.setWeight("bolder");
 			con6.setSize("medium");
 
@@ -207,8 +207,8 @@ public class EscalateTicketQualityService {
 			con7.setType("Input.Text");
 			con7.setId("Remarks");
 			con7.setIsRequired(true);
-			con7.setErrorMessage("pls enter remarks");
-			con7.setPlaceholder("enter text here");
+			con7.setErrorMessage("Pls enter remarks");
+			con7.setPlaceholder("Enter text here");
 			con7.setMaxLength("700");
 			con7.setIsMultiline(true);
 
@@ -510,7 +510,7 @@ public class EscalateTicketQualityService {
 
 		ticketRepo.save(tkt);
 
-		return createThanksAdaptiveCard();
+		return "";
 
 	}
 

@@ -92,7 +92,7 @@ public class FetchnSave_Retry_Mechanism {
 	 * } }
 	 */
 	 
-	// * * * * * every one minutes
+	// * * * * * every one minute
 	// */1 * * * * * every second
 	// * * * * * *
 
@@ -131,10 +131,15 @@ public class FetchnSave_Retry_Mechanism {
 
 		System.out.println(resource);
 		resource.getFile();
+		int chatNumber=-1;
+		int holdforUpdate=-1;
 
 		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
-		int chatNumber = lastNumberObj.getAutoCodeNo();
-		int holdforUpdate = chatNumber;
+		if(lastNumberObj!=null) {
+			chatNumber = lastNumberObj.getAutoCodeNo();
+			holdforUpdate = chatNumber;
+		}
+	
 
 		List<Ticket_296> tkts = ticketRepo.findAllByStatuscycleId("27");
 
@@ -246,55 +251,6 @@ public class FetchnSave_Retry_Mechanism {
 													date, tkt.getId(), fileMap.get("fileId"), chatNumber,
 													lastNumberObj);
 
-											// https://kgmerp-my.sharepoint.com/personal/admin_kgmerp_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/apache-jmeter-5.5.zip
-
-											// ChatMessageHostedContentCollectionPage hostedContents =
-											// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents().buildRequest().get();
-
-											// System.out.println(hostedContents.getCurrentPage().get(0));
-
-											// ChatMessageHostedContent cmHA =
-											// graphClient.chats(tkt.getChatGroupId()).messages(message.id).hostedContents(cmA.id).buildRequest().get();
-
-											// cmA.contentUrl=
-											// "https://kgmip-my.sharepoint.com/:x:/g/personal/husenaiah_g_kgmip_onmicrosoft_com/EZgbvc5oTghIglTxP5X2fFAB7lQZZJQGmQFMvTBbuVKsmw?login_hint=admin%40kgmip.onmicrosoft.com&ct=1654852547269&wdOrigin=OFFICECOM-WEB.MAIN.OTHER&cid=65b2135c-9b23-41ab-a221-ef07d83d0ecf";
-
-											// String downloadLink =
-											// "https://135.181.202.86:12002/kagami-generated_Srinivasa_Live/dms/downloadDocument?docId=1654509082354";
-
-											// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft
-											// Teams Chat Files/Screenshot from 2022-06-05 22-28-36.png
-											// https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png
-
-											// File packageFile = new
-											// File("/home/husenaiah/Downloads/avadhootTemplates/employee.png");
-
-											/*
-											 * try (BufferedInputStream in = new BufferedInputStream(new URL(
-											 * "https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"
-											 * ).openStream()); FileOutputStream fileOutputStream = new
-											 * FileOutputStream("")) { byte dataBuffer[] = new byte[1024]; int
-											 * bytesRead; while ((bytesRead = in.read(dataBuffer, 0, 1024)) != -1) {
-											 * fileOutputStream.write(dataBuffer, 0, bytesRead); }
-											 * uploadDocument(dataBuffer, "xlsx", cmA.name); } catch (IOException e) {
-											 * 
-											 * log.info("Current Time = {}", e); }
-											 */
-
-											// FileUtils.copyURLToFile(new
-											// URL("https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Screenshot%20from%202022-06-05%2022-28-36.png"),
-											// packageFile);
-
-											// FileInputStream fl = new FileInputStream(packageFile);
-											// Now creating byte array of same length as file
-											// byte[] arr = new byte[(int) packageFile.length()];
-											// fl.read(arr);
-											// fl.close();
-
-											// Random rd = new Random(); byte[] arrtest = new byte[7];
-											// rd.nextBytes(arr);
-											// System.out.println(arr);
-											// uploadDocument(arr, "xlsx", cmA.name);
 										}
 
 									}

@@ -22,7 +22,7 @@ public class Utility {
 	 
 	     based on function type need to show feed back form or not 
 	 
-	 //  username/password ===>    sf_helpdesk@srinivasa.co / Jhills@45
+	  //  username/password ===>    sf_helpdesk@srinivasa.co / Jhills@45
 	  * 
 	  * 
 	  *    sf_helpdesk@srinivasa.co teamsId ==> 5f92b236-28ec-474f-bae4-f9cab9275230
@@ -102,42 +102,50 @@ public class Utility {
 	 * 
 	 * /* Improvements asked on Sep 14 202
 	 * 
-	 * 1 pls need to remove from lable dont use shortforms 
+	 * 1 pls need to remove from lable dont use shortforms                  => done
 	 * 
 	 * 2 issue description should come with full display after ticket creation 
 	 * 
-	 * 3 icon descript changes srinivasformshelpdesk 
+	 * 3 icon description changes srinivasformshelpdesk               
 	 * 
 	 * 4 loading symbol aftrer click afrer every click 
 	 * 
-	 * 5 Ticklet tle : one 
+	 * 5 Ticklet tle : one                                                  => done
 	 * 
-	 * 6 Enter text here E caps 
+	 * 6 Enter text here E caps                                             => done
 	 * 
-	 * 7 Deatiled Description 
+	 * 7 Deatiled Description                                               => done
 	 * 
-	 * 8 department need to remove from open chat
+	 * 8 department need to remove from open chat                           => done
 	 *  
-	 * 9 Hello all need to remve  
+	 * 9 Hello all need to remve                                            => done
 	 * 
-	 * 10 Desctipon > issue description need to remove 
+	 * 10 Desctipon > issue description need to remove                      => done
 	 * 
-	 * 11 leave otption need to remove 
+	 * 11 leave option need to remove 
 	 * 
 	 * 12 helpdesk need to remove should not apper 
 	 * 
-	 * 13 default rating 5 should come 
+	 * 13 default rating 5 should come                                      => done
 	 * 
-	 * 14 pls -> Please 
+	 * 14 pls -> Please                                                     => done
 	 * 
-	 * 15 E cap leter 
+	 * 15 E cap leter                                                       => done
 	 * 
-	 * 16 Servive rated 
+	 * 16 Servive rated                                                     => done
 	 * 
-	 * 17 remarks 
+	 * 17 remarks                                                           => done
 	 * 
 	 * 18 removal of chats unpi and loading should come for   tech issue 
 	 * 
+	 * 19 <close> =>  <escalate>
+	 * 
+	 *
+	 * 20 Thanks no need to come for display                                => done
+	 * 
+	 * 21 background color no need                                          => done
+	 * 
+	 * 22 helpdesk chat need to remove to clear aftrer clicking on go to chat need to confirmation
 	 */
 	
 	

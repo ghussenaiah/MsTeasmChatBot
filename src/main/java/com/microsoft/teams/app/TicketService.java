@@ -205,7 +205,7 @@ public class TicketService {
 
 		Container con = new Container();
 		con.setType("TextBlock");
-		con.setText("One line description of issue (Ticket Title)");
+		con.setText("Ticket Title: One line description of issue");
 		con.setWeight("bolder");
 		con.setSize("medium");
 		con.setColor("accent");
@@ -215,7 +215,7 @@ public class TicketService {
 		con2.setType("Input.Text");
 		con2.setId("IssueTitle");
 		con2.setIsRequired(true);
-		con2.setErrorMessage("pls enter issue max 200 char..");
+		con2.setErrorMessage("Please enter issue (max 200 chars)");
 
 
 		if (issueTitle != null && !issueTitle.isEmpty()) {
@@ -226,7 +226,7 @@ public class TicketService {
 		
 
 		} else {
-			con2.setPlaceholder("enter text here");
+			con2.setPlaceholder("Enter text here");
 			ActionSet action = new ActionSet();
 			action.setType("Action.Submit");
 			action.setTitle("OK");
@@ -240,7 +240,7 @@ public class TicketService {
 
 		Container con3 = new Container();
 		con3.setType("TextBlock");
-		con3.setText("Detailed description of issue");
+		con3.setText("Deatiled Description");
 		con3.setWeight("bolder");
 		con3.setSize("medium");
 		con3.setColor("accent");
@@ -250,13 +250,37 @@ public class TicketService {
 		con4.setId("IssueDescription");
 
 		if (issueDescription != null && !issueDescription.isEmpty()) {
-			con4.setType("TextBlock");
-			con4.setText(issueDescription);
-			con4.setMaxLength("700");
-			con4.setIsMultiline(true);
-			con4.setMaxLines(8);
+			
+			
+			//con4.setType("TextBlock");
+			//con4.setText(issueDescription);
+			//con4.setMaxLength("700");
+			//con4.setIsMultiline(true);
+			//con4.setMaxLines(8);
+			
+		
+			con4.setType("Container");
+			//con2.setStyle("good");
+			con4.setBleed(true);
+			Item it2 = new Item();
+			it2.setType("TextBlock");
+			it2.setText(issueDescription);
+			it2.setWeight("bolder");
+			it2.setSize("medium");
+			it2.setWrap(true);
+			//it2.setColor("accent");
+			//it2.setColor("good");
+
+			ArrayList<Item> itemList2 = new ArrayList<>();
+			itemList2.add(it2);
+			con4.setItems(itemList2);
+
+		
+			
+			
+			
 		} else {
-			con4.setPlaceholder("enter text here");
+			con4.setPlaceholder("Enter text here");
 		}
 		// con4.setMaxLength("1000");
 		con4.setIsMultiline(true);
@@ -322,7 +346,7 @@ public class TicketService {
 		con2.setType("Container");
 		Item it2 = new Item();
 		it2.setType("TextBlock");
-		it2.setText("Please rate the quality service rendered");
+		it2.setText("Service rated");
 		it2.setWeight("bolder");
 		it2.setSize("medium");
 		ArrayList<Item> item2 = new ArrayList<>();
@@ -408,7 +432,7 @@ public class TicketService {
 
 		Container con6 = new Container();
 		con6.setType("TextBlock");
-		con6.setText("Provided remarks");
+		con6.setText("Remarks");
 		con6.setWeight("bolder");
 		con6.setSize("medium");
 
@@ -608,7 +632,7 @@ public class TicketService {
 		con.setType("Container");
 		MsTeams mst=new MsTeams();
 		mst.setWidth("full");
-		con.setStyle("good");
+		//con.setStyle("good");
 		con.setBleed(true);
 		Item it1 = new Item();
 		it1.setType("TextBlock");
@@ -617,11 +641,11 @@ public class TicketService {
 		// </strong><br/><strong>Issue Details :
 		// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
 		// added to this Chat Group</strong>";
-		it1.setText("Hello All, New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+		it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
 		it1.setWeight("bolder");
 		it1.setSize("medium");
 		it1.setWrap(true);
-		//it1.setColor("good");
+		it1.setColor("accent");
 
 		ArrayList<Item> item = new ArrayList<>();
 		item.add(it1);
@@ -631,23 +655,46 @@ public class TicketService {
 
 		Container con2 = new Container();
 		con2.setType("Container");
-		con2.setStyle("good");
+		//con2.setStyle("good");
 		con2.setBleed(true);
 
 		Item it2 = new Item();
 		it2.setType("TextBlock");
-		it2.setText("Issue Details : " + tkt.getIssuedetails()+ " " + dep.get().getDeptName()
-				+ " Department people were added to this Chat Group");
+		it2.setText("Description : " + tkt.getIssuedetails()+ " ");
 		it2.setWeight("bolder");
 		it2.setSize("medium");
 		it2.setWrap(true);
-	//	it2.setColor("good");
+	    it2.setColor("accent");
 
 		ArrayList<Item> itemList2 = new ArrayList<>();
 		itemList2.add(it2);
 		con2.setItems(itemList2);
 
 		conlist.add(con2);
+		
+		
+		
+		Container con3 = new Container();
+		con3.setType("Container");
+		//con2.setStyle("good");
+		con3.setBleed(true);
+
+		Item it3 = new Item();
+		it3.setType("TextBlock");
+		it3.setText(dep.get().getDeptName()
+				+ " Department people were added to this Chat Group");
+		it3.setWeight("bolder");
+		it3.setSize("medium");
+		it3.setWrap(true);
+	    it3.setColor("accent");
+
+		ArrayList<Item> itemList3 = new ArrayList<>();
+		itemList3.add(it3);
+		con3.setItems(itemList3);
+
+		conlist.add(con3);
+		
+		
 
 		/*
 		 * Container con3 = new Container(); con3.setType("TextBlock");
@@ -698,7 +745,7 @@ public class TicketService {
 
 		adcard.setActions(actList);
 		
-		tkt.setWelmsg("Yes");
+		tkt.setWelmsg("Yes");  // when people added then should not send again new chat group information
 		ticketRepo.save(tkt);
 		
 
@@ -814,15 +861,15 @@ public class TicketService {
 		MsTeams mst=new MsTeams();
 		mst.setWidth("full");
 		con.setType("Container");
-		con.setStyle("good");
+		//con.setStyle("good");
 		con.setBleed(true);
 		Item it1 = new Item();
 		it1.setType("TextBlock");
-		it1.setText("Hello All, New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+		it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
 		it1.setWeight("bolder");
 		it1.setSize("medium");
 		it1.setWrap(true);
-		//it1.setColor("good");
+		it1.setColor("accent");
 
 		ArrayList<Item> item = new ArrayList<>();
 		item.add(it1);
@@ -832,22 +879,46 @@ public class TicketService {
 
 		Container con2 = new Container();
 		con2.setType("Container");
-		con2.setStyle("good");
+		//con2.setStyle("good");
 		con2.setBleed(true);
 		Item it2 = new Item();
 		it2.setType("TextBlock");
-		it2.setText("Issue Details : " + tkt.getIssuedetails()+ " " + dep.get().getDeptName()
-				+ " Department people were added to this Chat Group");
+		it2.setText("Description : " + tkt.getIssuedetails()+ " ");
 		it2.setWeight("bolder");
 		it2.setSize("medium");
 		it2.setWrap(true);
+		it2.setColor("accent");
 		//it2.setColor("good");
+		
+		
+		
 
 		ArrayList<Item> itemList2 = new ArrayList<>();
 		itemList2.add(it2);
 		con2.setItems(itemList2);
 
 		conlist.add(con2);
+		
+		Container con3 = new Container();
+		con3.setType("Container");
+		//con2.setStyle("good");
+		con3.setBleed(true);
+
+		Item it3 = new Item();
+		it3.setType("TextBlock");
+		it3.setText(dep.get().getDeptName()
+				+ " Department people were added to this Chat Group");
+		it3.setWeight("bolder");
+		it3.setSize("medium");
+		it3.setWrap(true);
+	    it3.setColor("accent");
+
+		ArrayList<Item> itemList3 = new ArrayList<>();
+		itemList3.add(it3);
+		con3.setItems(itemList3);
+
+		conlist.add(con3);
+		
 
 		
 		// if we completely close the ticket then no need to add any trigger
