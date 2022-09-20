@@ -622,7 +622,7 @@ public class TicketService {
 
 		String json = null;
 
-		Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+		//Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 		List<Container> conlist = new ArrayList<>();
@@ -674,25 +674,20 @@ public class TicketService {
 		
 		
 		
-		Container con3 = new Container();
-		con3.setType("Container");
-		//con2.setStyle("good");
-		con3.setBleed(true);
-
-		Item it3 = new Item();
-		it3.setType("TextBlock");
-		it3.setText(dep.get().getDeptName()
-				+ " Department people were added to this Chat Group");
-		it3.setWeight("bolder");
-		it3.setSize("medium");
-		it3.setWrap(true);
-	    it3.setColor("accent");
-
-		ArrayList<Item> itemList3 = new ArrayList<>();
-		itemList3.add(it3);
-		con3.setItems(itemList3);
-
-		conlist.add(con3);
+		/*
+		 * Container con3 = new Container(); con3.setType("Container");
+		 * //con2.setStyle("good"); con3.setBleed(true);
+		 * 
+		 * Item it3 = new Item(); it3.setType("TextBlock");
+		 * it3.setText(dep.get().getDeptName() +
+		 * " Department people were added to this Chat Group"); it3.setWeight("bolder");
+		 * it3.setSize("medium"); it3.setWrap(true); it3.setColor("accent");
+		 * 
+		 * ArrayList<Item> itemList3 = new ArrayList<>(); itemList3.add(it3);
+		 * con3.setItems(itemList3);
+		 * 
+		 * conlist.add(con3);
+		 */
 		
 		
 
@@ -853,7 +848,7 @@ public class TicketService {
 		List<Container> conlist = new ArrayList<>();
 		List<ActionSet> actList = new ArrayList<>();
 
-		Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+		//Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
 
 		String json = null;
 
@@ -899,25 +894,20 @@ public class TicketService {
 
 		conlist.add(con2);
 		
-		Container con3 = new Container();
-		con3.setType("Container");
-		//con2.setStyle("good");
-		con3.setBleed(true);
-
-		Item it3 = new Item();
-		it3.setType("TextBlock");
-		it3.setText(dep.get().getDeptName()
-				+ " Department people were added to this Chat Group");
-		it3.setWeight("bolder");
-		it3.setSize("medium");
-		it3.setWrap(true);
-	    it3.setColor("accent");
-
-		ArrayList<Item> itemList3 = new ArrayList<>();
-		itemList3.add(it3);
-		con3.setItems(itemList3);
-
-		conlist.add(con3);
+		/*
+		 * Container con3 = new Container(); con3.setType("Container");
+		 * //con2.setStyle("good"); con3.setBleed(true);
+		 * 
+		 * Item it3 = new Item(); it3.setType("TextBlock");
+		 * it3.setText(dep.get().getDeptName() +
+		 * " Department people were added to this Chat Group"); it3.setWeight("bolder");
+		 * it3.setSize("medium"); it3.setWrap(true); it3.setColor("accent");
+		 * 
+		 * ArrayList<Item> itemList3 = new ArrayList<>(); itemList3.add(it3);
+		 * con3.setItems(itemList3);
+		 * 
+		 * conlist.add(con3);
+		 */
 		
 
 		
