@@ -98,9 +98,12 @@ public class Ticket_296 implements Serializable {
         @JsonProperty("statuscycleId")
         private String statuscycleId;
 
-        @Column(name = "departmentid")
-        @JsonProperty("departmentId")
-        private String departmentId;
+       
+        
+        @Column(name = "supportdepartmentid")
+        @JsonProperty("supportDepartmentId")
+        private String supportDepartmentId;
+
 
         @Column(name = "supportid")
         @JsonProperty("supportId")
@@ -342,14 +345,15 @@ public class Ticket_296 implements Serializable {
         }
 
         @JsonIgnore
-        public String getDepartmentId() {
-                return departmentId;
+        public String getSupportDepartmentId() {
+                return supportDepartmentId;
         }
 
         @JsonIgnore
-        public void setDepartmentId(String departmentId) {
-                this.departmentId = departmentId;
+        public void setSupportDepartmentId(String supportDepartmentId) {
+                this.supportDepartmentId = supportDepartmentId;
         }
+
 
         @JsonIgnore
         public String getSupportId() {

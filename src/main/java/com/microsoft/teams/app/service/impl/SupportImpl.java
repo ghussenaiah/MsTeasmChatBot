@@ -21,18 +21,19 @@ public class SupportImpl implements SupportRepo {
 
 	@Override
 	public List<Support_298> findAll() {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Support_298> findAll(Sort sort) {
-
+		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public List<Support_298> findAllById(Iterable<String> ids) {
+		// TODO Auto-generated method stub
 		return null;
 	}
 
@@ -45,7 +46,7 @@ public class SupportImpl implements SupportRepo {
 	@Override
 	public void flush() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
@@ -57,13 +58,13 @@ public class SupportImpl implements SupportRepo {
 	@Override
 	public void deleteInBatch(Iterable<Support_298> entities) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void deleteAllInBatch() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
@@ -98,6 +99,7 @@ public class SupportImpl implements SupportRepo {
 
 	@Override
 	public Optional<Support_298> findById(String id) {
+		// TODO Auto-generated method stub
 		return supportRepo.findById(id);
 	}
 
@@ -116,31 +118,31 @@ public class SupportImpl implements SupportRepo {
 	@Override
 	public void deleteById(String id) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void delete(Support_298 entity) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void deleteAll(Iterable<? extends Support_298> entities) {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public void deleteAll() {
 		// TODO Auto-generated method stub
-
+		
 	}
 
 	@Override
 	public <S extends Support_298> Optional<S> findOne(Example<S> example) {
 		// TODO Auto-generated method stub
-		return null;
+		return Optional.empty();
 	}
 
 	@Override
@@ -162,8 +164,15 @@ public class SupportImpl implements SupportRepo {
 	}
 
 	@Override
-	public List<Support_298> findAllByDepartmentId(String departmentId) {
-		return supportRepo.findAllByDepartmentId(departmentId);
+	public List<Support_298> findAllBySupportdepartmentId(String supportdepartmentid) {
+		// TODO Auto-generated method stub
+		return supportRepo.findAllBySupportdepartmentId(supportdepartmentid);
 	}
+
+	@Override
+	public Support_298 findAll(String id) {
+		return supportRepo.findAll(id);
+	}
+
 
 }

@@ -12,9 +12,9 @@ import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
+import com.microsoft.teams.app.entity.SupportDepartment_311;
 import com.microsoft.teams.app.repository.SupportRepo;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -48,7 +48,7 @@ public class DepartmentService {
 
 		// ============= create department Json structure done =======================
 
-		List<Department_23> departmentList = departmentImpl.findAll();
+		List<SupportDepartment_311> departmentList = departmentImpl.findAll();
 		System.out.println(departmentList);
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
@@ -84,7 +84,7 @@ public class DepartmentService {
 		con2.setValue("0");
 
 		ArrayList<Choices> choiceList = new ArrayList<>();
-		for (Department_23 dep : departmentList) {
+		for (SupportDepartment_311 dep : departmentList) {
 
 			Choices choice = new Choices();
 			choice.setTitle(dep.getDeptName());

@@ -95,16 +95,16 @@ public class Utility {
 	 * 
 	 * 10 filter conditions need to be updated for view in runtime for it department only it it people will see it issues 
 	 * 
-	 * 11 Show feedback form only eligible support types 
+	 * 11 Show feedback form only eligible support types               =>>>>>>>>>>> pending 
 	 * 
-	 * 12 quality rate order need to display in reverse order 
+	 * 12 quality rate order need to display in reverse order         ================> done
 	 * 
 	 * 
 	 * /* Improvements asked on Sep 14 202
 	 * 
 	 * 1 pls need to remove from lable dont use shortforms                  => done
 	 * 
-	 * 2 issue description should come with full display after ticket creation 
+	 * 2 issue description should come with full display after ticket creation  => done
 	 * 
 	 * 3 icon description changes srinivasformshelpdesk               
 	 * 
@@ -146,7 +146,25 @@ public class Utility {
 	 * 21 background color no need                                          => done
 	 * 
 	 * 22 helpdesk chat need to remove to clear aftrer clicking on go to chat need to confirmation
+	 * 
+	 * 
+	 * New Schema Changes 
+	 * 
+	 * 
+	 * Escalation Map Table with supportId and EmployeeId 
+	 * 
+	 * 
+	 * Fetching Employees from Support Deportment  
+	 * 
+	 * Fetching Function Support from Support 
+	 * 
+	 * Create Ticket 
+	 * 
+	 * Escalate to User  
+	 * 
 	 */
+	
+	
 	
 	
 	

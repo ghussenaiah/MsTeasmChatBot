@@ -57,7 +57,6 @@ import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.ChatHistory_299;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Ticket_296;
@@ -179,38 +178,37 @@ public class EchoBot extends TeamsActivityHandler {
 	private void processTurnContext(TurnContext turnContext) {
 
 		// List<Activity> activityList = new ArrayList<>();
-		logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
-		logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
-		logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
-		logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
-		logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
-		logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
+		//logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
+		//logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
+		//logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
+		//logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
+		//logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
+		//logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
 		// turnContext.getActivity().getConversation().setIsGroup(true);
-		logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
-		logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
-		logger.info("getId()=> " + turnContext.getActivity().getId());
-		logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
-		logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
-		logger.info("getText()=> " + turnContext.getActivity().getText());
-		logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
-		logger.info("getAction()=> " + turnContext.getActivity().getAction());
-		logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
-		logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
-		logger.info("getName()=> " + turnContext.getActivity().getName());
-		logger.info("getText()=> " + turnContext.getActivity().getText());
-		logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
-		logger.info("getType()=> " + turnContext.getActivity().getType());
-		logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
-		logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
-		logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
-		logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
-		logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
+		//logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
+		//logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
+		//logger.info("getId()=> " + turnContext.getActivity().getId());
+		//logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
+		//logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
+		//logger.info("getText()=> " + turnContext.getActivity().getText());
+		//logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
+		//logger.info("getAction()=> " + turnContext.getActivity().getAction());
+		//logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
+		//logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
+		//logger.info("getName()=> " + turnContext.getActivity().getName());
+		//logger.info("getText()=> " + turnContext.getActivity().getText());
+		//logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
+		//logger.info("getType()=> " + turnContext.getActivity().getType());
+		//logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
+		//logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
+		//logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
+		//logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
+		//logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
 
-		logger.info("getActivityId=> " + turnContext.getActivity().getId());
-		logger.info("getActivityName=> " + turnContext.getActivity().getName());
+		//logger.info("getActivityId=> " + turnContext.getActivity().getId());
+		//logger.info("getActivityName=> " + turnContext.getActivity().getName());
 
-		logger.info("getActivity().getConversation().getAadObjectId()=> "
-				+ turnContext.getActivity().getConversation().getAadObjectId());
+		//logger.info("getActivity().getConversation().getAadObjectId()=> "+ turnContext.getActivity().getConversation().getAadObjectId());
 
 		Attachment cardAttachment = null;
 		Attachment newcardAttachment = null;
@@ -412,38 +410,37 @@ public class EchoBot extends TeamsActivityHandler {
 
 		System.out.println("helo");
 
-		logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
-		logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
-		logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
-		logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
-		logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
-		logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
+		//logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
+		//logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
+		//logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
+		//logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
+		//logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
+		//logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
 		// turnContext.getActivity().getConversation().setIsGroup(true);
-		logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
-		logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
-		logger.info("getId()=> " + turnContext.getActivity().getId());
-		logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
-		logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
-		logger.info("getText()=> " + turnContext.getActivity().getText());
-		logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
-		logger.info("getAction()=> " + turnContext.getActivity().getAction());
-		logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
-		logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
-		logger.info("getName()=> " + turnContext.getActivity().getName());
-		logger.info("getText()=> " + turnContext.getActivity().getText());
-		logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
-		logger.info("getType()=> " + turnContext.getActivity().getType());
-		logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
-		logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
-		logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
-		logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
-		logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
+		//logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
+		//logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
+		//logger.info("getId()=> " + turnContext.getActivity().getId());
+		//logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
+		//logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
+		//logger.info("getText()=> " + turnContext.getActivity().getText());
+		//logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
+		//logger.info("getAction()=> " + turnContext.getActivity().getAction());
+		//logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
+		//logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
+		//logger.info("getName()=> " + turnContext.getActivity().getName());
+		//logger.info("getText()=> " + turnContext.getActivity().getText());
+		//logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
+		//logger.info("getType()=> " + turnContext.getActivity().getType());
+		//logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
+		//logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
+		//logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
+		//logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
+		//logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
 
-		logger.info("getActivityId=> " + turnContext.getActivity().getId());
-		logger.info("getActivityName=> " + turnContext.getActivity().getName());
+		//logger.info("getActivityId=> " + turnContext.getActivity().getId());
+		//logger.info("getActivityName=> " + turnContext.getActivity().getName());
 
-		logger.info("getActivity().getConversation().getAadObjectId()=> "
-				+ turnContext.getActivity().getConversation().getAadObjectId());
+		//logger.info("getActivity().getConversation().getAadObjectId()=> "+ turnContext.getActivity().getConversation().getAadObjectId());
 
 		
 		ticketService.IssueStatus(turnContext,ticket);

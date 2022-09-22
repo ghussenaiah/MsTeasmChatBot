@@ -6,6 +6,7 @@ import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,15 +38,18 @@ import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Department_23;
+import com.microsoft.teams.app.entity.EscalationMap_312;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
+import com.microsoft.teams.app.entity.SupportDepartment_311;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
+import com.microsoft.teams.app.repository.EscalationMapDao;
 import com.microsoft.teams.app.repository.TicketRepo;
 import com.microsoft.teams.app.repository.UserRepository;
 import com.microsoft.teams.app.entity.User;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
+import com.microsoft.teams.app.service.impl.EscalationMapImpl;
 import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.microsoft.teams.app.service.impl.TicketImpl;
 
@@ -74,6 +78,9 @@ public class EscalateTicketQualityService {
 
 	@Autowired
 	UserRepository userRepo;
+	
+	@Autowired
+	EscalationMapImpl escImpl;
 
 	/*
 	 * @Autowired AuthenticationService authService;
@@ -244,7 +251,10 @@ public class EscalateTicketQualityService {
 			
 			ticketRepo.save(tkt);
 			
-			User appuser=userRepo.findAll(tkt.getDepartmentId());
+			
+			EscalationMap_312 escMap=escImpl.findAllBySupportId(tkt.getSupportId());
+			
+			User appuser=escMap.getUser();
 
 			ChatMessage chatMessage = new ChatMessage();
 			ItemBody body = new ItemBody();
@@ -310,16 +320,21 @@ public class EscalateTicketQualityService {
 		String chaturl = null;
 		// MyNewApp
 
-		List<User> userList = userRepo.findAllByDepartmentId(tkt.getDepartmentId());
+		//List<User> userList = userRepo.findAllByDepartmentId(tkt.getSupportDepartmentId());
+		Support_298 sup = supportImpl.findAll(tkt.getSupportId());
+		
+		Set<User> userList=sup.getUser();
+		
+		
 		
 		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
 
-		for (int i = 0; i < userList.size(); i++) {
+		for (User user:userList) {
 
 			// Print all elements of List
 			// System.out.println(userList.get(i));
 
-			if (userList.get(i) != null && userList.get(i).getTeamsId() != null) {
+			if (user != null && user.getTeamsId() != null) {
 
 				AadUserConversationMember members = new AadUserConversationMember();
 				LinkedList<String> rolesList = new LinkedList<String>();
@@ -328,7 +343,7 @@ public class EscalateTicketQualityService {
 				// 5f92b236-28ec-474f-bae4-f9cab9275230
 				members.additionalDataManager().put("user@odata.bind",
 						new JsonPrimitive(
-								"https://graph.microsoft.com/v1.0/users('" + userList.get(i).getTeamsId() + "')"));
+								"https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
 				members.additionalDataManager().put("@odata.type",
 						new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 				membersList.add(members);
@@ -523,7 +538,7 @@ public class EscalateTicketQualityService {
 		AdaptiveCardsRequest adcard = null;
 		if (requestType == "Department") {
 
-			Optional<Department_23> dep = departmentImpl.findById(SelectedId);
+			Optional<SupportDepartment_311> dep = departmentImpl.findById(SelectedId);
 			adcard = new AdaptiveCardsRequest();
 
 			Container con = new Container();

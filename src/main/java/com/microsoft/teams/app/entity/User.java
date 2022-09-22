@@ -2,33 +2,21 @@ package com.microsoft.teams.app.entity;
 
 import javax.persistence.Column;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import lombok.Data;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import javax.persistence.Id;
 
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.JoinColumn;
-import javax.persistence.JoinTable;
-import javax.persistence.ManyToOne;
 import javax.persistence.Table;
 
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
 
-import javax.persistence.ForeignKey;
 
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
+
 
 import java.io.Serializable;
-import java.util.LinkedHashSet;
-import java.util.Set;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
@@ -136,31 +124,36 @@ public class User implements Serializable {
     @Column(name = "teamsid")
     @JsonProperty("teamsId")
     private String teamsId;
+	/*
+	 * @JsonSerialize(as = java.util.LinkedHashSet.class)
+	 * 
+	 * @JsonDeserialize(as = java.util.LinkedHashSet.class)
+	 * 
+	 * @Fetch(FetchMode.SELECT)
+	 * 
+	 * @ManyToMany(fetch = FetchType.EAGER)
+	 * 
+	 * @JoinTable(joinColumns = @JoinColumn(referencedColumnName = "id", name =
+	 * "userid"), inverseJoinColumns = @JoinColumn(referencedColumnName = "id", name
+	 * = "roleid"), name = "user__role")
+	 * 
+	 * @JsonProperty("Role") private Set<Role> Role = new LinkedHashSet<>();
+	 * 
+	 * 
+	 * @ManyToOne(fetch = FetchType.EAGER)
+	 * 
+	 * @JoinColumn(referencedColumnName = "id", name = "departmentid", updatable =
+	 * false, foreignKey = @ForeignKey(name = "FK_UserDepartment_23"), insertable =
+	 * false)
+	 * 
+	 * @JsonProperty("Department_23") private SupportDepartment_311 Department_23;
+	 */
     
-    @JsonSerialize(as = java.util.LinkedHashSet.class)
-    @JsonDeserialize(as = java.util.LinkedHashSet.class)
-    @Fetch(FetchMode.SELECT)
-    @ManyToMany(fetch = FetchType.EAGER)
-    @JoinTable(joinColumns = @JoinColumn(referencedColumnName = "id", name = "userid"), inverseJoinColumns = @JoinColumn(referencedColumnName = "id", name = "roleid"), name = "user__role")
-    @JsonProperty("Role")
-    private Set<Role> Role = new LinkedHashSet<>();
-
-
-    @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(referencedColumnName = "id", name = "departmentid", updatable = false, foreignKey = @ForeignKey(name = "FK_UserDepartment_23"), insertable = false)
-    @JsonProperty("Department_23")
-    private Department_23 Department_23;
-    
-    
-    @JsonIgnore
-    public Set<Role> getRole() {
-            return Role;
-    }
-
-    @JsonIgnore
-    public void setRole(Set<Role> Role) {
-            this.Role = Role;
-    }
+	/*
+	 * @JsonIgnore public Set<Role> getRole() { return Role; }
+	 * 
+	 * @JsonIgnore public void setRole(Set<Role> Role) { this.Role = Role; }
+	 */
 
 
     @JsonIgnore
@@ -453,15 +446,13 @@ public class User implements Serializable {
         this.teamsId = teamsId;
     }
 
-    @JsonIgnore
-    public Department_23 getDepartment_23() {
-        return Department_23;
-    }
-
-    @JsonIgnore
-    public void setDepartment_23(Department_23 Department_23) {
-        this.Department_23 = Department_23;
-    }
+	/*
+	 * @JsonIgnore public SupportDepartment_311 getSupportDepartment_311() { return
+	 * Department_23; }
+	 * 
+	 * @JsonIgnore public void setSupportDepartment_311(SupportDepartment_311
+	 * Department_23) { this.Department_23 = Department_23; }
+	 */
     
 
 

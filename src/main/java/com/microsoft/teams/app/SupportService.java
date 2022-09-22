@@ -41,14 +41,14 @@ public class SupportService {
 		Ticket_296 tkt = ticket.get(turnContext.getActivity().getFrom().getId());
 
 		if (tkt != null) {
-			tkt.setDepartmentId(departmentId);
+			tkt.setSupportDepartmentId(departmentId);
 		} else {
 			Ticket_296 t = new Ticket_296();
-			t.setDepartmentId(departmentId);
+			t.setSupportDepartmentId(departmentId);
 			ticket.put(turnContext.getActivity().getFrom().getId(), t);
 		}
 
-		List<Support_298> supportList = supportImpl.findAllByDepartmentId(departmentId);
+		List<Support_298> supportList = supportImpl.findAllBySupportdepartmentId(departmentId);
 		System.out.println(supportList);
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();

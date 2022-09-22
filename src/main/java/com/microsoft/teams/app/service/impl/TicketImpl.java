@@ -168,12 +168,7 @@ public class TicketImpl  implements TicketRepo{
 		return false;
 	}
 
-	@Override
-	public List<Support_298> findAllByDepartmentId(String departmentId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
+	
 	@Override
 	public Ticket_296 findAllByTicketNumber(String ticketNumber) {
 		return ticketRepo.findAllByTicketNumber(ticketNumber);

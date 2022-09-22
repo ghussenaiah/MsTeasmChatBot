@@ -27,10 +27,9 @@ import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Department_23;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
-
+import com.microsoft.teams.app.entity.SupportDepartment_311;
 import com.microsoft.teams.app.entity.Ticket_296;
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
@@ -367,14 +366,14 @@ public class TicketService {
 		
 		if (qualityrate.equalsIgnoreCase("1")) {
 			Choices choice001 = new Choices();
-			choice001.setTitle("1");
+			choice001.setTitle("1. POOR-Significant delay in Issue resolution.");
 			choice001.setValue("1");
 			choiceList.add(choice001);
 
 		} else if (qualityrate.equalsIgnoreCase("2")) {
 			
 			Choices choice002 = new Choices();
-			choice002.setTitle("2");
+			choice002.setTitle("2. NEEDS IMPROVEMENT-Delay in Issue resolution.");
 			choice002.setValue("2");
 			choiceList.add(choice002);
 
@@ -383,7 +382,7 @@ public class TicketService {
 
 
 			Choices choice003 = new Choices();
-			choice003.setTitle("3");
+			choice003.setTitle("3. GOOD-Issue resolved in reasonable time.");
 			choice003.setValue("3");
 			choiceList.add(choice003);
 
@@ -391,14 +390,14 @@ public class TicketService {
 		} else if (qualityrate.equalsIgnoreCase("4")) {
 			
 			Choices choice004 = new Choices();
-			choice004.setTitle("4");
+			choice004.setTitle("4. EXCELLENT-Issue resolved within expected time.");
 			choice004.setValue("4");
 			choiceList.add(choice004);
 
 		} else if (qualityrate.equalsIgnoreCase("5")) {
 			
 			Choices choice005 = new Choices();
-			choice005.setTitle("5");
+			choice005.setTitle("5. OUTSTANDING-Issue resolved in less than expected time.");
 			choice005.setValue("5");
 			choiceList.add(choice005);
 
@@ -410,9 +409,9 @@ public class TicketService {
 		/// work in progresss =============================================
 
 		conlist.add(con3);
-
 		
-		//Container con5 = new Container();
+	
+	//Container con5 = new Container();
 		//con5.setType("Container");
 
 		//Item it5 = new Item();
@@ -503,6 +502,7 @@ public class TicketService {
 			tkt.setUpdatedBy(turnContext.getActivity().getFrom().getName());
 			tkt.setCreatedBy(turnContext.getActivity().getFrom().getName());
 
+
 			lastNumberObj.setAutoCodeNo(lastNumberObj.getAutoCodeNo() + 1);
 			autoGenerationRepo.save(lastNumberObj);
 
@@ -511,7 +511,7 @@ public class TicketService {
 			// List<Ticket_296> tktlist = ticketRepo.findAll();
 			// System.out.println(tktlist);
 
-			Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+			Optional<SupportDepartment_311> dep = departmentImpl.findById(tkt.getSupportDepartmentId());
 
 			
 

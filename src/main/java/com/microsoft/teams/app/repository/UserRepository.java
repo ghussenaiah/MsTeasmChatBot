@@ -18,7 +18,7 @@ public interface UserRepository extends JpaRepository<User, String> {
 
 	
 	// fetching hod data
-	@Query("SELECT u FROM User u JOIN u.Role r WHERE u.departmentId = :departmentId and r.roleName='Indent Approver1'")
-	public User findAll(@Param("departmentId") String departmentid);
+	//@Query("SELECT u FROM User u JOIN u.Role r WHERE u.departmentId = :departmentId and r.roleName='Indent Approver1'")
+	//public User findAll(@Param("departmentId") String departmentid);
 
 }
