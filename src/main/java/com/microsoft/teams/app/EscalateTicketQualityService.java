@@ -396,6 +396,21 @@ public class EscalateTicketQualityService {
 		chat.topic = "Ticket #".concat(tkt.getTicketNumber() + " " + tkt.getTicketTitle());
 		
 		
+		AadUserConversationMember members1 = new AadUserConversationMember();
+		LinkedList<String> rolesList1 = new LinkedList<String>();
+		rolesList1.add("owner");
+		members1.roles = rolesList1;
+		members1.additionalDataManager().put("user@odata.bind",
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
+		members1.additionalDataManager().put("@odata.type",
+				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+
+		membersList.add(members1);
+		
+		
+		 
+		
+		
 
 		if (!addedMembers.contains(turnContext.getActivity().getFrom().getAadObjectId())) {
 			
@@ -413,6 +428,7 @@ public class EscalateTicketQualityService {
 		 
 		
 		//turnContext.getActivity().getFrom().getAadObjectId()
+		
 		
 		/*
 		 * AadUserConversationMember members1 = new AadUserConversationMember();
