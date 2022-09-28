@@ -789,7 +789,6 @@ public class TicketService {
 				newactivity.setId(turnContext.getActivity().getReplyToId());
 				CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
 				System.out.println(resourceresponse);
-				ticketService.StatusDbUpdate(triggerClicked, turnContext, tkt, cardAttachment);
 
 			} else if ("ESCALATE".equalsIgnoreCase(triggerClicked)
 					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_11")
@@ -808,13 +807,22 @@ public class TicketService {
 				newactivity.setId(turnContext.getActivity().getReplyToId());
 				CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
 				System.out.println(resourceresponse);
-				ticketService.StatusDbUpdate(triggerClicked, turnContext, tkt, cardAttachment);
 
 			}
+
+			//System.out.println("statement started");
+			Thread newThread = new Thread(() -> {
+				ticketService.StatusDbUpdate(triggerClicked, turnContext, tkt, cardAttachment);
+			});
+			newThread.start();
+			//System.out.println("statement reached");
 
 		}
 
 	}
+	
+	
+	
 	
 	public void StatusDbUpdate(String triggerClicked, TurnContext turnContext, Ticket_296 tkt,
 			Attachment cardAttachment) {

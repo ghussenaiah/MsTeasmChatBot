@@ -15,7 +15,7 @@ public class Utility {
 	
 	 //1  Before live deploy for jar application we have to add https and /botapp context app in application.properties file
 	
-	 //2 authentication also need to change
+	 //2  Authentication also need to change
 	
 	 /*   Bot Related Tasks
 	 

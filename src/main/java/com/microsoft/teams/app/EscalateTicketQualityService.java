@@ -2,6 +2,7 @@ package com.microsoft.teams.app;
 
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -325,6 +326,8 @@ public class EscalateTicketQualityService {
 		
 		Set<User> userList=sup.getUser();
 		
+		Set<String> addedMembers=new HashSet<String>();
+		
 		
 		
 		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
@@ -341,6 +344,7 @@ public class EscalateTicketQualityService {
 				rolesList.add("owner");
 				members.roles = rolesList;
 				// 5f92b236-28ec-474f-bae4-f9cab9275230
+				addedMembers.add(user.getTeamsId());
 				members.additionalDataManager().put("user@odata.bind",
 						new JsonPrimitive(
 								"https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
@@ -384,22 +388,32 @@ public class EscalateTicketQualityService {
 		 * .authenticationProvider(tokenCredentialAuthProvider).buildClient();
 		 * System.out.println(graphClient.getServiceRoot());
 		 */
+		
+	
 
 		Chat chat = new Chat();
 		chat.chatType = ChatType.GROUP;
 		chat.topic = "Ticket #".concat(tkt.getTicketNumber() + " " + tkt.getTicketTitle());
+		
+		
 
-		AadUserConversationMember members = new AadUserConversationMember();
-		LinkedList<String> rolesList = new LinkedList<String>();
-		rolesList.add("owner");
-		members.roles = rolesList;
-		members.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
-		members.additionalDataManager().put("@odata.type",
-				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-		membersList.add(members);
+		if (!addedMembers.contains(turnContext.getActivity().getFrom().getAadObjectId())) {
+			
+			AadUserConversationMember members = new AadUserConversationMember();
+			LinkedList<String> rolesList = new LinkedList<String>();
+			rolesList.add("owner");
+			members.roles = rolesList;
+			//members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
+			members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+turnContext.getActivity().getFrom().getAadObjectId()+"')"));
+			members.additionalDataManager().put("@odata.type",
+					new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+			membersList.add(members);
+			
+		}
 		 
-
+		
+		//turnContext.getActivity().getFrom().getAadObjectId()
+		
 		/*
 		 * AadUserConversationMember members1 = new AadUserConversationMember();
 		 * LinkedList<String> rolesList1 = new LinkedList<String>();
@@ -469,6 +483,8 @@ public class EscalateTicketQualityService {
 			System.out.println(cli.topic);
 			System.out.println(cli.webUrl);
 			System.out.println(cli.oDataType);
+			
+			addedMembers.clear();
 
 		} catch (Exception e) {
 			// logger.debug("" + e.getMessage());
