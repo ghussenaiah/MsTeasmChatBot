@@ -411,17 +411,18 @@ public class EscalateTicketQualityService {
 		membersList.add(members1);
 		addedMembers.add("5f92b236-28ec-474f-bae4-f9cab9275230");
 		
-		AadUserConversationMember members2 = new AadUserConversationMember();
-		LinkedList<String> rolesList2 = new LinkedList<String>();
-		rolesList2.add("owner");
-		members2.roles = rolesList2;
-		members2.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('dc4b37af-3ca2-4049-989b-069589d57e72')"));
-		members2.additionalDataManager().put("@odata.type",
-				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-
-		membersList.add(members2);
-		addedMembers.add("dc4b37af-3ca2-4049-989b-069589d57e72");
+		/*
+		 * AadUserConversationMember members2 = new AadUserConversationMember();
+		 * LinkedList<String> rolesList2 = new LinkedList<String>();
+		 * rolesList2.add("owner"); members2.roles = rolesList2;
+		 * members2.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
+		 * "https://graph.microsoft.com/v1.0/users('dc4b37af-3ca2-4049-989b-069589d57e72')"
+		 * )); members2.additionalDataManager().put("@odata.type", new
+		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		 * 
+		 * membersList.add(members2);
+		 * addedMembers.add("dc4b37af-3ca2-4049-989b-069589d57e72");
+		 */
 		
 		
 		
