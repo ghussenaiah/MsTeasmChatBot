@@ -27,7 +27,7 @@ public class AdaptiveCardsRequest {
 	public AdaptiveCardsRequest() {
 		this.set$schema("http://adaptivecards.io/schemas/adaptive-card.json");
 		this.type = "AdaptiveCard";
-		this.version = "1.0";
+		this.version = "1.4";
 		//this.backgroundColor="#CCCCCC";
 
 	}

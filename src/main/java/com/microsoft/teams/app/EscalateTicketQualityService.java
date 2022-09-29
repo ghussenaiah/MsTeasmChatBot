@@ -1,5 +1,6 @@
 package com.microsoft.teams.app;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -19,8 +20,8 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.JsonPrimitive;
 
 import com.microsoft.bot.builder.TurnContext;
-
 import com.microsoft.graph.models.AadUserConversationMember;
+
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.Chat;
 import com.microsoft.graph.models.ChatMessage;
@@ -89,7 +90,7 @@ public class EscalateTicketQualityService {
 
 	public String ticketStatusUpdate(String status, Ticket_296 tkt,
 			TurnContext turnContext) {
-
+		
 		String json = null;
 		// tkt = ticket.get(turnContext.getActivity().getFrom().getId());
 		// String msgId=turnContext.getActivity().getReplyToId();
@@ -244,7 +245,7 @@ public class EscalateTicketQualityService {
 
 			return json;
 
-		} else if ("ESCALATE".equalsIgnoreCase(status)) {
+		} else if ("ESCALATE".equalsIgnoreCase(status) && tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
 			final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
 			
@@ -352,6 +353,8 @@ public class EscalateTicketQualityService {
 						new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 				membersList.add(members);
 			}
+			
+			
 
 		}
 
@@ -406,12 +409,22 @@ public class EscalateTicketQualityService {
 				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 
 		membersList.add(members1);
+		addedMembers.add("5f92b236-28ec-474f-bae4-f9cab9275230");
 		
-		
-		 
-		
-		
+		AadUserConversationMember members2 = new AadUserConversationMember();
+		LinkedList<String> rolesList2 = new LinkedList<String>();
+		rolesList2.add("owner");
+		members2.roles = rolesList2;
+		members2.additionalDataManager().put("user@odata.bind",
+				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('dc4b37af-3ca2-4049-989b-069589d57e72')"));
+		members2.additionalDataManager().put("@odata.type",
+				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 
+		membersList.add(members2);
+		addedMembers.add("dc4b37af-3ca2-4049-989b-069589d57e72");
+		
+		
+		
 		if (!addedMembers.contains(turnContext.getActivity().getFrom().getAadObjectId())) {
 			
 			AadUserConversationMember members = new AadUserConversationMember();
@@ -463,6 +476,8 @@ public class EscalateTicketQualityService {
 
 			// graphClient.applications().buildRequest().post(application);
 			Chat cli = graphClient.chats().buildRequest().post(chat);
+			
+			
 
 			/*
 			 * Chat chat1 = new Chat(); chat1.topic = "Group chat title update";
@@ -533,36 +548,39 @@ public class EscalateTicketQualityService {
 		if (tkt == null) {
 			tkt = ticketRepo.findAllByChatGroupId(ChatId);
 		}
+		
+		if (tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
-		if (((botResponseMap).get("Remarks")) != null) {
-			tkt.setTicketQualityComments((String) ((botResponseMap).get("Remarks")));
+			if (((botResponseMap).get("Remarks")) != null) {
+				tkt.setTicketQualityComments((String) ((botResponseMap).get("Remarks")));
+			}
+
+			if (((botResponseMap).get("QualityRate")) != null) {
+				tkt.setTicketQualityRate((String) ((botResponseMap).get("QualityRate")));
+
+			} else if (((botResponseMap).get("secondColumn")) != null) {
+				tkt.setTicketQualityRate("2");
+
+			} else if (((botResponseMap).get("thirdColumn")) != null) {
+				tkt.setTicketQualityRate("3");
+
+			} else if (((botResponseMap).get("fourthColumn")) != null) {
+				tkt.setTicketQualityRate("4");
+
+			} else if (((botResponseMap).get("fifthColumn")) != null) {
+				tkt.setTicketQualityRate("5");
+
+			}
+
+			ticketRepo.save(tkt);
 		}
-
-		if (((botResponseMap).get("QualityRate")) != null) {
-			tkt.setTicketQualityRate((String) ((botResponseMap).get("QualityRate")));
-
-		} else if (((botResponseMap).get("secondColumn")) != null) {
-			tkt.setTicketQualityRate("2");
-
-		} else if (((botResponseMap).get("thirdColumn")) != null) {
-			tkt.setTicketQualityRate("3");
-
-		} else if (((botResponseMap).get("fourthColumn")) != null) {
-			tkt.setTicketQualityRate("4");
-
-		} else if (((botResponseMap).get("fifthColumn")) != null) {
-			tkt.setTicketQualityRate("5");
-
-		}
-
-		ticketRepo.save(tkt);
 
 		return "";
 
 	}
 
 	public String AdaptiveCardForPreviousSelection(String SelectedId, String requestType,
-			LinkedHashMap botResponseMap,TurnContext turnContext) {
+			LinkedHashMap botResponseMap,TurnContext turnContext) throws IOException {
 
 		// ============= Thanks Json structure done =======================
 

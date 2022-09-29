@@ -102,13 +102,21 @@ public class FetchnSave_Retry_Mechanism {
 	//@Scheduled(cron = "*/1 * * * * *")
 	
 	
-	@Scheduled(cron = "*/10 * * * * *")
+	//
+	//@PostConstruct
+	//@Scheduled(cron = "*/10 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
 		updateTeamsMsgToDatabase();
+		/*
+		 * System.out.println("statement started"); Thread newThread = new Thread(() ->
+		 * { factorial(); }); newThread.start();
+		 * System.out.println("statement reached");
+		 */
 		// updateTicketQualityAfter5Hours();
 	}
-
+	
+	
 	public synchronized void updateTicketQualityAfter5Hours() throws Exception {
 
 		List<Ticket_296> tkts = ticketRepo.findAllByStatuscycleId("27");

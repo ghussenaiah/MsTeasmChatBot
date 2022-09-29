@@ -25,6 +25,8 @@ import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.ResourceResponse;
 
+
+
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.ThumbnailCard;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
@@ -163,7 +165,12 @@ public class EchoBot extends TeamsActivityHandler {
 	@Override
 	protected CompletableFuture<Void> onMessageActivity(TurnContext turnContext) {
 
-		processTurnContext(turnContext);
+		try {
+			processTurnContext(turnContext);
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
 
 		// return turnContext.sendActivity(activity).th
 		return CompletableFuture.completedFuture(null);
@@ -175,7 +182,7 @@ public class EchoBot extends TeamsActivityHandler {
 	}
 
 	// user method
-	private void processTurnContext(TurnContext turnContext) {
+	private void processTurnContext(TurnContext turnContext) throws IOException {
 
 		// List<Activity> activityList = new ArrayList<>();
 		//logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
@@ -290,26 +297,12 @@ public class EchoBot extends TeamsActivityHandler {
 
 			} else if (((botResponseMap).get("Remarks")) != null) {
 				cardAttachment = new Attachment();
-				try {
-
-					newcardAttachment = new Attachment();
-					newcardAttachment.setContent(Serialization.jsonToTree(ticketQualityService
-							.AdaptiveCardForPreviousSelection(((String) (botResponseMap).get("Remarks")),
-									"StatusUpdate", botResponseMap, turnContext)));
-					newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
-					Activity newactivity = MessageFactory.attachment(newcardAttachment);
-					newactivity.setId(turnContext.getActivity().getReplyToId());
-					CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
-					System.out.println(resourceresponse);
+				ticketQualityService
+							.AdaptiveCardForPreviousSelection((String) (botResponseMap).get("Remarks"),
+									"StatusUpdate", botResponseMap, turnContext);
+				
 
 					ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext);
-
-					// ticket close update here and thanks adaptive card will go
-					// cardAttachment.setContent(Serialization.jsonToTree();
-				} catch (IOException e) {
-
-					e.printStackTrace();
-				}
 			}
 
 			else {
@@ -513,6 +506,10 @@ public class EchoBot extends TeamsActivityHandler {
 				ResourceResponse rr = resourceresponse.get();
 				
 				tkt.setClstktreplyId(rr.getId());
+				
+			
+				
+				
 				
 				ticketRepo.save(tkt);
 

@@ -301,17 +301,20 @@ public class TicketService {
 	}
 
 	
-	public String feedbackUpdatedForm(LinkedHashMap botResponseMap, TurnContext turnContext) {
+	public String feedbackUpdatedForm(LinkedHashMap botResponseMap, TurnContext turnContext) throws IOException {
 
 		Ticket_296 tkt = null;
 		String remarks = null;
 		String qualityrate = null;
 		String json = null;
-
+		
 		String ChatId = turnContext.getActivity().getConversation().getId();
 		if (tkt == null) {
 			tkt = ticketRepo.findAllByChatGroupId(ChatId);
 		}
+		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		List<Container> conlist = new ArrayList<>();
+		if(tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
 		if (((botResponseMap).get("Remarks")) != null) {
 			tkt.setTicketQualityComments((String) ((botResponseMap).get("Remarks")));
@@ -322,8 +325,7 @@ public class TicketService {
 			qualityrate = (String) ((botResponseMap).get("QualityRate"));
 		}
 
-		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
-		List<Container> conlist = new ArrayList<>();
+		
 	
 		Container con = new Container();
 		con.setType("Container");
@@ -449,14 +451,40 @@ public class TicketService {
 
 		adcard.setBody(conlist);
 		adcard.setMsTeams(mst);
-
+		
 		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
 		try {
 			json = ow.writeValueAsString(adcard);
+
+			Attachment newcardAttachment = new Attachment();
+			newcardAttachment.setContent(Serialization.jsonToTree(json));
+			newcardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+			Activity newactivity = MessageFactory.attachment(newcardAttachment);
+			newactivity.setId(turnContext.getActivity().getReplyToId());
+			CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
+			System.out.println(resourceresponse);
 		} catch (JsonProcessingException e) {
 
 			e.printStackTrace();
 		}
+
+		
+	}
+	/*
+	 * else {
+	 * 
+	 * Container con = new Container(); con.setType("Container"); MsTeams mst = new
+	 * MsTeams(); mst.setWidth("full"); Item it1 = new Item();
+	 * it1.setType("TextBlock");
+	 * it1.setText("Unauthorized user pls contact IT support");
+	 * it1.setWeight("bolder"); it1.setSize("medium"); it1.setWrap(true);
+	 * it1.setColor("Attention"); ArrayList<Item> item = new ArrayList<>();
+	 * item.add(it1); con.setItems(item); conlist.add(con); adcard.setBody(conlist);
+	 * adcard.setMsTeams(mst); }
+	 */
+		
+		
+	
 
 		return json;
 
@@ -478,6 +506,8 @@ public class TicketService {
 
 		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
 		int tktNumber = lastNumberObj.getAutoCodeNo();
+		
+	
 
 		Long trasactionNumber = utility.nextId();
 
@@ -490,7 +520,7 @@ public class TicketService {
 			tkt.setUpdateDateTime(dt);
 			tkt.setTicketNumber(String.valueOf(lastNumberObj.getAutoCodeNo()));
 			tkt.setId(String.valueOf(lastNumberObj.getAutoCodeNo()));
-			tkt.setEmployeeTeamsId(turnContext.getActivity().getFrom().getId());
+			tkt.setEmployeeTeamsId(turnContext.getActivity().getFrom().getAadObjectId());
 			tkt.setTransactionentityId(trasactionNumber);
 			tkt.setChatGroupId(null);
 			tkt.setNextRoles(null);
@@ -616,6 +646,12 @@ public class TicketService {
 
 		return json;
 
+	}
+	
+	
+	public void createTicketAsyncCall()
+	{
+		
 	}
 
 	public String SendChatInitialMessage(TurnContext turnContext, Ticket_296 tkt) {
@@ -753,6 +789,97 @@ public class TicketService {
 
 			e.printStackTrace();
 		}
+		
+		String test=null;
+		
+		test ="{\n"
+				+ "  \"$schema\" : \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+				+ "  \"type\" : \"AdaptiveCard\",\n"
+				+ "  \"version\" : \"1.4\",\n"
+				+ "  \"msTeams\" : {\n"
+				+ "    \"width\" : \"full\"\n"
+				+ "  },\n"
+				+ "  \"body\" : [ {\n"
+				+ "    \"type\" : \"Container\",\n"
+				+ "    \"bleed\" : true,\n"
+				+ "    \"items\" : [ {\n"
+				+ "      \"type\" : \"TextBlock\",\n"
+				+ "      \"size\" : \"medium\",\n"
+				+ "      \"weight\" : \"bolder\",\n"
+				+ "      \"text\" : \"New chat group created with ticket #525501 for discussion !!\",\n"
+				+ "      \"wrap\" : true,\n"
+				+ "      \"color\" : \"accent\"\n"
+				+ "    } ],\n"
+				+ "    \"maxLines\" : 0\n"
+				+ "  }, {\n"
+				+ "    \"type\" : \"Container\",\n"
+				+ "    \"bleed\" : true,\n"
+				+ "    \"items\" : [ {\n"
+				+ "      \"type\" : \"TextBlock\",\n"
+				+ "      \"size\" : \"medium\",\n"
+				+ "      \"weight\" : \"bolder\",\n"
+				+ "      \"text\" : \"Description : test \",\n"
+				+ "      \"wrap\" : true,\n"
+				+ "      \"color\" : \"accent\"\n"
+				+ "    } ],\n"
+				+ "    \"maxLines\" : 0\n"
+				+ "  } ],\n"
+				+ "\"refresh\": {\n"
+				+ "    \"action\": {\n"
+				+ "      \"type\": \"Action.Execute\",\n"
+				+ "      \"title\": \"Close\",\n"
+				+ "      \"verb\": \"editOrResolveView\",\n"
+				+ "      \"data\": {\n"
+				+ "            \"refresh info\": \"<refresh info>\"\n"
+				+ "      }\n"
+				+ "    },\n"
+				+ "    \"userIds\": [\"29:1BYIf-yESZSS4Yak2Wn6F8pzObmcYrwOp2yjdtCn2MjaiKeLob2wi__U83vpnAB3po2Jp1wQvlj2OK-dLpCYXPw\"]\n"
+				+ "  }\n"
+				+ "}\n"
+				+ "";
+		
+		test="{\n"
+				+ "  \"$schema\" : \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+				+ "  \"type\" : \"AdaptiveCard\",\n"
+				+ "  \"version\" : \"1.4\",\n"
+				+ "  \"msTeams\" : {\n"
+				+ "    \"width\" : \"full\"\n"
+				+ "  },\n"
+				+ "  \"body\" : [ {\n"
+				+ "    \"type\" : \"Container\",\n"
+				+ "    \"bleed\" : true,\n"
+				+ "    \"items\" : [ {\n"
+				+ "      \"type\" : \"TextBlock\",\n"
+				+ "      \"size\" : \"medium\",\n"
+				+ "      \"weight\" : \"bolder\",\n"
+				+ "      \"text\" : \"New chat group created with ticket #525501 for discussion !!\",\n"
+				+ "      \"wrap\" : true,\n"
+				+ "      \"color\" : \"accent\"\n"
+				+ "    } ],\n"
+				+ "    \"maxLines\" : 0\n"
+				+ "  }, {\n"
+				+ "    \"type\" : \"Container\",\n"
+				+ "    \"bleed\" : true,\n"
+				+ "    \"items\" : [ {\n"
+				+ "      \"type\" : \"TextBlock\",\n"
+				+ "      \"size\" : \"medium\",\n"
+				+ "      \"weight\" : \"bolder\",\n"
+				+ "      \"text\" : \"Description : test \",\n"
+				+ "      \"wrap\" : true,\n"
+				+ "      \"color\" : \"accent\"\n"
+				+ "    } ],\n"
+				+ "    \"maxLines\" : 0\n"
+				+ "  } ],\n"
+				+ "\"refresh\": {\n"
+				+ "    \"action\": {\n"
+				+ "      \"type\": \"Action.Execute\",\n"
+				+ "      \"title\": \"Close\"\n"
+				+ "    },\n"
+				+ "    \"userIds\": [\"29:1BYIf-yESZSS4Yak2Wn6F8pzObmcYrwOp2yjdtCn2MjaiKeLob2wi__U83vpnAB3po2Jp1wQvlj2OK-dLpCYXPw\"]\n"
+				+ "  }\n"
+				+ "}";
+		
+		
 		return json;
 
 	}
@@ -792,7 +919,7 @@ public class TicketService {
 
 			} else if ("ESCALATE".equalsIgnoreCase(triggerClicked)
 					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_11")
-					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10")) {
+					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10") && tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
 				updatetriggerAttachment = new Attachment();
 				try {
