@@ -105,7 +105,7 @@ public class FetchnSave_Retry_Mechanism {
 	
 	//
 	//@PostConstruct
-	@Scheduled(cron = "*/10 * * * * *")
+	//@Scheduled(cron = "*/10 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
 		updateTeamsMsgToDatabase();

@@ -457,7 +457,7 @@ public class EchoBot extends TeamsActivityHandler {
 		// logger.info("getActivity().getConversation().getAadObjectId()=> "+
 		// turnContext.getActivity().getConversation().getAadObjectId());
 
-		ticketService.IssueStatus(turnContext, ticket);
+		//ticketService.IssueStatus(turnContext, ticket);
 		
 		
 		return CompletableFuture.completedFuture(null);
