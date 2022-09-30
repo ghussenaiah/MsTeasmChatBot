@@ -104,7 +104,6 @@ public class DepartmentService {
 		ActionSet action = new ActionSet();
 		action.setType("Action.Submit");
 		action.setTitle("OK");
-
 		actList.add(action);
 
 		adcard.setActions(actList);
@@ -118,7 +117,7 @@ public class DepartmentService {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		return json;
 
 		/*

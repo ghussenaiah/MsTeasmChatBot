@@ -18,5 +18,6 @@ public class ActionData {
 	private String key2;
 	private MsTeams msteams;
 	private String extraData;
+	private String button;
 
 }

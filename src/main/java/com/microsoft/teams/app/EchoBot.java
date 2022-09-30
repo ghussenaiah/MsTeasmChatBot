@@ -25,8 +25,6 @@ import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.ResourceResponse;
 
-
-
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.ThumbnailCard;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
@@ -40,7 +38,7 @@ import com.microsoft.graph.core.CustomRequestBuilder;
 import com.microsoft.graph.models.AadUserConversationMember;
 
 import com.microsoft.graph.models.DriveItem;
-
+import com.microsoft.graph.models.PinnedChatMessageInfo;
 import com.microsoft.graph.models.TeamsAppInstallation;
 
 import com.microsoft.graph.models.User;
@@ -147,11 +145,9 @@ public class EchoBot extends TeamsActivityHandler {
 
 	@Autowired
 	FetchnSave_Retry_Mechanism fetchnSave_Retry_Mechanism;
-	
 
 	public ConcurrentHashMap<String, Ticket_296> ticket = new ConcurrentHashMap<>();
 
-	
 	/*
 	 * @PostConstruct public void test() {
 	 * 
@@ -185,37 +181,48 @@ public class EchoBot extends TeamsActivityHandler {
 	private void processTurnContext(TurnContext turnContext) throws IOException {
 
 		// List<Activity> activityList = new ArrayList<>();
-		//logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
-		//logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
-		//logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
-		//logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
-		//logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
-		//logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
+		// logger.info("getChannelData()=> " +
+		// turnContext.getActivity().getChannelData().toString());
+		// logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
+		// logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
+		// logger.info("getConversationId()=> " +
+		// turnContext.getActivity().getConversation().getId());
+		// logger.info("getConversationType()=> " +
+		// turnContext.getActivity().getConversation().getConversationType());
+		// logger.info("getConversationName()=> " +
+		// turnContext.getActivity().getConversation().getName());
 		// turnContext.getActivity().getConversation().setIsGroup(true);
-		//logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
-		//logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
-		//logger.info("getId()=> " + turnContext.getActivity().getId());
-		//logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
-		//logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
-		//logger.info("getText()=> " + turnContext.getActivity().getText());
-		//logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
-		//logger.info("getAction()=> " + turnContext.getActivity().getAction());
-		//logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
-		//logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
-		//logger.info("getName()=> " + turnContext.getActivity().getName());
-		//logger.info("getText()=> " + turnContext.getActivity().getText());
-		//logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
-		//logger.info("getType()=> " + turnContext.getActivity().getType());
-		//logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
-		//logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
-		//logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
-		//logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
-		//logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
+		// logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
+		// logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
+		// logger.info("getId()=> " + turnContext.getActivity().getId());
+		// logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
+		// logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
+		// logger.info("getText()=> " + turnContext.getActivity().getText());
+		// logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
+		// logger.info("getAction()=> " + turnContext.getActivity().getAction());
+		// logger.info("getDeliveryMode()=> " +
+		// turnContext.getActivity().getDeliveryMode());
+		// logger.info("getImportance()=> " +
+		// turnContext.getActivity().getImportance());
+		// logger.info("getName()=> " + turnContext.getActivity().getName());
+		// logger.info("getText()=> " + turnContext.getActivity().getText());
+		// logger.info("getServiceUrl()=> " +
+		// turnContext.getActivity().getServiceUrl());
+		// logger.info("getType()=> " + turnContext.getActivity().getType());
+		// logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
+		// logger.info("teamsGetTeamId()=> " +
+		// turnContext.getActivity().teamsGetTeamId());
+		// logger.info("getConversation().getName())=> " +
+		// turnContext.getActivity().getConversation().getName());
+		// logger.info("getRecipientId=> " +
+		// turnContext.getActivity().getRecipient().getId());
+		// logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
 
-		//logger.info("getActivityId=> " + turnContext.getActivity().getId());
-		//logger.info("getActivityName=> " + turnContext.getActivity().getName());
+		// logger.info("getActivityId=> " + turnContext.getActivity().getId());
+		// logger.info("getActivityName=> " + turnContext.getActivity().getName());
 
-		//logger.info("getActivity().getConversation().getAadObjectId()=> "+ turnContext.getActivity().getConversation().getAadObjectId());
+		// logger.info("getActivity().getConversation().getAadObjectId()=> "+
+		// turnContext.getActivity().getConversation().getAadObjectId());
 
 		Attachment cardAttachment = null;
 		Attachment newcardAttachment = null;
@@ -297,12 +304,16 @@ public class EchoBot extends TeamsActivityHandler {
 
 			} else if (((botResponseMap).get("Remarks")) != null) {
 				cardAttachment = new Attachment();
-				ticketQualityService
-							.AdaptiveCardForPreviousSelection((String) (botResponseMap).get("Remarks"),
-									"StatusUpdate", botResponseMap, turnContext);
-				
+				ticketQualityService.AdaptiveCardForPreviousSelection((String) (botResponseMap).get("Remarks"),
+						"StatusUpdate", botResponseMap, turnContext);
 
-					ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext);
+				//ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext);
+				
+				cardAttachment.setContent(
+						Serialization.jsonToTree(ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext)));
+			}
+			else if (((botResponseMap).get("button")) != null) {
+				  ticketService.IssueStatus(turnContext, ticket);
 			}
 
 			else {
@@ -403,41 +414,52 @@ public class EchoBot extends TeamsActivityHandler {
 
 		System.out.println("helo");
 
-		//logger.info("getChannelData()=> " + turnContext.getActivity().getChannelData().toString());
-		//logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
-		//logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
-		//logger.info("getConversationId()=> " + turnContext.getActivity().getConversation().getId());
-		//logger.info("getConversationType()=> " + turnContext.getActivity().getConversation().getConversationType());
-		//logger.info("getConversationName()=> " + turnContext.getActivity().getConversation().getName());
+		// logger.info("getChannelData()=> " +
+		// turnContext.getActivity().getChannelData().toString());
+		// logger.info("getCallerId()=> " + turnContext.getActivity().getCallerId());
+		// logger.info("getSummary()=> " + turnContext.getActivity().getSummary());
+		// logger.info("getConversationId()=> " +
+		// turnContext.getActivity().getConversation().getId());
+		// logger.info("getConversationType()=> " +
+		// turnContext.getActivity().getConversation().getConversationType());
+		// logger.info("getConversationName()=> " +
+		// turnContext.getActivity().getConversation().getName());
 		// turnContext.getActivity().getConversation().setIsGroup(true);
-		//logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
-		//logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
-		//logger.info("getId()=> " + turnContext.getActivity().getId());
-		//logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
-		//logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
-		//logger.info("getText()=> " + turnContext.getActivity().getText());
-		//logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
-		//logger.info("getAction()=> " + turnContext.getActivity().getAction());
-		//logger.info("getDeliveryMode()=> " + turnContext.getActivity().getDeliveryMode());
-		//logger.info("getImportance()=> " + turnContext.getActivity().getImportance());
-		//logger.info("getName()=> " + turnContext.getActivity().getName());
-		//logger.info("getText()=> " + turnContext.getActivity().getText());
-		//logger.info("getServiceUrl()=> " + turnContext.getActivity().getServiceUrl());
-		//logger.info("getType()=> " + turnContext.getActivity().getType());
-		//logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
-		//logger.info("teamsGetTeamId()=> " + turnContext.getActivity().teamsGetTeamId());
-		//logger.info("getConversation().getName())=> " + turnContext.getActivity().getConversation().getName());
-		//logger.info("getRecipientId=> " + turnContext.getActivity().getRecipient().getId());
-		//logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
+		// logger.info("getFrom()=> " + turnContext.getActivity().getFrom().toString());
+		// logger.info("getChannelId()=> " + turnContext.getActivity().getChannelId());
+		// logger.info("getId()=> " + turnContext.getActivity().getId());
+		// logger.info("getReplyToId()=> " + turnContext.getActivity().getReplyToId());
+		// logger.info("getTopicName()=> " + turnContext.getActivity().getTopicName());
+		// logger.info("getText()=> " + turnContext.getActivity().getText());
+		// logger.info("getLabel()=> " + turnContext.getActivity().getLabel());
+		// logger.info("getAction()=> " + turnContext.getActivity().getAction());
+		// logger.info("getDeliveryMode()=> " +
+		// turnContext.getActivity().getDeliveryMode());
+		// logger.info("getImportance()=> " +
+		// turnContext.getActivity().getImportance());
+		// logger.info("getName()=> " + turnContext.getActivity().getName());
+		// logger.info("getText()=> " + turnContext.getActivity().getText());
+		// logger.info("getServiceUrl()=> " +
+		// turnContext.getActivity().getServiceUrl());
+		// logger.info("getType()=> " + turnContext.getActivity().getType());
+		// logger.info("getValueType()=> " + turnContext.getActivity().getValueType());
+		// logger.info("teamsGetTeamId()=> " +
+		// turnContext.getActivity().teamsGetTeamId());
+		// logger.info("getConversation().getName())=> " +
+		// turnContext.getActivity().getConversation().getName());
+		// logger.info("getRecipientId=> " +
+		// turnContext.getActivity().getRecipient().getId());
+		// logger.info("getFromId=> " + turnContext.getActivity().getFrom().getId());
 
-		//logger.info("getActivityId=> " + turnContext.getActivity().getId());
-		//logger.info("getActivityName=> " + turnContext.getActivity().getName());
+		// logger.info("getActivityId=> " + turnContext.getActivity().getId());
+		// logger.info("getActivityName=> " + turnContext.getActivity().getName());
 
-		//logger.info("getActivity().getConversation().getAadObjectId()=> "+ turnContext.getActivity().getConversation().getAadObjectId());
+		// logger.info("getActivity().getConversation().getAadObjectId()=> "+
+		// turnContext.getActivity().getConversation().getAadObjectId());
 
+		ticketService.IssueStatus(turnContext, ticket);
 		
-		ticketService.IssueStatus(turnContext,ticket);
-
+		
 		return CompletableFuture.completedFuture(null);
 		// String triggerClicked = (String) ((Map)
 		// botResponseMap).get("ActionResponse");
@@ -447,7 +469,7 @@ public class EchoBot extends TeamsActivityHandler {
 	@Override
 	protected CompletableFuture<MessagingExtensionResponse> onTeamsAppBasedLinkQuery(TurnContext turnContextt,
 			AppBasedLinkQuery query) {
-		//System.out.println("helo");
+		// System.out.println("helo");
 		ThumbnailCard card = new ThumbnailCard();
 		card.setTitle("CodeProject");
 		card.setText(query.getUrl());
@@ -504,13 +526,17 @@ public class EchoBot extends TeamsActivityHandler {
 
 			try {
 				ResourceResponse rr = resourceresponse.get();
-				
+
 				tkt.setClstktreplyId(rr.getId());
 				
-			
-				
-				
-				
+				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
+				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
+						"https://graph.microsoft.com/v1.0/chats/"+ChatId+"/messages/"+rr.getId()+""));
+
+				graphClient.chats(ChatId).pinnedMessages().buildRequest()
+						.post(pinnedChatMessageInfo);
+
 				ticketRepo.save(tkt);
 
 				// we need to update ticket with turncontext and welcomemessage status
@@ -570,7 +596,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 		Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
 
-		if (tkt.getWelmsg() == null) {
+		if (tkt!=null && tkt.getWelmsg() == null) {
 
 			Attachment cardAttachment = new Attachment();
 			try {
@@ -592,6 +618,14 @@ public class EchoBot extends TeamsActivityHandler {
 				ResourceResponse rr = resourceresponse.get();
 
 				tkt.setClstktreplyId(rr.getId());
+
+				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
+				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
+						"https://graph.microsoft.com/v1.0/chats/"+ChatId+"/messages/"+rr.getId()+""));
+
+				graphClient.chats(ChatId).pinnedMessages().buildRequest()
+						.post(pinnedChatMessageInfo);
 
 				ticketRepo.save(tkt);
 
@@ -796,11 +830,9 @@ public class EchoBot extends TeamsActivityHandler {
 		 * final UsernamePasswordCredential usernamePasswordCredential = new
 		 * UsernamePasswordCredentialBuilder()
 		 * .clientId("dc3cba5c-d9f7-4a84-b6f6-f51d07a20480").username(
-		 * "admin@kgmip.onmicrosoft.com")
-		 * .password("Kgm@123$").build();
-		 * final TokenCredentialAuthProvider tokenCredentialAuthProvider = new
-		 * TokenCredentialAuthProvider(
-		 * usernamePasswordCredential);
+		 * "admin@kgmip.onmicrosoft.com") .password("Kgm@123$").build(); final
+		 * TokenCredentialAuthProvider tokenCredentialAuthProvider = new
+		 * TokenCredentialAuthProvider( usernamePasswordCredential);
 		 */
 		System.out.println("hello world");
 
@@ -816,9 +848,7 @@ public class EchoBot extends TeamsActivityHandler {
 		User user = graphClient.me().buildRequest().get();
 		System.out.println(user);
 
-		DriveItemCollectionPage children = graphClient.me().drive().root().children()
-				.buildRequest()
-				.get();
+		DriveItemCollectionPage children = graphClient.me().drive().root().children().buildRequest().get();
 
 		List<DriveItem> di = children.getCurrentPage();
 
@@ -875,9 +905,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 		String baseUrl = "https://kgmip-my.sharepoint.com/personal/husenaiah_g_kgmip_onmicrosoft_com/Documents/Microsoft%20Teams%20Chat%20Files/Employee%20Declaration%20_Income%20tax_Form.xlsx";
 
-		InputStream stream12 = graphClient.customRequest(baseUrl, InputStream.class)
-				.buildRequest()
-				.get();
+		InputStream stream12 = graphClient.customRequest(baseUrl, InputStream.class).buildRequest().get();
 
 		// final InputStream result =
 		// graphClient.me().messages("id").attachments().buildRequest();
@@ -954,8 +982,7 @@ public class EchoBot extends TeamsActivityHandler {
 
 		InputStream stream123 = graphClient
 				.customRequest("/me/drive/items/cebd1b98-4e68-4808-8254-f13f95f67c50/content", InputStream.class)
-				.buildRequest()
-				.get();
+				.buildRequest().get();
 		System.out.println(stream);
 
 		graphClient.sites()
@@ -967,19 +994,14 @@ public class EchoBot extends TeamsActivityHandler {
 		DriveCollectionPage drive1 = graphClient.me().drives().buildRequest().get();
 
 		System.out.println(drive1.getCurrentPage());
-		SiteCollectionPage sites = graphClient.sites()
-				.buildRequest()
-				.get();
+		SiteCollectionPage sites = graphClient.sites().buildRequest().get();
 
 		Long ss = sites.getCount();
 		System.out.println(ss);
 
 		System.out.println(sites.getCurrentPage());
 
-		DriveRecentCollectionPage recent = graphClient.me().drive()
-				.recent()
-				.buildRequest()
-				.get();
+		DriveRecentCollectionPage recent = graphClient.me().drive().recent().buildRequest().get();
 		System.out.println(recent);
 
 		// InputStream stream =
@@ -1132,19 +1154,13 @@ public class EchoBot extends TeamsActivityHandler {
 		// trial three
 
 		/*
-		 * ActionSet action = new ActionSet();
-		 * action.setType("Action.Submit");
-		 * action.setTitle("Call Java");
-		 * action.setId("http_request");
-		 * MsTeams msteams=new MsTeams();
-		 * msteams.setType("signin");
-		 * msteams.setValue(
+		 * ActionSet action = new ActionSet(); action.setType("Action.Submit");
+		 * action.setTitle("Call Java"); action.setId("http_request"); MsTeams
+		 * msteams=new MsTeams(); msteams.setType("signin"); msteams.setValue(
 		 * "https://0a4d-115-246-202-106.ngrok.io/api/redis/employee/getall");
 		 * 
-		 * ActionData data=new ActionData();
-		 * data.setMsteams(msteams);
-		 * data.setExtraData("(this will be ignored)");
-		 * action.setData(data);
+		 * ActionData data=new ActionData(); data.setMsteams(msteams);
+		 * data.setExtraData("(this will be ignored)"); action.setData(data);
 		 */
 
 		// trial four
@@ -1162,11 +1178,10 @@ public class EchoBot extends TeamsActivityHandler {
 		action.setData(data);
 
 		/*
-		 * { "type": "Action.Submit", "title": "Click me for signin",
-		 * "data": {
+		 * { "type": "Action.Submit", "title": "Click me for signin", "data": {
 		 * "msteams": { "type": "signin", "value":
-		 * "https://yoursigninurl.com/signinpath?parames=values", },
-		 * "extraData": "(this will be ignored)" }
+		 * "https://yoursigninurl.com/signinpath?parames=values", }, "extraData":
+		 * "(this will be ignored)" }
 		 * 
 		 * }
 		 */
@@ -1223,41 +1238,29 @@ public class EchoBot extends TeamsActivityHandler {
 			e.printStackTrace();
 		}
 
-		json = "{\n"
-				+ "    \"type\": \"AdaptiveCard\",\n"
-				+ "    \"body\": [\n"
-				+ "        {\n"
+		json = "{\n" + "    \"type\": \"AdaptiveCard\",\n" + "    \"body\": [\n" + "        {\n"
 				+ "            \"type\": \"Container\",\n"
 				+ "            \"id\": \"353b659f-b668-fac0-5b7f-5d2f1bdb46ac\",\n"
-				+ "            \"padding\": \"Default\",\n"
-				+ "            \"items\": [\n"
-				+ "                {\n"
-				+ "                    \"type\": \"ActionSet\",\n"
-				+ "                    \"actions\": [\n"
-				+ "                        {\n"
-				+ "                            \"type\": \"Action.Http\",\n"
+				+ "            \"padding\": \"Default\",\n" + "            \"items\": [\n" + "                {\n"
+				+ "                    \"type\": \"ActionSet\",\n" + "                    \"actions\": [\n"
+				+ "                        {\n" + "                            \"type\": \"Action.Http\",\n"
 				+ "                            \"id\": \"accept\",\n"
 				+ "                            \"title\": \"Accept\",\n"
 				+ "                            \"method\": \"POST\",\n"
 				+ "                            \"url\": \"https://www.microsoft.com\",\n"
 				+ "                            \"body\": \"{}\",\n"
 				+ "                            \"isPrimary\": true,\n"
-				+ "                            \"style\": \"positive\"\n"
-				+ "                        },\n"
-				+ "                        {\n"
-				+ "                            \"type\": \"Action.ShowCard\",\n"
+				+ "                            \"style\": \"positive\"\n" + "                        },\n"
+				+ "                        {\n" + "                            \"type\": \"Action.ShowCard\",\n"
 				+ "                            \"id\": \"e1487cbc-66b0-037e-cdc4-045fb7d8d0b8\",\n"
-				+ "                            \"title\": \"Reject\",\n"
-				+ "                            \"card\": {\n"
+				+ "                            \"title\": \"Reject\",\n" + "                            \"card\": {\n"
 				+ "                                \"type\": \"AdaptiveCard\",\n"
-				+ "                                \"body\": [\n"
-				+ "                                    {\n"
+				+ "                                \"body\": [\n" + "                                    {\n"
 				+ "                                        \"type\": \"Input.Text\",\n"
 				+ "                                        \"id\": \"Comment\",\n"
 				+ "                                        \"placeholder\": \"Add a comment\",\n"
 				+ "                                        \"isMultiline\": true\n"
-				+ "                                    },\n"
-				+ "                                    {\n"
+				+ "                                    },\n" + "                                    {\n"
 				+ "                                        \"type\": \"ActionSet\",\n"
 				+ "                                        \"id\": \"1e77f639-e5a8-320f-c6de-4291227db6b3\",\n"
 				+ "                                        \"actions\": [\n"
@@ -1268,147 +1271,81 @@ public class EchoBot extends TeamsActivityHandler {
 				+ "                                                \"method\": \"POST\",\n"
 				+ "                                                \"url\": \"https://dev3.kagamierp.com:3978/api/redis/employee/getall\",\n"
 				+ "                                                 \"body\": \"{}\",\n"
-				+ "                                            }\n"
-				+ "                                        ]\n"
-				+ "                                    }\n"
-				+ "                                ],\n"
+				+ "                                            }\n" + "                                        ]\n"
+				+ "                                    }\n" + "                                ],\n"
 				+ "                                \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
 				+ "                                \"fallbackText\": \"Unable to render the card\",\n"
-				+ "                                \"padding\": \"None\"\n"
-				+ "                            }\n"
-				+ "                        }\n"
-				+ "                    ],\n"
-				+ "                    \"spacing\": \"None\"\n"
-				+ "                }\n"
-				+ "            ],\n"
-				+ "            \"spacing\": \"None\",\n"
-				+ "            \"separator\": true\n"
-				+ "        }\n"
-				+ "    ],\n"
-				+ "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
-				+ "    \"version\": \"1.0\",\n"
-				+ "    \"padding\": \"None\"\n"
-				+ "}";
+				+ "                                \"padding\": \"None\"\n" + "                            }\n"
+				+ "                        }\n" + "                    ],\n"
+				+ "                    \"spacing\": \"None\"\n" + "                }\n" + "            ],\n"
+				+ "            \"spacing\": \"None\",\n" + "            \"separator\": true\n" + "        }\n"
+				+ "    ],\n" + "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+				+ "    \"version\": \"1.0\",\n" + "    \"padding\": \"None\"\n" + "}";
 
-		json = "{\n"
-				+ "    \"@type\": \"MessageCard\",\n"
-				+ "    \"@context\": \"http://schema.org/extensions\",\n"
-				+ "    \"themeColor\": \"0076D7\",\n"
-				+ "    \"summary\": \"Larry Bryant created a new task\",\n"
-				+ "    \"sections\": [{\n"
-				+ "        \"activityTitle\": \"Larry Bryant created a new task\",\n"
+		json = "{\n" + "    \"@type\": \"MessageCard\",\n" + "    \"@context\": \"http://schema.org/extensions\",\n"
+				+ "    \"themeColor\": \"0076D7\",\n" + "    \"summary\": \"Larry Bryant created a new task\",\n"
+				+ "    \"sections\": [{\n" + "        \"activityTitle\": \"Larry Bryant created a new task\",\n"
 				+ "        \"activitySubtitle\": \"On Project Tango\",\n"
 				+ "        \"activityImage\": \"https://teamsnodesample.azurewebsites.net/static/img/image5.png\",\n"
-				+ "        \"facts\": [{\n"
-				+ "            \"name\": \"Assigned to\",\n"
-				+ "            \"value\": \"Unassigned\"\n"
-				+ "        }, {\n"
-				+ "            \"name\": \"Due date\",\n"
+				+ "        \"facts\": [{\n" + "            \"name\": \"Assigned to\",\n"
+				+ "            \"value\": \"Unassigned\"\n" + "        }, {\n" + "            \"name\": \"Due date\",\n"
 				+ "            \"value\": \"Mon May 01 2017 17:07:18 GMT-0700 (Pacific Daylight Time)\"\n"
-				+ "        }, {\n"
-				+ "            \"name\": \"Status\",\n"
-				+ "            \"value\": \"Not started\"\n"
-				+ "        }],\n"
-				+ "        \"markdown\": true\n"
-				+ "    }],\n"
-				+ "    \"potentialAction\": [{\n"
-				+ "        \"@type\": \"ActionCard\",\n"
-				+ "        \"name\": \"Add a comment\",\n"
-				+ "        \"inputs\": [{\n"
-				+ "            \"@type\": \"TextInput\",\n"
-				+ "            \"id\": \"comment\",\n"
-				+ "            \"isMultiline\": false,\n"
-				+ "            \"title\": \"Add a comment here for this task\"\n"
-				+ "        }],\n"
-				+ "        \"actions\": [{\n"
-				+ "            \"@type\": \"HttpPOST\",\n"
+				+ "        }, {\n" + "            \"name\": \"Status\",\n" + "            \"value\": \"Not started\"\n"
+				+ "        }],\n" + "        \"markdown\": true\n" + "    }],\n" + "    \"potentialAction\": [{\n"
+				+ "        \"@type\": \"ActionCard\",\n" + "        \"name\": \"Add a comment\",\n"
+				+ "        \"inputs\": [{\n" + "            \"@type\": \"TextInput\",\n"
+				+ "            \"id\": \"comment\",\n" + "            \"isMultiline\": false,\n"
+				+ "            \"title\": \"Add a comment here for this task\"\n" + "        }],\n"
+				+ "        \"actions\": [{\n" + "            \"@type\": \"HttpPOST\",\n"
 				+ "            \"name\": \"Add comment\",\n"
 				+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
-				+ "        }]\n"
-				+ "    }, {\n"
-				+ "        \"@type\": \"ActionCard\",\n"
-				+ "        \"name\": \"Set due date\",\n"
-				+ "        \"inputs\": [{\n"
-				+ "            \"@type\": \"DateInput\",\n"
-				+ "            \"id\": \"dueDate\",\n"
-				+ "            \"title\": \"Enter a due date for this task\"\n"
-				+ "        }],\n"
-				+ "        \"actions\": [{\n"
-				+ "            \"@type\": \"HttpPOST\",\n"
+				+ "        }]\n" + "    }, {\n" + "        \"@type\": \"ActionCard\",\n"
+				+ "        \"name\": \"Set due date\",\n" + "        \"inputs\": [{\n"
+				+ "            \"@type\": \"DateInput\",\n" + "            \"id\": \"dueDate\",\n"
+				+ "            \"title\": \"Enter a due date for this task\"\n" + "        }],\n"
+				+ "        \"actions\": [{\n" + "            \"@type\": \"HttpPOST\",\n"
 				+ "            \"name\": \"Save\",\n"
 				+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
-				+ "        }]\n"
-				+ "    }, {\n"
-				+ "        \"@type\": \"OpenUri\",\n"
-				+ "        \"name\": \"Learn More\",\n"
-				+ "        \"targets\": [{\n"
+				+ "        }]\n" + "    }, {\n" + "        \"@type\": \"OpenUri\",\n"
+				+ "        \"name\": \"Learn More\",\n" + "        \"targets\": [{\n"
 				+ "            \"os\": \"default\",\n"
-				+ "            \"uri\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
-				+ "        }]\n"
-				+ "    }, {\n"
-				+ "        \"@type\": \"ActionCard\",\n"
-				+ "        \"name\": \"Change status\",\n"
-				+ "        \"inputs\": [{\n"
-				+ "            \"@type\": \"MultichoiceInput\",\n"
-				+ "            \"id\": \"list\",\n"
-				+ "            \"title\": \"Select a status\",\n"
-				+ "            \"isMultiSelect\": \"false\",\n"
-				+ "            \"choices\": [{\n"
-				+ "                \"display\": \"In Progress\",\n"
-				+ "                \"value\": \"1\"\n"
-				+ "            }, {\n"
-				+ "                \"display\": \"Active\",\n"
-				+ "                \"value\": \"2\"\n"
-				+ "            }, {\n"
-				+ "                \"display\": \"Closed\",\n"
-				+ "                \"value\": \"3\"\n"
-				+ "            }]\n"
-				+ "        }],\n"
-				+ "        \"actions\": [{\n"
-				+ "            \"@type\": \"HttpPOST\",\n"
-				+ "            \"name\": \"Save\",\n"
+				+ "            \"uri\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n" + "        }]\n"
+				+ "    }, {\n" + "        \"@type\": \"ActionCard\",\n" + "        \"name\": \"Change status\",\n"
+				+ "        \"inputs\": [{\n" + "            \"@type\": \"MultichoiceInput\",\n"
+				+ "            \"id\": \"list\",\n" + "            \"title\": \"Select a status\",\n"
+				+ "            \"isMultiSelect\": \"false\",\n" + "            \"choices\": [{\n"
+				+ "                \"display\": \"In Progress\",\n" + "                \"value\": \"1\"\n"
+				+ "            }, {\n" + "                \"display\": \"Active\",\n"
+				+ "                \"value\": \"2\"\n" + "            }, {\n"
+				+ "                \"display\": \"Closed\",\n" + "                \"value\": \"3\"\n"
+				+ "            }]\n" + "        }],\n" + "        \"actions\": [{\n"
+				+ "            \"@type\": \"HttpPOST\",\n" + "            \"name\": \"Save\",\n"
 				+ "            \"target\": \"https://docs.microsoft.com/outlook/actionable-messages\"\n"
-				+ "        }]\n"
-				+ "    }]\n"
-				+ "}";
+				+ "        }]\n" + "    }]\n" + "}";
 
-		json = "\n"
-				+ "\n"
-				+ "{\n"
-				+ "    \"type\": \"AdaptiveCard\",\n"
-				+ "    \"body\": [\n"
-				+ "        {\n"
+		json = "\n" + "\n" + "{\n" + "    \"type\": \"AdaptiveCard\",\n" + "    \"body\": [\n" + "        {\n"
 				+ "            \"type\": \"Container\",\n"
 				+ "            \"id\": \"353b659f-b668-fac0-5b7f-5d2f1bdb46ac\",\n"
-				+ "            \"padding\": \"Default\",\n"
-				+ "            \"items\": [\n"
-				+ "                {\n"
-				+ "                    \"type\": \"ActionSet\",\n"
-				+ "                    \"actions\": [\n"
-				+ "                        {\n"
-				+ "                            \"type\": \"Action.Submit\",\n"
+				+ "            \"padding\": \"Default\",\n" + "            \"items\": [\n" + "                {\n"
+				+ "                    \"type\": \"ActionSet\",\n" + "                    \"actions\": [\n"
+				+ "                        {\n" + "                            \"type\": \"Action.Submit\",\n"
 				+ "                            \"id\": \"accept\",\n"
 				+ "                            \"title\": \"Accept\",\n"
 				+ "                            \"method\": \"POST\",\n"
 				+ "                            \"url\": \"https://www.microsoft.com\",\n"
 				+ "                            \"body\": \"{}\",\n"
 				+ "                            \"isPrimary\": true,\n"
-				+ "                            \"style\": \"positive\"\n"
-				+ "                        },\n"
-				+ "                        {\n"
-				+ "                            \"type\": \"Action.ShowCard\",\n"
+				+ "                            \"style\": \"positive\"\n" + "                        },\n"
+				+ "                        {\n" + "                            \"type\": \"Action.ShowCard\",\n"
 				+ "                            \"id\": \"e1487cbc-66b0-037e-cdc4-045fb7d8d0b8\",\n"
-				+ "                            \"title\": \"Reject\",\n"
-				+ "                            \"card\": {\n"
+				+ "                            \"title\": \"Reject\",\n" + "                            \"card\": {\n"
 				+ "                                \"type\": \"AdaptiveCard\",\n"
-				+ "                                \"body\": [\n"
-				+ "                                    {\n"
+				+ "                                \"body\": [\n" + "                                    {\n"
 				+ "                                        \"type\": \"Input.Text\",\n"
 				+ "                                        \"id\": \"Comment\",\n"
 				+ "                                        \"placeholder\": \"Add a comment\",\n"
 				+ "                                        \"isMultiline\": true\n"
-				+ "                                    },\n"
-				+ "                                    {\n"
+				+ "                                    },\n" + "                                    {\n"
 				+ "                                        \"type\": \"ActionSet\",\n"
 				+ "                                        \"id\": \"1e77f639-e5a8-320f-c6de-4291227db6b3\",\n"
 				+ "                                        \"actions\": [\n"
@@ -1419,27 +1356,16 @@ public class EchoBot extends TeamsActivityHandler {
 				+ "                                                \"method\": \"POST\",\n"
 				+ "                                                \"url\": \"https://04f9-115-246-202-106.ngrok.io/api/redis/employee/post\",\n"
 				+ "                                                \"body\": \"{comment : {{Comment.value}}}\"\n"
-				+ "                                            }\n"
-				+ "                                        ]\n"
-				+ "                                    }\n"
-				+ "                                ],\n"
+				+ "                                            }\n" + "                                        ]\n"
+				+ "                                    }\n" + "                                ],\n"
 				+ "                                \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
 				+ "                                \"fallbackText\": \"Unable to render the card\",\n"
-				+ "                                \"padding\": \"None\"\n"
-				+ "                            }\n"
-				+ "                        }\n"
-				+ "                    ],\n"
-				+ "                    \"spacing\": \"None\"\n"
-				+ "                }\n"
-				+ "            ],\n"
-				+ "            \"spacing\": \"None\",\n"
-				+ "            \"separator\": true\n"
-				+ "        }\n"
-				+ "    ],\n"
-				+ "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
-				+ "    \"version\": \"1.0\",\n"
-				+ "    \"padding\": \"None\"\n"
-				+ "}";
+				+ "                                \"padding\": \"None\"\n" + "                            }\n"
+				+ "                        }\n" + "                    ],\n"
+				+ "                    \"spacing\": \"None\"\n" + "                }\n" + "            ],\n"
+				+ "            \"spacing\": \"None\",\n" + "            \"separator\": true\n" + "        }\n"
+				+ "    ],\n" + "    \"$schema\": \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
+				+ "    \"version\": \"1.0\",\n" + "    \"padding\": \"None\"\n" + "}";
 
 		// attachments.contentType = "application/vnd.microsoft.card.thumbnail";
 		// attachments.content = "{\r\n \"title\": \"This is an example of posting a

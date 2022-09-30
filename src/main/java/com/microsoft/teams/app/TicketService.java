@@ -3,10 +3,13 @@ package com.microsoft.teams.app;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -19,6 +22,8 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
+import com.microsoft.graph.models.AadUserConversationMember;
+import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.teams.app.entity.ActionData;
 import com.microsoft.teams.app.entity.ActionSet;
@@ -30,7 +35,9 @@ import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.SupportDepartment_311;
+import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
+import com.microsoft.teams.app.entity.User;
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
@@ -43,6 +50,7 @@ import okhttp3.Request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
+import com.google.gson.JsonPrimitive;
 
 @Component
 public class TicketService {
@@ -494,61 +502,44 @@ public class TicketService {
 			TurnContext turnContext) {
 
 		Ticket_296 tkt = ticket.get(turnContext.getActivity().getFrom().getId());
+		
+		if (tkt == null) {
+			String ChatId = turnContext.getActivity().getConversation().getId();
+			tkt = ticketRepo.findAllByChatGroupId(ChatId);
+		}
 
-		Date dt = new Date();
+		
+		
+		
 		String json = null;
+		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
+		int tktNumber = lastNumberObj.getAutoCodeNo();
+		
+		String UserteamsId= turnContext.getActivity().getFrom().getAadObjectId();
+		String UserteamsName=  turnContext.getActivity().getFrom().getName();
+		String issueTtle= (String) (botResponseMap).get("IssueTitle");
+		String issueDescription= (String) (botResponseMap).get("IssueDescription");
+		
+		tkt.setTicketNumber(String.valueOf(lastNumberObj.getAutoCodeNo()));
+		tkt.setTicketTitle(issueTtle);
+		
+		
+		final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
 
+	
 		// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		// String check = dateFormat.format(dt);
 
 		// status 27 for open and 28 for submitted
 
-		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
-		int tktNumber = lastNumberObj.getAutoCodeNo();
-		
-	
-
-		Long trasactionNumber = utility.nextId();
-
-		if (tkt != null) {
-			tkt.setTicketTitle((String) (botResponseMap).get("IssueTitle"));
-			//tkt.setDescription((String) (botResponseMap).get("IssueDescription"));
-			tkt.setIssuedetails((String) (botResponseMap).get("IssueDescription"));
-			tkt.setStatuscycleId("27");
-			tkt.setCreateDateTime(dt);
-			tkt.setUpdateDateTime(dt);
-			tkt.setTicketNumber(String.valueOf(lastNumberObj.getAutoCodeNo()));
-			tkt.setId(String.valueOf(lastNumberObj.getAutoCodeNo()));
-			tkt.setEmployeeTeamsId(turnContext.getActivity().getFrom().getAadObjectId());
-			tkt.setTransactionentityId(trasactionNumber);
-			tkt.setChatGroupId(null);
-			tkt.setNextRoles(null);
-			// tkt.setPriorityId("sfarm_cloud_env_1");// low priority
-			tkt.setPriorityId(null);
-			tkt.setStatus(null);
-			tkt.setTicketQualityRate("5");
-			tkt.setTicketQualityComments(null);
-			tkt.setUpdatedBy(turnContext.getActivity().getFrom().getName());
-			tkt.setCreatedBy(turnContext.getActivity().getFrom().getName());
-
-
-			lastNumberObj.setAutoCodeNo(lastNumberObj.getAutoCodeNo() + 1);
-			autoGenerationRepo.save(lastNumberObj);
-
-			ticketRepo.save(tkt);
-
-			// List<Ticket_296> tktlist = ticketRepo.findAll();
-			// System.out.println(tktlist);
-
-			Optional<SupportDepartment_311> dep = departmentImpl.findById(tkt.getSupportDepartmentId());
+	//	Optional<SupportDepartment_311> dep = departmentImpl.findById(tkt.getSupportDepartmentId());
 
 			
-
-			final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
-
-			String chatUrl = ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,
-					dep.get().getDeptName(), graphClient);
+		String chatUrl = ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,
+					 graphClient,lastNumberObj,UserteamsId,UserteamsName,issueTtle,issueDescription);
+		
+		if(chatUrl!=null && tktNumber>0) {
 
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 			List<Container> conlist = new ArrayList<>();
@@ -577,7 +568,8 @@ public class TicketService {
 
 			Item it2 = new Item();
 			it2.setType("TextBlock");
-			it2.setText("Team members from " + dep.get().getDeptName() + "  department are added to this chat.");
+			//it2.setText("Team members from " + dep.get().getDeptName() + "  department are added to this chat.");
+			it2.setText("Team members from selected support type were added to this chat.");
 			it2.setWeight("bolder");
 			it2.setSize("medium");
 			it2.setWrap(true);
@@ -641,19 +633,15 @@ public class TicketService {
 
 				e.printStackTrace();
 			}
-
 		}
+
+		
 
 		return json;
 
 	}
 	
 	
-	public void createTicketAsyncCall()
-	{
-		
-	}
-
 	public String SendChatInitialMessage(TurnContext turnContext, Ticket_296 tkt) {
 
 		String json = null;
@@ -736,45 +724,57 @@ public class TicketService {
 		 */
         adcard.setMsTeams(mst);
 		adcard.setBody(conlist);
-
+		/*
+		 * ActionSet action = new ActionSet(); action.setType("Action.Execute");
+		 * action.setTitle("CLOSE TICKET"); action.setVerb("personalDetailsFormSubmit");
+		 * action.setId("ReplyYes");
+		 * 
+		 * ActionData ad = new ActionData(); ad.setKey1(true); ad.setKey2("okay");
+		 * 
+		 * Actionfallback af = new Actionfallback(); af.setType("Action.Submit");
+		 * af.setTitle("CLOSE TICKET");
+		 * 
+		 * action.setData(ad); action.setFallback(af);
+		 * 
+		 * ActionSet action2 = new ActionSet(); action2.setType("Action.Execute");
+		 * action2.setTitle("ESCALATE"); action2.setVerb("personalDetailsFormSubmit");
+		 * action2.setId("ReplyNo");
+		 * 
+		 * ActionData ad2 = new ActionData(); ad2.setKey1(true); ad2.setKey2("okay");
+		 * 
+		 * Actionfallback af2 = new Actionfallback(); af2.setType("Action.Submit");
+		 * af2.setTitle("ESCALATE");
+		 * 
+		 * action2.setData(ad2); action2.setFallback(af2);
+		 * 
+		 * actList.add(action); actList.add(action2);
+		 * 
+		 * adcard.setActions(actList);
+		 
+		 */
+		
 		ActionSet action = new ActionSet();
-		action.setType("Action.Execute");
+		action.setType("Action.Submit");
 		action.setTitle("CLOSE TICKET");
-		action.setVerb("personalDetailsFormSubmit");
-		action.setId("ReplyYes");
-
+		
 		ActionData ad = new ActionData();
-		ad.setKey1(true);
-		ad.setKey2("okay");
-
-		Actionfallback af = new Actionfallback();
-		af.setType("Action.Submit");
-		af.setTitle("CLOSE TICKET");
-
+		ad.setButton("closeticket");
 		action.setData(ad);
-		action.setFallback(af);
-
+		
 		ActionSet action2 = new ActionSet();
-		action2.setType("Action.Execute");
+		action2.setType("Action.Submit");
 		action2.setTitle("ESCALATE");
-		action2.setVerb("personalDetailsFormSubmit");
-		action2.setId("ReplyNo");
-
+		
 		ActionData ad2 = new ActionData();
-		ad2.setKey1(true);
-		ad2.setKey2("okay");
-
-		Actionfallback af2 = new Actionfallback();
-		af2.setType("Action.Submit");
-		af2.setTitle("ESCALATE");
-
+		ad2.setButton("escalate");
 		action2.setData(ad2);
-		action2.setFallback(af2);
+
 
 		actList.add(action);
 		actList.add(action2);
-
+		
 		adcard.setActions(actList);
+
 		
 		tkt.setWelmsg("Yes");  // when people added then should not send again new chat group information
 		ticketRepo.save(tkt);
@@ -789,96 +789,6 @@ public class TicketService {
 
 			e.printStackTrace();
 		}
-		
-		String test=null;
-		
-		test ="{\n"
-				+ "  \"$schema\" : \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
-				+ "  \"type\" : \"AdaptiveCard\",\n"
-				+ "  \"version\" : \"1.4\",\n"
-				+ "  \"msTeams\" : {\n"
-				+ "    \"width\" : \"full\"\n"
-				+ "  },\n"
-				+ "  \"body\" : [ {\n"
-				+ "    \"type\" : \"Container\",\n"
-				+ "    \"bleed\" : true,\n"
-				+ "    \"items\" : [ {\n"
-				+ "      \"type\" : \"TextBlock\",\n"
-				+ "      \"size\" : \"medium\",\n"
-				+ "      \"weight\" : \"bolder\",\n"
-				+ "      \"text\" : \"New chat group created with ticket #525501 for discussion !!\",\n"
-				+ "      \"wrap\" : true,\n"
-				+ "      \"color\" : \"accent\"\n"
-				+ "    } ],\n"
-				+ "    \"maxLines\" : 0\n"
-				+ "  }, {\n"
-				+ "    \"type\" : \"Container\",\n"
-				+ "    \"bleed\" : true,\n"
-				+ "    \"items\" : [ {\n"
-				+ "      \"type\" : \"TextBlock\",\n"
-				+ "      \"size\" : \"medium\",\n"
-				+ "      \"weight\" : \"bolder\",\n"
-				+ "      \"text\" : \"Description : test \",\n"
-				+ "      \"wrap\" : true,\n"
-				+ "      \"color\" : \"accent\"\n"
-				+ "    } ],\n"
-				+ "    \"maxLines\" : 0\n"
-				+ "  } ],\n"
-				+ "\"refresh\": {\n"
-				+ "    \"action\": {\n"
-				+ "      \"type\": \"Action.Execute\",\n"
-				+ "      \"title\": \"Close\",\n"
-				+ "      \"verb\": \"editOrResolveView\",\n"
-				+ "      \"data\": {\n"
-				+ "            \"refresh info\": \"<refresh info>\"\n"
-				+ "      }\n"
-				+ "    },\n"
-				+ "    \"userIds\": [\"29:1BYIf-yESZSS4Yak2Wn6F8pzObmcYrwOp2yjdtCn2MjaiKeLob2wi__U83vpnAB3po2Jp1wQvlj2OK-dLpCYXPw\"]\n"
-				+ "  }\n"
-				+ "}\n"
-				+ "";
-		
-		test="{\n"
-				+ "  \"$schema\" : \"http://adaptivecards.io/schemas/adaptive-card.json\",\n"
-				+ "  \"type\" : \"AdaptiveCard\",\n"
-				+ "  \"version\" : \"1.4\",\n"
-				+ "  \"msTeams\" : {\n"
-				+ "    \"width\" : \"full\"\n"
-				+ "  },\n"
-				+ "  \"body\" : [ {\n"
-				+ "    \"type\" : \"Container\",\n"
-				+ "    \"bleed\" : true,\n"
-				+ "    \"items\" : [ {\n"
-				+ "      \"type\" : \"TextBlock\",\n"
-				+ "      \"size\" : \"medium\",\n"
-				+ "      \"weight\" : \"bolder\",\n"
-				+ "      \"text\" : \"New chat group created with ticket #525501 for discussion !!\",\n"
-				+ "      \"wrap\" : true,\n"
-				+ "      \"color\" : \"accent\"\n"
-				+ "    } ],\n"
-				+ "    \"maxLines\" : 0\n"
-				+ "  }, {\n"
-				+ "    \"type\" : \"Container\",\n"
-				+ "    \"bleed\" : true,\n"
-				+ "    \"items\" : [ {\n"
-				+ "      \"type\" : \"TextBlock\",\n"
-				+ "      \"size\" : \"medium\",\n"
-				+ "      \"weight\" : \"bolder\",\n"
-				+ "      \"text\" : \"Description : test \",\n"
-				+ "      \"wrap\" : true,\n"
-				+ "      \"color\" : \"accent\"\n"
-				+ "    } ],\n"
-				+ "    \"maxLines\" : 0\n"
-				+ "  } ],\n"
-				+ "\"refresh\": {\n"
-				+ "    \"action\": {\n"
-				+ "      \"type\": \"Action.Execute\",\n"
-				+ "      \"title\": \"Close\"\n"
-				+ "    },\n"
-				+ "    \"userIds\": [\"29:1BYIf-yESZSS4Yak2Wn6F8pzObmcYrwOp2yjdtCn2MjaiKeLob2wi__U83vpnAB3po2Jp1wQvlj2OK-dLpCYXPw\"]\n"
-				+ "  }\n"
-				+ "}";
-		
 		
 		return json;
 
@@ -897,11 +807,11 @@ public class TicketService {
 		if (turnContext.getActivity().getValue() != null) {
 
 			LinkedHashMap botResponseMap = (LinkedHashMap) turnContext.getActivity().getValue();
-			LinkedHashMap actionObj = (LinkedHashMap) botResponseMap.get("action");
-			String triggerClicked = (String) ((Map) actionObj).get("title");
-
-			if ("CLOSE TICKET".equalsIgnoreCase(triggerClicked)
-					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10")) {
+			String triggerClicked =  (String) botResponseMap.get("button");
+			//String triggerClicked = (String) ((Map) actionObj).get("title");
+			//"CLOSE TICKET".equalsIgnoreCase(triggerClicked)
+			
+			if ("closeticket".equalsIgnoreCase(triggerClicked) && !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10")) {
 
 				updatetriggerAttachment = new Attachment();
 				try {
@@ -916,8 +826,9 @@ public class TicketService {
 				newactivity.setId(turnContext.getActivity().getReplyToId());
 				CompletableFuture<ResourceResponse> resourceresponse = turnContext.updateActivity(newactivity);
 				System.out.println(resourceresponse);
+				//"ESCALATE".equalsIgnoreCase(triggerClicked)
 
-			} else if ("ESCALATE".equalsIgnoreCase(triggerClicked)
+			} else if ("escalate".equalsIgnoreCase(triggerClicked)
 					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_11")
 					&& !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10") && tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
@@ -1052,28 +963,20 @@ public class TicketService {
 		adcard.setBody(conlist);
 		adcard.setMsTeams(mst);
 
-		if ("ESCALATE".equalsIgnoreCase(triggerClicked)) {
+		if ("escalate".equalsIgnoreCase(triggerClicked)) {
 
-			ActionSet action = new ActionSet();
-			action.setType("Action.Execute");
-			action.setTitle("CLOSE TICKET");
-			action.setVerb("personalDetailsFormSubmit");
-			action.setId("ReplyYes");
 
-			ActionData ad = new ActionData();
-			ad.setKey1(true);
-			ad.setKey2("okay");
+			    ActionSet action = new ActionSet();
+				action.setType("Action.Submit");
+				action.setTitle("CLOSE TICKET");
+				
+				ActionData ad = new ActionData();
+				ad.setButton("closeticket");
+				action.setData(ad);
+				
+				actList.add(action);
 
-			Actionfallback af = new Actionfallback();
-			af.setType("Action.Submit");
-			af.setTitle("CLOSE TICKET");
-
-			action.setData(ad);
-			action.setFallback(af);
-
-			actList.add(action);
-
-			adcard.setActions(actList);
+			    adcard.setActions(actList);
 
 		}
 

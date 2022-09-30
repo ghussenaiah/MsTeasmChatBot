@@ -21,23 +21,23 @@ import com.google.gson.JsonPrimitive;
 
 import com.microsoft.bot.builder.TurnContext;
 import com.microsoft.graph.models.AadUserConversationMember;
-
 import com.microsoft.graph.models.BodyType;
 import com.microsoft.graph.models.Chat;
 import com.microsoft.graph.models.ChatMessage;
 import com.microsoft.graph.models.ChatMessageMention;
 import com.microsoft.graph.models.ChatMessageMentionedIdentitySet;
-
-import com.microsoft.graph.models.ChatType;
-import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.models.Identity;
 import com.microsoft.graph.models.ItemBody;
+import com.microsoft.graph.models.PinnedChatMessageInfo;
+import com.microsoft.graph.models.ChatType;
+import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.models.TeamsAppInstallation;
 import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionResponse;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
+import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
 import com.microsoft.teams.app.entity.EscalationMap_312;
@@ -46,6 +46,7 @@ import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.SupportDepartment_311;
 import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
+import com.microsoft.teams.app.repository.AutoGenerationRepo;
 import com.microsoft.teams.app.repository.EscalationMapDao;
 import com.microsoft.teams.app.repository.TicketRepo;
 import com.microsoft.teams.app.repository.UserRepository;
@@ -54,6 +55,7 @@ import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.microsoft.teams.app.service.impl.EscalationMapImpl;
 import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.microsoft.teams.app.service.impl.TicketImpl;
+import com.microsoft.teams.app.utility.Utility;
 
 import okhttp3.Request;
 
@@ -68,6 +70,9 @@ public class EscalateTicketQualityService {
 
 	@Autowired
 	CommonUtility commonUtility;
+	
+	@Autowired
+	AutoGenerationRepo autoGenerationRepo;
 
 	@Autowired
 	DepartmentImpl departmentImpl;
@@ -83,6 +88,9 @@ public class EscalateTicketQualityService {
 	
 	@Autowired
 	EscalationMapImpl escImpl;
+	
+	@Autowired
+	Utility utility;
 
 	/*
 	 * @Autowired AuthenticationService authService;
@@ -100,8 +108,10 @@ public class EscalateTicketQualityService {
 		if (tkt == null) {
 			tkt = ticketRepo.findAllByChatGroupId(ChatId);
 		}
+		// "CLOSE TICKET".equalsIgnoreCase(status)
+		 
 
-		if ("CLOSE TICKET".equalsIgnoreCase(status)) { // close the ticket
+		if ("closeticket".equalsIgnoreCase(status)) { // close the ticket
 
 			tkt.setStatuscycleId("sfarm_cloud_env_10");
 			tkt.setUpdateDateTime(new Date());
@@ -245,7 +255,7 @@ public class EscalateTicketQualityService {
 
 			return json;
 
-		} else if ("ESCALATE".equalsIgnoreCase(status) && tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
+		} else if ("escalate".equalsIgnoreCase(status) && tkt.getEmployeeTeamsId().equalsIgnoreCase(turnContext.getActivity().getFrom().getAadObjectId())) {
 
 			final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
 			
@@ -296,6 +306,7 @@ public class EscalateTicketQualityService {
 			 */
 
 			graphClient.chats(ChatId).messages().buildRequest().post(chatMessage);
+		
 
 		}
 		return json;
@@ -314,49 +325,21 @@ public class EscalateTicketQualityService {
 		}
 	}
 
-	public String creatchatwithTeamMembers(Ticket_296 tkt, TurnContext turnContext, String deptName,
-			GraphServiceClient<Request> graphClient) {
+	public String creatchatwithTeamMembers(Ticket_296 tkt, TurnContext turnContext,
+			GraphServiceClient<Request> graphClient,AutoGenarationCode lastNumberObj,String UserteamsId,String UserteamsName,String issueTtle,String issueDescription) {
 
+	
 		//
 		// String json = null;
 		String chaturl = null;
 		// MyNewApp
 
 		//List<User> userList = userRepo.findAllByDepartmentId(tkt.getSupportDepartmentId());
-		Support_298 sup = supportImpl.findAll(tkt.getSupportId());
 		
-		Set<User> userList=sup.getUser();
-		
-		Set<String> addedMembers=new HashSet<String>();
-		
-		
-		
+		//Set<String> addedMembers=new HashSet<String>();
 		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
-
-		for (User user:userList) {
-
-			// Print all elements of List
-			// System.out.println(userList.get(i));
-
-			if (user != null && user.getTeamsId() != null) {
-
-				AadUserConversationMember members = new AadUserConversationMember();
-				LinkedList<String> rolesList = new LinkedList<String>();
-				rolesList.add("owner");
-				members.roles = rolesList;
-				// 5f92b236-28ec-474f-bae4-f9cab9275230
-				addedMembers.add(user.getTeamsId());
-				members.additionalDataManager().put("user@odata.bind",
-						new JsonPrimitive(
-								"https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
-				members.additionalDataManager().put("@odata.type",
-						new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-				membersList.add(members);
-			}
-			
-			
-
-		}
+		
+		
 
 		/*
 		 * final ClientSecretCredential usernamePasswordCredential = new
@@ -398,7 +381,7 @@ public class EscalateTicketQualityService {
 		chat.chatType = ChatType.GROUP;
 		chat.topic = "Ticket #".concat(tkt.getTicketNumber() + " " + tkt.getTicketTitle());
 		
-		
+		// adding sfhelp user
 		AadUserConversationMember members1 = new AadUserConversationMember();
 		LinkedList<String> rolesList1 = new LinkedList<String>();
 		rolesList1.add("owner");
@@ -409,36 +392,55 @@ public class EscalateTicketQualityService {
 				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 
 		membersList.add(members1);
-		addedMembers.add("5f92b236-28ec-474f-bae4-f9cab9275230");
+		//addedMembers.add("5f92b236-28ec-474f-bae4-f9cab9275230");
+		
 		
 		/*
 		 * AadUserConversationMember members2 = new AadUserConversationMember();
 		 * LinkedList<String> rolesList2 = new LinkedList<String>();
-		 * rolesList2.add("owner"); members2.roles = rolesList2;
+		 * rolesList2.add("guest"); members2.roles = rolesList2;
 		 * members2.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
-		 * "https://graph.microsoft.com/v1.0/users('dc4b37af-3ca2-4049-989b-069589d57e72')"
+		 * "https://graph.microsoft.com/v1.0/users('f6cce08a-5068-4a39-8976-7659bd02d6f7')"
 		 * )); members2.additionalDataManager().put("@odata.type", new
 		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 		 * 
 		 * membersList.add(members2);
+		 * addedMembers.add("f6cce08a-5068-4a39-8976-7659bd02d6f7");
+		 */ // husen
+		
+		/*
+		 * AadUserConversationMember members4 = new AadUserConversationMember();
+		 * LinkedList<String> rolesList4 = new LinkedList<String>();
+		 * rolesList4.add("guest"); members4.roles = rolesList4;
+		 * members4.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
+		 * "https://graph.microsoft.com/v1.0/users('225e6ff0-0cfd-4b0e-9533-4c8082dff228')"
+		 * )); members4.additionalDataManager().put("@odata.type", new
+		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		 * 
+		 * membersList.add(members4);
+		 * addedMembers.add("225e6ff0-0cfd-4b0e-9533-4c8082dff228");
+		 */// ankith
+		
+		
+		
+		  
+		  
+		/*
+		 * AadUserConversationMember members3 = new AadUserConversationMember();
+		 * LinkedList<String> rolesList3 = new LinkedList<String>();
+		 * rolesList3.add("owner"); members3.roles = rolesList3;
+		 * members3.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
+		 * "https://graph.microsoft.com/v1.0/users('dc4b37af-3ca2-4049-989b-069589d57e72')"
+		 * )); members3.additionalDataManager().put("@odata.type", new
+		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		 * 
+		 * membersList.add(members3);
 		 * addedMembers.add("dc4b37af-3ca2-4049-989b-069589d57e72");
-		 */
+		 */ //subramanyam
+		  
 		
-		
-		
-		if (!addedMembers.contains(turnContext.getActivity().getFrom().getAadObjectId())) {
-			
-			AadUserConversationMember members = new AadUserConversationMember();
-			LinkedList<String> rolesList = new LinkedList<String>();
-			rolesList.add("owner");
-			members.roles = rolesList;
-			//members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
-			members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+turnContext.getActivity().getFrom().getAadObjectId()+"')"));
-			members.additionalDataManager().put("@odata.type",
-					new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-			membersList.add(members);
-			
-		}
+		  
+	
 		 
 		
 		//turnContext.getActivity().getFrom().getAadObjectId()
@@ -478,6 +480,9 @@ public class EscalateTicketQualityService {
 			// graphClient.applications().buildRequest().post(application);
 			Chat cli = graphClient.chats().buildRequest().post(chat);
 			
+			//graphClient.chats("19:2da4c29f6d7041eca70b638b43d45437@thread.v2")
+		
+			
 			
 
 			/*
@@ -488,13 +493,19 @@ public class EscalateTicketQualityService {
 			 */
 
 			chaturl = cli.webUrl;
+			
 			tkt.setChatGroupId(cli.id);
+			
+			Thread newThread = new Thread(() -> {
 
-			ticketRepo.save(tkt);
-
-			// System.out.println(cli);
-
-			AddChatBotToTeamsApp(cli.id, graphClient);
+			
+				createTicketAsyncCall(cli.id,tkt,lastNumberObj,UserteamsId,UserteamsName,issueTtle,issueDescription,graphClient);
+				
+				AddChatBotToTeamsApp(cli.id, graphClient);
+			});
+			newThread.start();
+			
+		
 
 			/*
 			 * //==== working code for send message to group chat======
@@ -516,7 +527,9 @@ public class EscalateTicketQualityService {
 			System.out.println(cli.webUrl);
 			System.out.println(cli.oDataType);
 			
-			addedMembers.clear();
+			membersList.clear();
+		
+		
 
 		} catch (Exception e) {
 			// logger.debug("" + e.getMessage());
@@ -525,6 +538,99 @@ public class EscalateTicketQualityService {
 		return chaturl;
 
 	}
+	
+	public void createTicketAsyncCall(String chatId,Ticket_296 tkt,AutoGenarationCode lastNumberObj,String UserteamsId,String UserteamsName,String issueTtle,String issueDescription,GraphServiceClient<Request> graphClient)
+	{
+		
+	
+		
+		Long trasactionNumber = utility.nextId();
+		Date dt = new Date();
+		
+		if (tkt != null) {
+			
+			//tkt.setDescription((String) (botResponseMap).get("IssueDescription"));
+			tkt.setIssuedetails(issueDescription);
+			tkt.setStatuscycleId("27");
+			tkt.setCreateDateTime(dt);
+			tkt.setUpdateDateTime(dt);
+		
+			tkt.setId(String.valueOf(lastNumberObj.getAutoCodeNo()));
+			tkt.setEmployeeTeamsId(UserteamsId);
+			tkt.setTransactionentityId(trasactionNumber);
+			tkt.setChatGroupId(chatId);
+			tkt.setNextRoles(null);
+			// tkt.setPriorityId("sfarm_cloud_env_1");// low priority
+			tkt.setPriorityId(null);
+			tkt.setStatus(null);
+			tkt.setTicketQualityRate("5");
+			tkt.setTicketQualityComments(null);
+			tkt.setUpdatedBy(UserteamsName);
+			tkt.setCreatedBy(UserteamsName);
+
+			lastNumberObj.setAutoCodeNo(lastNumberObj.getAutoCodeNo() + 1);
+			autoGenerationRepo.save(lastNumberObj);
+		
+
+			ticketRepo.save(tkt);
+			
+			
+			Support_298 sup = supportImpl.findAll(tkt.getSupportId());
+			
+			Set<User> userList=sup.getUser();
+			
+			Set<String> addedMembers=new HashSet<String>();
+			
+			//LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
+			
+			for (User user:userList) {
+
+				if (user != null && user.getTeamsId() != null) {
+				  
+						AadUserConversationMember member = new AadUserConversationMember();
+						LinkedList<String> rolesList = new LinkedList<String>();
+						rolesList.add("owner");
+						member.roles = rolesList; //
+						addedMembers.add(user.getTeamsId());
+						member.additionalDataManager().put("user@odata.bind",
+								new JsonPrimitive("https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
+						member.additionalDataManager().put("@odata.type",
+								new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+						graphClient.chats(chatId).members().buildRequest().post(member);
+						//membersList.add(members);
+					}
+			}
+		
+			  if (!addedMembers.contains(UserteamsId)) {
+					 
+					 
+					com.microsoft.graph.models.User user = graphClient.users(UserteamsId).buildRequest().select("userType").get();
+					AadUserConversationMember member = new AadUserConversationMember();
+					LinkedList<String> rolesList = new LinkedList<String>();
+					 if(user.userType.equalsIgnoreCase("Guest")) {
+						 rolesList.add("guest");
+					 }else {
+						 rolesList.add("owner");
+					 }
+					 
+					
+					 member.roles = rolesList;
+					//members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
+					 member.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+UserteamsId+"')"));
+					 member.additionalDataManager().put("@odata.type",
+							new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+					graphClient.chats(chatId).members().buildRequest().post(member);
+				//	membersList.add(members);
+					
+				}
+			  
+		
+
+			  
+		}
+
+	}
+
 
 	public void AddChatBotToTeamsApp(String chatId, GraphServiceClient<Request> graphClient) {
 		TeamsAppInstallation teamsAppInstallation = new TeamsAppInstallation();
@@ -576,7 +682,7 @@ public class EscalateTicketQualityService {
 			ticketRepo.save(tkt);
 		}
 
-		return "";
+		return createThanksAdaptiveCard();
 
 	}
 
@@ -685,7 +791,7 @@ public class EscalateTicketQualityService {
 
 		Item it1 = new Item();
 		it1.setType("TextBlock");
-		it1.setText("Thank you for your valuable remarks !!!");
+		it1.setText("Your remarks saved");
 		it1.setWeight("bolder");
 		it1.setSize("medium");
 		it1.setColor("good");
