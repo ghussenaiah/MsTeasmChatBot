@@ -18,6 +18,7 @@ import com.microsoft.graph.requests.ChatMessageCollectionPage;
 
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
+import com.microsoft.graph.requests.UserCollectionPage;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.ChatHistory_299;
 import com.microsoft.teams.app.entity.Ticket_296;
@@ -104,7 +105,7 @@ public class FetchnSave_Retry_Mechanism {
 	
 	//
 	//@PostConstruct
-	@Scheduled(cron = "*/10 * * * * *")
+	//@Scheduled(cron = "*/10 * * * * *")
 	public void currentTime() throws Exception {
 		// log.info("Current Time = {}", dateFormat.format(new Date()));
 		updateTeamsMsgToDatabase();
@@ -334,7 +335,9 @@ public class FetchnSave_Retry_Mechanism {
 			throws Exception {
 
 		// pending in this method is
-
+		
+		
+		
 		Map<String, String> fileMap = new HashMap<>();
 
 		// drive id
