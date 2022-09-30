@@ -111,7 +111,7 @@ public class User implements Serializable {
     @JsonProperty("k_vendorId")
     private String k_vendorId;
     @Column(name = "errormessage")
-    @Lob
+    //@Lob
     @JsonProperty("errorMessage")
     private String errorMessage;
 
