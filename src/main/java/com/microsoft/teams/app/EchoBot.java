@@ -631,13 +631,13 @@ public class EchoBot extends TeamsActivityHandler {
 				tkt.setClstktreplyId(rr.getId());
 
 				
-				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
-				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
-				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
-						"https://graph.microsoft.com/v1.0/chats/" + ChatId + "/messages/" + rr.getId() + ""));
-
-				graphClient.chats(ChatId).pinnedMessages().buildRequest().post(pinnedChatMessageInfo);
-				 
+//				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+//				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
+//				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
+//						"https://graph.microsoft.com/v1.0/chats/" + ChatId + "/messages/" + rr.getId() + ""));
+//
+//				graphClient.chats(ChatId).pinnedMessages().buildRequest().post(pinnedChatMessageInfo);
+//				 
                 tkt.setWelmsg("Yes");
 				ticketRepo.save(tkt);
 
