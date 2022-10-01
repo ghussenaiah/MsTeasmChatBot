@@ -249,7 +249,7 @@ public class TicketService {
 
 		Container con3 = new Container();
 		con3.setType("TextBlock");
-		con3.setText("Deatiled Description");
+		con3.setText("Detailed Description");
 		con3.setWeight("bolder");
 		con3.setSize("medium");
 		con3.setColor("accent");
