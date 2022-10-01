@@ -39,6 +39,7 @@ import com.microsoft.graph.models.AadUserConversationMember;
 
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.PinnedChatMessageInfo;
+//import com.microsoft.graph.models.PinnedChatMessageInfo;
 import com.microsoft.graph.models.TeamsAppInstallation;
 
 import com.microsoft.graph.models.User;
@@ -65,6 +66,7 @@ import com.microsoft.teams.app.repository.TicketRepo;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.microsoft.teams.app.service.impl.SupportImpl;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 
 import org.apache.commons.io.IOUtils;
@@ -108,7 +110,7 @@ spring.datasource.password=WANAparthy@544
 spring.jpa.hibernate.ddl-auto=update
 spring.jpa.show-sql=true
 */
-
+@Slf4j
 public class EchoBot extends TeamsActivityHandler {
 
 	private Logger logger = LoggerFactory.getLogger(BotController.class);
@@ -529,13 +531,18 @@ public class EchoBot extends TeamsActivityHandler {
 
 				tkt.setClstktreplyId(rr.getId());
 				
-				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
-				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
-				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
-						"https://graph.microsoft.com/v1.0/chats/"+ChatId+"/messages/"+rr.getId()+""));
-
-				graphClient.chats(ChatId).pinnedMessages().buildRequest()
-						.post(pinnedChatMessageInfo);
+				/*
+				 * final GraphServiceClient<Request> graphClient =
+				 * AuthenticationService.getInstance(); PinnedChatMessageInfo
+				 * pinnedChatMessageInfo = new PinnedChatMessageInfo();
+				 * pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new
+				 * JsonPrimitive(
+				 * "https://graph.microsoft.com/v1.0/chats/"+ChatId+"/messages/"+rr.getId()+""))
+				 * ;
+				 * 
+				 * graphClient.chats(ChatId).pinnedMessages().buildRequest()
+				 * .post(pinnedChatMessageInfo);
+				 */
 
 				ticketRepo.save(tkt);
 
@@ -619,14 +626,15 @@ public class EchoBot extends TeamsActivityHandler {
 
 				tkt.setClstktreplyId(rr.getId());
 
+				
 				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
 				PinnedChatMessageInfo pinnedChatMessageInfo = new PinnedChatMessageInfo();
 				pinnedChatMessageInfo.additionalDataManager().put("message@odata.bind", new JsonPrimitive(
-						"https://graph.microsoft.com/v1.0/chats/"+ChatId+"/messages/"+rr.getId()+""));
+						"https://graph.microsoft.com/v1.0/chats/" + ChatId + "/messages/" + rr.getId() + ""));
 
-				graphClient.chats(ChatId).pinnedMessages().buildRequest()
-						.post(pinnedChatMessageInfo);
-
+				graphClient.chats(ChatId).pinnedMessages().buildRequest().post(pinnedChatMessageInfo);
+				 
+                tkt.setWelmsg("Yes");
 				ticketRepo.save(tkt);
 
 				// System.out.println(rr.getId());

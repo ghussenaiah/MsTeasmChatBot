@@ -12,6 +12,10 @@ import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 
 import java.io.IOException;
 
+import javax.websocket.server.ServerEndpointConfig.Configurator;
+
+import org.apache.logging.log4j.LogManager;
+import org.slf4j.Logger;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
@@ -35,6 +39,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class Application extends BotDependencyConfiguration {
 
     public static void main(String[] args) throws IOException {
+    	
+    	//Logger logger = (Logger) LogManager.getLogger("com.bcv.kagami");
+    		//	Configurator.setLevel(logger.getName(), Level.ERROR);
         SpringApplication.run(Application.class, args);
         System.out.println("Application started");
         

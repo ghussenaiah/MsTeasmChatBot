@@ -45,6 +45,7 @@ import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.microsoft.teams.app.service.impl.TicketImpl;
 import com.microsoft.teams.app.utility.Utility;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -52,6 +53,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
 import com.google.gson.JsonPrimitive;
 
+@Slf4j
 @Component
 public class TicketService {
 
@@ -539,6 +541,7 @@ public class TicketService {
 		String chatUrl = ecalateTicketQualityService.creatchatwithTeamMembers(tkt, turnContext,
 					 graphClient,lastNumberObj,UserteamsId,UserteamsName,issueTtle,issueDescription);
 		
+		log.info("chat url and tkt number =>{},{}",chatUrl,tktNumber);
 		if(chatUrl!=null && tktNumber>0) {
 
 			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
@@ -633,11 +636,13 @@ public class TicketService {
 
 				e.printStackTrace();
 			}
+			return json;
 		}
+		return json;
 
 		
 
-		return json;
+	
 
 	}
 	

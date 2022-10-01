@@ -28,7 +28,7 @@ import com.microsoft.graph.models.ChatMessageMention;
 import com.microsoft.graph.models.ChatMessageMentionedIdentitySet;
 import com.microsoft.graph.models.Identity;
 import com.microsoft.graph.models.ItemBody;
-import com.microsoft.graph.models.PinnedChatMessageInfo;
+//import com.microsoft.graph.models.PinnedChatMessageInfo;
 import com.microsoft.graph.models.ChatType;
 import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.models.TeamsAppInstallation;
@@ -496,15 +496,19 @@ public class EscalateTicketQualityService {
 			
 			tkt.setChatGroupId(cli.id);
 			
-			Thread newThread = new Thread(() -> {
+			if (chaturl != null) {
 
-			
-				createTicketAsyncCall(cli.id,tkt,lastNumberObj,UserteamsId,UserteamsName,issueTtle,issueDescription,graphClient);
-				
-				AddChatBotToTeamsApp(cli.id, graphClient);
-			});
-			newThread.start();
-			
+				Thread newThread = new Thread(() -> {
+					
+					AddChatBotToTeamsApp(cli.id, graphClient);
+
+					createTicketAsyncCall(cli.id, tkt, lastNumberObj, UserteamsId, UserteamsName, issueTtle,
+							issueDescription, graphClient);
+
+					
+				});
+				newThread.start();
+			}
 		
 
 			/*

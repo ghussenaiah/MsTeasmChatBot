@@ -5,7 +5,9 @@ import org.springframework.scheduling.annotation.Scheduled;
 import com.azure.identity.UsernamePasswordCredential;
 import com.azure.identity.UsernamePasswordCredentialBuilder;
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
+import com.microsoft.graph.models.User;
 import com.microsoft.graph.requests.GraphServiceClient;
+import com.microsoft.graph.requests.UserRequestBuilder;
 
 import okhttp3.Request;
 
@@ -35,10 +37,10 @@ public class AuthenticationService {
 
 	public static GraphServiceClient<Request> getInstance() {
 		if (graphClient == null) {
+		
 			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
 					// production
-					.clientId("3afa6722-1ab9-4bde-9824-fb727a612eb2").username("sf_helpdesk@srinivasa.co")
-					.password("Jhills@45").build();
+					.clientId("3afa6722-1ab9-4bde-9824-fb727a612eb2").username("sf_helpdesk@srinivasa.co").password("Jhills@45").build();
 
 			// testing purpose
 			// .clientId("d9c45a22-46b6-4c1f-b78d-b909f3649434").username("sf_helpdesk@srinivasa.co").password("Jhills@45").build();
@@ -48,6 +50,11 @@ public class AuthenticationService {
 
 			graphClient = GraphServiceClient.builder().authenticationProvider(tokenCredentialAuthProvider)
 					.buildClient();
+			// User user = graphClient.me().buildRequest().get();
+			//UserRequestBuilder user=graphClient.me().chats("");
+			
+			
+			//System.out.println(user.displayName);
 		}
 		return graphClient;
 	}
