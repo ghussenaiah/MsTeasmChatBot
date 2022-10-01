@@ -802,6 +802,7 @@ public class TicketService {
 	
 	synchronized void IssueStatus(TurnContext turnContext, ConcurrentHashMap<String, Ticket_296> ticket) {
 
+		log.info("On click synchronized call reached ");
 		Attachment cardAttachment = null;
 		Attachment updatetriggerAttachment = null;
 
@@ -815,6 +816,8 @@ public class TicketService {
 			String triggerClicked =  (String) botResponseMap.get("button");
 			//String triggerClicked = (String) ((Map) actionObj).get("title");
 			//"CLOSE TICKET".equalsIgnoreCase(triggerClicked)
+			
+			log.info("On click trigger type  ========> {}",triggerClicked);
 			
 			if ("closeticket".equalsIgnoreCase(triggerClicked) && !tkt.getStatuscycleId().equalsIgnoreCase("sfarm_cloud_env_10")) {
 

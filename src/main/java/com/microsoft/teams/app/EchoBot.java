@@ -315,6 +315,8 @@ public class EchoBot extends TeamsActivityHandler {
 						Serialization.jsonToTree(ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext)));
 			}
 			else if (((botResponseMap).get("button")) != null) {
+				
+				log.info("On click event reached ");
 				  ticketService.IssueStatus(turnContext, ticket);
 			}
 
@@ -348,7 +350,7 @@ public class EchoBot extends TeamsActivityHandler {
 			}
 		}
 
-		if (cardAttachment.getContent() != null) {
+		if (cardAttachment !=null && cardAttachment.getContent() != null) {
 			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
 			Activity activity = MessageFactory.attachment(cardAttachment);
 			CompletableFuture<ResourceResponse> resourceresponse = turnContext.sendActivity(activity);
@@ -458,6 +460,8 @@ public class EchoBot extends TeamsActivityHandler {
 
 		// logger.info("getActivity().getConversation().getAadObjectId()=> "+
 		// turnContext.getActivity().getConversation().getAadObjectId());
+		
+		log.info("On click event reached from invoke activity should never call this method");
 
 		//ticketService.IssueStatus(turnContext, ticket);
 		
