@@ -10,6 +10,8 @@ import com.microsoft.bot.integration.Configuration;
 import com.microsoft.bot.integration.spring.BotController;
 import com.microsoft.bot.integration.spring.BotDependencyConfiguration;
 
+import lombok.extern.slf4j.Slf4j;
+
 import java.io.IOException;
 
 import javax.websocket.server.ServerEndpointConfig.Configurator;
@@ -36,6 +38,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @ComponentScan(basePackages = "com.microsoft.teams.app")
 @EnableScheduling
 @EnableTransactionManagement
+@Slf4j
 public class Application extends BotDependencyConfiguration {
 
     public static void main(String[] args) throws IOException {
@@ -43,7 +46,27 @@ public class Application extends BotDependencyConfiguration {
     	//Logger logger = (Logger) LogManager.getLogger("com.bcv.kagami");
     		//	Configurator.setLevel(logger.getName(), Level.ERROR);
         SpringApplication.run(Application.class, args);
-        System.out.println("Application started");
+       // System.out.println("Application started");
+	
+        
+        //String killCommand = String.format("kill -9 %s", processId);
+        String runbccommad1 = String.format("disown -h %d",1);
+        String runbccommad2 = String.format("disown -h %d",2);
+		
+		try {
+			Process l = Runtime.getRuntime().exec(runbccommad1);
+			log.info("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
+		} catch (IOException e) {
+
+		}
+
+		try {
+			Process l = Runtime.getRuntime().exec(runbccommad2);
+			log.info("making as backend process for app jobs 2.. {} with pid : {}", l.toString());
+		} catch (IOException e) {
+
+		}
+		
         
         
         
