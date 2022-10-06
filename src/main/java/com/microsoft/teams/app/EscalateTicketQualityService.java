@@ -500,10 +500,11 @@ public class EscalateTicketQualityService {
 
 				Thread newThread = new Thread(() -> {
 					
-					AddChatBotToTeamsApp(cli.id, graphClient);
+				
 
 					createTicketAsyncCall(cli.id, tkt, lastNumberObj, UserteamsId, UserteamsName, issueTtle,
 							issueDescription, graphClient);
+					AddChatBotToTeamsApp(cli.id, graphClient);
 
 					
 				});

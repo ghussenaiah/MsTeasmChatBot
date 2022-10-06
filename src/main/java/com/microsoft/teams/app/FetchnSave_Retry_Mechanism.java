@@ -17,6 +17,7 @@ import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
 
 import com.microsoft.graph.requests.DriveItemCollectionPage;
+import com.microsoft.graph.requests.DriveItemCollectionRequestBuilder;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.UserCollectionPage;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
@@ -351,11 +352,20 @@ public class FetchnSave_Retry_Mechanism {
 		System.out.println(drive.id);
 		// folder id
 		DriveItemCollectionPage dicp = graphClient.me().drives(drive.id).root().children().buildRequest().get();
+		dicp.getCount();
+		//dicp.getNextPage().
+		
 
 		System.out.println(dicp);
+		
+		dicp.getCurrentPage().get(0);
+		//dicp.getNextPage()
+		
+		
 
 		DriveItem folderId = dicp.getCurrentPage().get(0);
 
+		
 		System.out.println(folderId);
 
 		DriveItemCollectionPage filesList = graphClient.me().drives(drive.id).items(folderId.id).children()
