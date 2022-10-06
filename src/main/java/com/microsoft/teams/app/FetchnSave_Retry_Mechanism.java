@@ -352,13 +352,13 @@ public class FetchnSave_Retry_Mechanism {
 		System.out.println(drive.id);
 		// folder id
 		DriveItemCollectionPage dicp = graphClient.me().drives(drive.id).root().children().buildRequest().get();
-		dicp.getCount();
+		//dicp.getCount();
 		//dicp.getNextPage().
 		
 
 		System.out.println(dicp);
 		
-		dicp.getCurrentPage().get(0);
+		//dicp.getCurrentPage().get(0);
 		//dicp.getNextPage()
 		
 		
