@@ -55,7 +55,9 @@ public class Application extends BotDependencyConfiguration {
 		
 		try {
 			Process l = Runtime.getRuntime().exec(runbccommad1);
+			log.debug("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
 			log.info("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
+			
 		} catch (IOException e) {
 
 		}
