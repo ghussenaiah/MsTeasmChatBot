@@ -356,7 +356,7 @@ public class FetchnSave_Retry_Mechanism {
 		//dicp.getNextPage().
 		
 
-		System.out.println(dicp);
+		//System.out.println(dicp);
 		
 		//dicp.getCurrentPage().get(0);
 		//dicp.getNextPage()
@@ -364,6 +364,12 @@ public class FetchnSave_Retry_Mechanism {
 		
 
 		DriveItem folderId = dicp.getCurrentPage().get(0);
+		
+		//List<DriveItem> dd=dicp.getCurrentPage();
+		
+		//DriveItemCollectionRequestBuilder sdsdsd=dicp.getNextPage();
+		
+		
 
 		
 		System.out.println(folderId);
