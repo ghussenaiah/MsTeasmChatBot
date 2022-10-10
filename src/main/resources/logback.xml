@@ -28,7 +28,7 @@
         </encoder>
         <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
             <!-- We are rolling over daily -->
-            <fileNamePattern>/home/ubuntu/kagami/logs/crunchify.log.timeroll.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
+            <fileNamePattern>/home/ubuntu/kagami/logs/app.log.timeroll.%d{yyyy-MM-dd}.%i.log</fileNamePattern>
             <!-- keep 10 days' worth of history capped at 1GB total size -->
              <maxFileSize>10MB</maxFileSize>
       <maxHistory>30</maxHistory>
