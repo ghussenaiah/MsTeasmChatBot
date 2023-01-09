@@ -36,14 +36,14 @@ import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.core.CustomRequestBuilder;
 
 import com.microsoft.graph.models.AadUserConversationMember;
-
+import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.models.DriveItem;
 import com.microsoft.graph.models.PinnedChatMessageInfo;
 //import com.microsoft.graph.models.PinnedChatMessageInfo;
 import com.microsoft.graph.models.TeamsAppInstallation;
 
 import com.microsoft.graph.models.User;
-
+import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.DriveCollectionPage;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.DriveItemRequestBuilder;
@@ -311,44 +311,73 @@ public class EchoBot extends TeamsActivityHandler {
 
 				//ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext);
 				
-				cardAttachment.setContent(
-						Serialization.jsonToTree(ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext)));
+				cardAttachment.setContent(Serialization.jsonToTree(ticketQualityService.ticketQualityRateUpdate(botResponseMap, ticket, turnContext)));
 			}
 			else if (((botResponseMap).get("button")) != null) {
 				
 				log.info("On click event reached ");
 				  ticketService.IssueStatus(turnContext, ticket);
 			}
-
-			else {
-
+		
+		} 
+		
+		if(turnContext != null && turnContext.getActivity()!=null && turnContext.getActivity().getText()!=null) {
+			
+			String commandValue=turnContext.getActivity().getText().toLowerCase().replaceAll("\\s", "");
+			
+			if(commandValue.equalsIgnoreCase("newticket")) {
+				
 				cardAttachment = new Attachment();
 				commonUtility.removeContextData(ticket, turnContext);
 				callShowImage(turnContext);
 				try {
-
 					// cardAttachment.setContent(Serialization.jsonToTree(Department));
 					cardAttachment.setContent(Serialization.jsonToTree(depService.createDepartmentAdaptiveCard()));
-
+					
 				} catch (IOException e) {
 
 					e.printStackTrace();
 				}
 			}
 
-		} else {
+			else if (commandValue.equalsIgnoreCase("showmytickets")) {
 
-			cardAttachment = new Attachment();
-			commonUtility.removeContextData(ticket, turnContext);
-			callShowImage(turnContext);
-			try {
-				// cardAttachment.setContent(Serialization.jsonToTree(Department));
-				cardAttachment.setContent(Serialization.jsonToTree(depService.createDepartmentAdaptiveCard()));
-			} catch (IOException e) {
+				cardAttachment = new Attachment();
+				try {
+					// cardAttachment.setContent(Serialization.jsonToTree(Department));
+					cardAttachment.setContent(Serialization.jsonToTree(ticketService.ShowMyTickets(turnContext)));
+					//cardAttachment.setContent(Serialization.jsonToTree(mk));
+					
+				} catch (IOException e) {
 
-				e.printStackTrace();
+					e.printStackTrace();
+				}
+			}
+			
+
+			else if (commandValue.equalsIgnoreCase("help")) {
+
+				cardAttachment = new Attachment();
+				
+				//callShowImage(turnContext);
+				try {
+					// cardAttachment.setContent(Serialization.jsonToTree(Department));
+					cardAttachment.setContent(Serialization.jsonToTree(ticketService.HelpCommands(turnContext)));
+					
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+			}
+
+			else if (commandValue.equalsIgnoreCase("clear")) {
+				// cardAttachment = new Attachment();
+				//ticketService.ClearChat(turnContext);
 			}
 		}
+		
+	
+
 
 		if (cardAttachment !=null && cardAttachment.getContent() != null) {
 			cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");

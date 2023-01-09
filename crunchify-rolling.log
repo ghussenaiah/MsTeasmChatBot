@@ -1,0 +1,23 @@
+2022-10-07 18:32:22 [HikariPool-1 connection adder] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@6c166755
+2022-10-07 18:32:23 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 2
+2022-10-07 18:32:23 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525487]
+2022-10-07 18:32:24 [HikariPool-1 connection adder] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Added connection org.postgresql.jdbc.PgConnection@585eb21a
+2022-10-07 18:32:24 [HikariPool-1 connection adder] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - After adding stats (total=10, active=1, idle=9, waiting=0)
+2022-10-07 18:32:25 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 3
+2022-10-07 18:32:25 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525506]
+2022-10-07 18:32:28 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 4
+2022-10-07 18:32:28 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525493]
+2022-10-07 18:32:30 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 5
+2022-10-07 18:32:30 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525501]
+2022-10-07 18:32:33 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 6
+2022-10-07 18:32:33 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525494]
+2022-10-07 18:32:36 [HikariPool-1 housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Pool stats (total=10, active=1, idle=9, waiting=0)
+2022-10-07 18:32:36 [HikariPool-1 housekeeper] DEBUG com.zaxxer.hikari.pool.HikariPool - HikariPool-1 - Fill pool skipped, pool is at sufficient level.
+2022-10-07 18:32:37 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 7
+2022-10-07 18:32:37 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525495]
+2022-10-07 18:32:40 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 8
+2022-10-07 18:32:40 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525496]
+2022-10-07 18:32:42 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 9
+2022-10-07 18:32:42 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525497]
+2022-10-07 18:32:44 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result set row: 10
+2022-10-07 18:32:44 [scheduling-1] DEBUG org.hibernate.loader.Loader - Result row: EntityKey[com.microsoft.teams.app.entity.Ticket_296#525498]

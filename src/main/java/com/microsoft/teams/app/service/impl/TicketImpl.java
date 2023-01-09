@@ -193,6 +193,12 @@ public class TicketImpl  implements TicketRepo{
 		// TODO Auto-generated method stub
 		return ticketRepo.findAllByStatuscycleId(statuscycleid);
 	}
+
+	@Override
+	public List<Ticket_296> findAll(String employeeTeamsId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 	 
 
 	

@@ -9,6 +9,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -57,8 +59,10 @@ import com.microsoft.teams.app.service.impl.SupportImpl;
 import com.microsoft.teams.app.service.impl.TicketImpl;
 import com.microsoft.teams.app.utility.Utility;
 
+import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
 
+@Slf4j
 @Component
 public class EscalateTicketQualityService {
 
@@ -495,6 +499,7 @@ public class EscalateTicketQualityService {
 			chaturl = cli.webUrl;
 			
 			tkt.setChatGroupId(cli.id);
+			tkt.setChatweburl(chaturl);
 			
 			if (chaturl != null) {
 
@@ -649,6 +654,7 @@ public class EscalateTicketQualityService {
 		 * ));
 		 */
 		graphClient.chats(chatId).installedApps().buildRequest().post(teamsAppInstallation);
+
 	}
 
 	public String ticketQualityRateUpdate(LinkedHashMap botResponseMap, ConcurrentHashMap<String, Ticket_296> ticket,
@@ -685,9 +691,49 @@ public class EscalateTicketQualityService {
 			}
 
 			ticketRepo.save(tkt);
+			
+			
+			final Timer timer = new Timer();
+
+			final TimerTask task = new TimerTask() {
+
+			    @Override
+			    public void run() {
+			    	removeMemberFromChat(ChatId,turnContext);
+			        timer.cancel(); // stop timer after execution
+			    }
+			};
+
+			timer.schedule(task, 5000);
+			
+		
 		}
+		
+		
 
 		return createThanksAdaptiveCard();
+
+	}
+	
+	
+	public void removeMemberFromChat(String chatId, TurnContext turnContext) {
+
+		String userteamsId = turnContext.getActivity().getFrom().getAadObjectId();
+
+		final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+		ConversationMemberCollectionPage members = graphClient.me().chats(chatId).members().buildRequest().get();
+		List<ConversationMember> listUser = members.getCurrentPage();
+
+		for (ConversationMember itrUser : listUser) {
+			AadUserConversationMember deleteUser = (com.microsoft.graph.models.AadUserConversationMember) itrUser;
+			// System.out.println(deleteUser.userId);
+			if (!deleteUser.userId.equalsIgnoreCase("5f92b236-28ec-474f-bae4-f9cab9275230")
+					&& !deleteUser.userId.equalsIgnoreCase(userteamsId)) {
+				log.info("deleting the user from chatid and userid {}{}", chatId, deleteUser.id);
+				graphClient.chats(chatId).members(deleteUser.id).buildRequest().delete();
+
+			}
+		}
 
 	}
 

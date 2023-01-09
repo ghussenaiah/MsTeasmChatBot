@@ -1,5 +1,6 @@
 package com.microsoft.teams.app.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import lombok.Getter;
@@ -25,6 +26,10 @@ public class Container {
 	private String id;
 	private String type;
 	private String style;
+	
+	private String gridStyle;
+	private Boolean firstRowAsHeaders;
+	
 	private Boolean isMultiSelect;
 	private Boolean isMultiline;
 	private Boolean bleed;
@@ -35,6 +40,7 @@ public class Container {
 	private String maxLength;
 	private String text;
 	private List<Column> columns;
+	private List<Rows> rows;
 	private List<Choices> choices;
 	private List<Item> items;
 	private Boolean wrap;
@@ -44,6 +50,7 @@ public class Container {
 	private Boolean isRequired;
 	private String errorMessage;
 	private int maxLines;
+	
 	
 
 	

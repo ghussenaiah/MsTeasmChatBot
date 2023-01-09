@@ -67,7 +67,7 @@ public class Utility {
 	 * 
 	 * 
 	 * 
-	 * MicrosoftAppId=096d823c-fe93-4fd5-b30e-be4f5b4ee461                   (it will be bot Id)
+	 * MicrosoftAppId=096d823c-fe93-4fd5-b30e-be4f5b4ee461                    (it will be bot Id)
 	   MicrosoftAppPassword=TO18Q~s3RQK9_Glwg7JLd5.aY6UKxaCLa5RIRaTE          ( it will be secret key) while creating for bot 
 	 */
 	

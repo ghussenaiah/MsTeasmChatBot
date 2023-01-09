@@ -25,6 +25,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Import;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
+import org.apache.commons.lang3.StringUtils;
 
 @SpringBootApplication
 
@@ -50,24 +51,15 @@ public class Application extends BotDependencyConfiguration {
 	
         
         //String killCommand = String.format("kill -9 %s", processId);
-        String runbccommad1 = String.format("disown -h %d",1);
-        String runbccommad2 = String.format("disown -h %d",2);
+      //  String runbccommad1 = String.format("disown -h %d",1);
+       // String runbccommad2 = String.format("disown -h %d",2);
 		
-		try {
-			Process l = Runtime.getRuntime().exec(runbccommad1);
-			log.debug("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
-			log.info("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
+		
+			System.out.println("test method");
+		//	Process l = Runtime.getRuntime().exec(runbccommad1);
+		//	log.debug("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
+		//	log.info("making as backend process for app jobs 1 .. {} with pid : {}", l.toString());
 			
-		} catch (IOException e) {
-
-		}
-
-		try {
-			Process l = Runtime.getRuntime().exec(runbccommad2);
-			log.info("making as backend process for app jobs 2.. {} with pid : {}", l.toString());
-		} catch (IOException e) {
-
-		}
 		
         
         

@@ -52,6 +52,9 @@ public class DepartmentService {
 		System.out.println(departmentList);
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		MsTeams mst=new MsTeams();
+		mst.setWidth("full");
+		adcard.setMsTeams(mst);
 		List<Container> conlist = new ArrayList<>();
 		List<ActionSet> actList = new ArrayList<>();
 
@@ -60,9 +63,6 @@ public class DepartmentService {
 		Container con = new Container();
 		con.setType("Container");
 		
-
-		MsTeams mst=new MsTeams();
-		mst.setWidth("full");
 
 		Item it1 = new Item();
 		it1.setType("TextBlock");

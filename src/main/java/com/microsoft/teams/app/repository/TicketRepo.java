@@ -35,12 +35,15 @@ public interface TicketRepo extends JpaRepository<Ticket_296, String> {
 	//@Query("SELECT t FROM Ticket_296 t WHERE t.statuscycleId = :statuscycleid and t.ticketQualityRate is null")
 	@Query("SELECT t FROM Ticket_296 t WHERE t.statuscycleId = :statuscycleid")
 	public List<Ticket_296> findAllByStatuscycleId(@Param("statuscycleid") String statuscycleid);
-    
-    
+
     public Ticket_296 findAllByTicketNumber(String ticketNumber);
     
     public Ticket_296 findAllByChatGroupId(String chatgroupid);
     
     public Ticket_296 findAllByClstktreplyId(String clstktreplyId);
+    
+	//@Query("SELECT u FROM User u JOIN u.Role r WHERE u.departmentId = :departmentId and r.roleName='Indent Approver1'")
+    @Query("SELECT t FROM Ticket_296 t WHERE t.employeeTeamsId = :employeeTeamsId and t.statuscycleId = '27'")
+	public List<Ticket_296> findAll(@Param("employeeTeamsId") String employeeTeamsId);
    
 }

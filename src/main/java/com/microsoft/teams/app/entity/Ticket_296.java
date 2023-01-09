@@ -46,6 +46,10 @@ public class Ticket_296 implements Serializable {
         @Column(name = "status")
         @JsonProperty("status")
         private String status;
+        
+        @Column(name = "chatweburl")
+        @JsonProperty("chatweburl")
+        private String chatweburl;
 
         @Column(name = "clstktreplyid")
         @JsonProperty("clstktreplyId")

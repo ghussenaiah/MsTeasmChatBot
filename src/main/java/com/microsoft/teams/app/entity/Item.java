@@ -39,5 +39,9 @@ public class Item {
 	private String horizontalAlignment; // value could be Right
 
 	private List<Choices> choices;
+	private ActionSet actionset;
+	private Container container;
+	public List<Item> items;
+	public List<Action> actions;
 
 }

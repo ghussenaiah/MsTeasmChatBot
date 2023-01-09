@@ -3,6 +3,8 @@ package com.microsoft.teams.app.entity;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.List;
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
@@ -23,6 +25,7 @@ public class ActionSet {
 	private String method;
 	private String url;
 	private String extraData;
+	private List<Action> actions;
 
 	/*
 	 * {\n" + " \"type\": \"Action.Execute\",\n" +
