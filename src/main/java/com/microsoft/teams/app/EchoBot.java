@@ -1,8 +1,34 @@
 package com.microsoft.teams.app;
 
+import java.io.BufferedInputStream;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.HttpURLConnection;
+import java.net.URISyntaxException;
+import java.net.URL;
+import java.nio.charset.StandardCharsets;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutionException;
+
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.azure.identity.UsernamePasswordCredential;
 import com.azure.identity.UsernamePasswordCredentialBuilder;
-import com.codepoetics.protonpack.collectors.CompletableFutures;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -24,40 +50,31 @@ import com.microsoft.bot.schema.CardImage;
 import com.microsoft.bot.schema.ChannelAccount;
 import com.microsoft.bot.schema.HeroCard;
 import com.microsoft.bot.schema.ResourceResponse;
-
 import com.microsoft.bot.schema.Serialization;
 import com.microsoft.bot.schema.ThumbnailCard;
 import com.microsoft.bot.schema.teams.AppBasedLinkQuery;
 import com.microsoft.bot.schema.teams.MessagingExtensionAttachment;
 import com.microsoft.bot.schema.teams.MessagingExtensionResponse;
 import com.microsoft.bot.schema.teams.MessagingExtensionResult;
-
 import com.microsoft.graph.authentication.TokenCredentialAuthProvider;
 import com.microsoft.graph.core.CustomRequestBuilder;
-
 import com.microsoft.graph.models.AadUserConversationMember;
-import com.microsoft.graph.models.ConversationMember;
 import com.microsoft.graph.models.DriveItem;
-import com.microsoft.graph.models.PinnedChatMessageInfo;
 //import com.microsoft.graph.models.PinnedChatMessageInfo;
 import com.microsoft.graph.models.TeamsAppInstallation;
-
 import com.microsoft.graph.models.User;
-import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.DriveCollectionPage;
 import com.microsoft.graph.requests.DriveItemCollectionPage;
 import com.microsoft.graph.requests.DriveItemRequestBuilder;
 import com.microsoft.graph.requests.DriveRecentCollectionPage;
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.graph.requests.SiteCollectionPage;
+import com.microsoft.graph.serializer.OffsetDateTimeSerializer;
 import com.microsoft.teams.app.entity.ActionData;
 import com.microsoft.teams.app.entity.ActionSet;
-import com.microsoft.teams.app.entity.Actionfallback;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
-import com.microsoft.teams.app.entity.AutoGenarationCode;
-import com.microsoft.teams.app.entity.ChatHistory_299;
-import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Container;
+import com.microsoft.teams.app.entity.EscalationMap_312;
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Ticket_296;
@@ -68,38 +85,6 @@ import com.microsoft.teams.app.service.impl.SupportImpl;
 
 import lombok.extern.slf4j.Slf4j;
 import okhttp3.Request;
-
-import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang3.StringUtils;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.jdbc.core.JdbcTemplate;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
-
-import java.net.HttpURLConnection;
-import java.net.URISyntaxException;
-import java.net.URL;
-
-import java.nio.charset.StandardCharsets;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ExecutionException;
 
 /*spring.jpa.properties.hibernate.dialect=org.hibernate.dialect.MySQL55Dialect
  * 
@@ -341,7 +326,8 @@ public class EchoBot extends TeamsActivityHandler {
 			}
 
 			else if (commandValue.equalsIgnoreCase("showmytickets")) {
-
+				
+				
 				cardAttachment = new Attachment();
 				try {
 					// cardAttachment.setContent(Serialization.jsonToTree(Department));
@@ -530,7 +516,7 @@ public class EchoBot extends TeamsActivityHandler {
 	}
 
 	@Override
-	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext) {
+	protected CompletableFuture<Void> onMembersAdded(List<ChannelAccount> membersAdded, TurnContext turnContext)  {
 
 		System.out.println("user getAadObjectId => " + membersAdded.get(0).getAadObjectId());
 
@@ -540,10 +526,12 @@ public class EchoBot extends TeamsActivityHandler {
 		String ChatId = turnContext.getActivity().getConversation().getId();
 
 		Ticket_296 tkt = ticketRepo.findAllByChatGroupId(ChatId);
+		Attachment cardAttachment = new Attachment();
 
 		if (tkt.getWelmsg() == null) {
 
-			Attachment cardAttachment = new Attachment();
+			
+		
 			try {
 				// cardAttachment.setContent(Serialization.jsonToTree(Department));
 				cardAttachment
@@ -562,7 +550,20 @@ public class EchoBot extends TeamsActivityHandler {
 			try {
 				ResourceResponse rr = resourceresponse.get();
 
-				tkt.setClstktreplyId(rr.getId());
+				//tkt.setClstktreplyId(rr.getId());
+				
+				cardAttachment
+				.setContent(Serialization.jsonToTree(ticketService.SendChatSecondMessage(turnContext, tkt)));
+
+				cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+				Activity activityValue = MessageFactory.attachment(cardAttachment);
+				logger.info(turnContext.getActivity().getChannelData().toString());
+
+				CompletableFuture<ResourceResponse> resourceres = turnContext.sendActivity(activityValue);
+			     rr = resourceres.get();
+
+				//tkt.setClstktreplyId(rr.getId());
+		
 				
 				/*
 				 * final GraphServiceClient<Request> graphClient =
@@ -586,6 +587,9 @@ public class EchoBot extends TeamsActivityHandler {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
@@ -641,8 +645,7 @@ public class EchoBot extends TeamsActivityHandler {
 			Attachment cardAttachment = new Attachment();
 			try {
 				// cardAttachment.setContent(Serialization.jsonToTree(Department));
-				cardAttachment
-						.setContent(Serialization.jsonToTree(ticketService.SendChatInitialMessage(turnContext, tkt)));
+				cardAttachment.setContent(Serialization.jsonToTree(ticketService.SendChatInitialMessage(turnContext, tkt)));
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -656,8 +659,18 @@ public class EchoBot extends TeamsActivityHandler {
 
 			try {
 				ResourceResponse rr = resourceresponse.get();
+				
+				cardAttachment
+				.setContent(Serialization.jsonToTree(ticketService.SendChatSecondMessage(turnContext, tkt)));
 
-				tkt.setClstktreplyId(rr.getId());
+				cardAttachment.setContentType("application/vnd.microsoft.card.adaptive");
+				Activity activityValue = MessageFactory.attachment(cardAttachment);
+				logger.info(turnContext.getActivity().getChannelData().toString());
+
+				CompletableFuture<ResourceResponse> resourceres = turnContext.sendActivity(activityValue);
+			     rr = resourceres.get();
+
+				//tkt.setClstktreplyId(rr.getId());
 
 				
 //				final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
@@ -678,6 +691,9 @@ public class EchoBot extends TeamsActivityHandler {
 				e.printStackTrace();
 			} catch (ExecutionException e) {
 
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}

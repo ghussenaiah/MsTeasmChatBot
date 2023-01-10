@@ -1,6 +1,8 @@
 package com.microsoft.teams.app;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
@@ -50,6 +52,7 @@ import com.microsoft.teams.app.entity.Support_298;
 import com.microsoft.teams.app.entity.Ticket_296;
 import com.microsoft.teams.app.entity.User;
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
+import com.microsoft.teams.app.repository.SupportRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
 import com.microsoft.teams.app.service.impl.DepartmentImpl;
 import com.microsoft.teams.app.service.impl.SupportImpl;
@@ -94,6 +97,11 @@ public class TicketService {
 
 	@Autowired
 	TicketService ticketService;
+	
+	@Autowired
+	SupportRepo supportRepo;
+	
+	
 
 	/*
 	 * @Autowired AuthenticationService authService;
@@ -124,6 +132,13 @@ public class TicketService {
 		if (tkt != null) {
 			tkt.setSupportId(supportTypeId);
 		}
+		
+		Thread newThread = new Thread(() -> {
+			ecalateTicketQualityService.updateTiecktMembersList(supportTypeId, turnContext);
+		});
+		newThread.start();
+		
+		
 
 		return TicketAdaptiveCard("", "");
 
@@ -480,7 +495,9 @@ public class TicketService {
 		tkt.setTicketTitle(issueTtle);
 
 		final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
-
+	
+		
+		
 		// SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
 
 		// String check = dateFormat.format(dt);
@@ -1043,7 +1060,7 @@ public class TicketService {
 
 		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
 		List<Container> conlist = new ArrayList<>();
-		List<ActionSet> actList = new ArrayList<>();
+	//	List<ActionSet> actList = new ArrayList<>();
 
 		Container con = new Container();
 		con.setType("Container");
@@ -1058,7 +1075,8 @@ public class TicketService {
 		// </strong><br/><strong>Issue Details :
 		// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
 		// added to this Chat Group</strong>";
-		it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+		//it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+		it1.setText("Ticket #" + (tkt.getTicketNumber()) + " - "+tkt.getTicketTitle());
 		it1.setWeight("bolder");
 		it1.setSize("medium");
 		it1.setWrap(true);
@@ -1069,6 +1087,36 @@ public class TicketService {
 		con.setItems(item);
 
 		conlist.add(con);
+		
+		 
+		    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
+		   
+		    String strDate = formatter.format(tkt.getCreateDateTime());  
+		    
+		  
+		
+		
+		
+		Container con3 = new Container();
+		con3.setType("Container");
+		// con2.setStyle("good");
+		con3.setBleed(true);
+
+		Item it3 = new Item();
+		it3.setType("TextBlock");
+		it3.setText("Created DateTime : " + strDate + " Created By "+tkt.getCreatedBy());
+		it3.setWeight("bolder");
+		it3.setSize("medium");
+		it3.setWrap(true);
+		it3.setColor("accent");
+
+		ArrayList<Item> itemList3 = new ArrayList<>();
+		itemList3.add(it3);
+		con3.setItems(itemList3);
+
+		
+		conlist.add(con3);
+		
 
 		Container con2 = new Container();
 		con2.setType("Container");
@@ -1142,6 +1190,93 @@ public class TicketService {
 		 * 
 		 */
 
+		/*
+		 * ActionSet action = new ActionSet(); action.setType("Action.Submit");
+		 * action.setTitle("CLOSE TICKET");
+		 * 
+		 * ActionData ad = new ActionData(); ad.setButton("closeticket");
+		 * action.setData(ad);
+		 * 
+		 * ActionSet action2 = new ActionSet(); action2.setType("Action.Submit");
+		 * action2.setTitle("ESCALATE");
+		 * 
+		 * ActionData ad2 = new ActionData(); ad2.setButton("escalate");
+		 * action2.setData(ad2);
+		 * 
+		 * actList.add(action); actList.add(action2);
+		 * 
+		 * adcard.setActions(actList);
+		 */
+
+		//tkt.setWelmsg("Yes"); // when people added then should not send again new chat group information
+		//ticketRepo.save(tkt);
+
+		// ============= create ticket Json structure done =======================
+
+		ObjectWriter ow = new ObjectMapper().writer().withDefaultPrettyPrinter();
+		try {
+			json = ow.writeValueAsString(adcard);
+		} catch (JsonProcessingException e) {
+
+			e.printStackTrace();
+		}
+
+		return json;
+
+	}
+	
+	
+	public String SendChatSecondMessage(TurnContext turnContext, Ticket_296 tkt) {
+
+		String json = null;
+		Optional<SupportDepartment_311> dep = departmentImpl.findById(tkt.getSupportDepartmentId());
+	    String departmentName=null;
+	  //  String supportName=null;
+	    
+	    if(dep.isPresent())
+	    {
+	    	  SupportDepartment_311 depData= dep.get();
+	    	  departmentName=depData.getDeptName();
+	    }
+	    /*
+		 * Optional<Support_298>
+		 * sup=Optional.of(supportImpl.findAll(tkt.getSupportId())); if(sup.isPresent())
+		 * { Support_298 supData= sup.get(); supportName= supData.getSupportType(); }
+		 */
+
+		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+		List<Container> conlist = new ArrayList<>();
+		List<ActionSet> actList = new ArrayList<>();
+
+		Container con = new Container();
+		con.setType("Container");
+		MsTeams mst = new MsTeams();
+		mst.setWidth("full");
+		
+		con.setBleed(true);
+		Item it1 = new Item();
+		it1.setType("TextBlock");
+		// body.content = "<br/><strong>Hello All, New chat group created with ticket
+		// #".concat(tkt.getTicketNumber())+" !! for discussion
+		// </strong><br/><strong>Issue Details :
+		// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
+		// added to this Chat Group</strong>";
+		//it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+		it1.setText("Support team members of "+departmentName+" are added to this chat.");
+		it1.setWeight("bolder");
+		it1.setSize("medium");
+		it1.setWrap(true);
+		it1.setColor("accent");
+
+		ArrayList<Item> item = new ArrayList<>();
+		item.add(it1);
+		con.setItems(item);
+
+		conlist.add(con);
+		
+		adcard.setMsTeams(mst);
+		adcard.setBody(conlist);
+		
 		ActionSet action = new ActionSet();
 		action.setType("Action.Submit");
 		action.setTitle("CLOSE TICKET");
@@ -1240,7 +1375,12 @@ public class TicketService {
 
 			// System.out.println("statement started");
 			Thread newThread = new Thread(() -> {
-				ticketService.StatusDbUpdate(triggerClicked, turnContext, tkt, cardAttachment);
+				try {
+					ticketService.StatusDbUpdate(triggerClicked, turnContext, tkt, cardAttachment);
+				} catch (ParseException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			});
 			newThread.start();
 			// System.out.println("statement reached");
@@ -1250,7 +1390,7 @@ public class TicketService {
 	}
 
 	public void StatusDbUpdate(String triggerClicked, TurnContext turnContext, Ticket_296 tkt,
-			Attachment cardAttachment) {
+			Attachment cardAttachment) throws ParseException {
 
 		String feedback = ticketQualityService.ticketStatusUpdate(triggerClicked, tkt, turnContext);
 		if (feedback != null) {
@@ -1276,53 +1416,89 @@ public class TicketService {
 
 	public String ButtonHide(String triggerClicked, TurnContext turnContext, Ticket_296 tkt,String chatId) {
 
-		AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
-		List<Container> conlist = new ArrayList<>();
-		List<ActionSet> actList = new ArrayList<>();
+		
+		/*  old code */
+		/*
+		 * AdaptiveCardsRequest adcard = new AdaptiveCardsRequest(); List<Container>
+		 * conlist = new ArrayList<>(); List<ActionSet> actList = new ArrayList<>();
+		 * 
+		 * // Optional<Department_23> dep =
+		 * departmentImpl.findById(tkt.getDepartmentId()); String json = null; Container
+		 * con = new Container(); MsTeams mst = new MsTeams(); mst.setWidth("full");
+		 * con.setType("Container"); // con.setStyle("good"); con.setBleed(true); Item
+		 * it1 = new Item(); it1.setType("TextBlock");
+		 * it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber())
+		 * + " for discussion !!"); it1.setWeight("bolder"); it1.setSize("medium");
+		 * it1.setWrap(true); it1.setColor("accent");
+		 * 
+		 * ArrayList<Item> item = new ArrayList<>(); item.add(it1); con.setItems(item);
+		 * conlist.add(con);
+		 * 
+		 * Container con2 = new Container(); con2.setType("Container"); //
+		 * con2.setStyle("good"); con2.setBleed(true); Item it2 = new Item();
+		 * it2.setType("TextBlock"); it2.setText("Description : " +
+		 * tkt.getIssuedetails() + " "); it2.setWeight("bolder"); it2.setSize("medium");
+		 * it2.setWrap(true); it2.setColor("accent"); // it2.setColor("good");
+		 * 
+		 * ArrayList<Item> itemList2 = new ArrayList<>(); itemList2.add(it2);
+		 * con2.setItems(itemList2);
+		 * 
+		 * conlist.add(con2);
+		 * 
+		 * adcard.setBody(conlist); adcard.setMsTeams(mst);
+		 */
+		
+		/*  old code */
+		
+			String json = null;
+			Optional<SupportDepartment_311> dep = departmentImpl.findById(tkt.getSupportDepartmentId());
+		    String departmentName=null;
+		  //  String supportName=null;
+		    
+		    if(dep.isPresent())
+		    {
+		    	  SupportDepartment_311 depData= dep.get();
+		    	  departmentName=depData.getDeptName();
+		    }
+		    /*
+			 * Optional<Support_298>
+			 * sup=Optional.of(supportImpl.findAll(tkt.getSupportId())); if(sup.isPresent())
+			 * { Support_298 supData= sup.get(); supportName= supData.getSupportType(); }
+			 */
 
-		// Optional<Department_23> dep = departmentImpl.findById(tkt.getDepartmentId());
+			AdaptiveCardsRequest adcard = new AdaptiveCardsRequest();
+			List<Container> conlist = new ArrayList<>();
+			List<ActionSet> actList = new ArrayList<>();
 
-		String json = null;
+			Container con = new Container();
+			con.setType("Container");
+			MsTeams mst = new MsTeams();
+			mst.setWidth("full");
+			
+			con.setBleed(true);
+			Item it1 = new Item();
+			it1.setType("TextBlock");
+			// body.content = "<br/><strong>Hello All, New chat group created with ticket
+			// #".concat(tkt.getTicketNumber())+" !! for discussion
+			// </strong><br/><strong>Issue Details :
+			// "+tkt.getDescription()+"</strong><br/><strong>All "+deptName+" people were
+			// added to this Chat Group</strong>";
+			//it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
+			it1.setText("Support team members of "+departmentName+" are added to this chat.");
+			it1.setWeight("bolder");
+			it1.setSize("medium");
+			it1.setWrap(true);
+			it1.setColor("accent");
 
-		Container con = new Container();
-		MsTeams mst = new MsTeams();
-		mst.setWidth("full");
-		con.setType("Container");
-		// con.setStyle("good");
-		con.setBleed(true);
-		Item it1 = new Item();
-		it1.setType("TextBlock");
-		it1.setText("New chat group created with ticket #" + (tkt.getTicketNumber()) + " for discussion !!");
-		it1.setWeight("bolder");
-		it1.setSize("medium");
-		it1.setWrap(true);
-		it1.setColor("accent");
+			ArrayList<Item> item = new ArrayList<>();
+			item.add(it1);
+			con.setItems(item);
 
-		ArrayList<Item> item = new ArrayList<>();
-		item.add(it1);
-		con.setItems(item);
-
-		conlist.add(con);
-
-		Container con2 = new Container();
-		con2.setType("Container");
-		// con2.setStyle("good");
-		con2.setBleed(true);
-		Item it2 = new Item();
-		it2.setType("TextBlock");
-		it2.setText("Description : " + tkt.getIssuedetails() + " ");
-		it2.setWeight("bolder");
-		it2.setSize("medium");
-		it2.setWrap(true);
-		it2.setColor("accent");
-		// it2.setColor("good");
-
-		ArrayList<Item> itemList2 = new ArrayList<>();
-		itemList2.add(it2);
-		con2.setItems(itemList2);
-
-		conlist.add(con2);
-
+			conlist.add(con);
+			
+			adcard.setMsTeams(mst);
+			adcard.setBody(conlist);
+			
 		/*
 		 * Container con3 = new Container(); con3.setType("Container");
 		 * //con2.setStyle("good"); con3.setBleed(true);
@@ -1341,23 +1517,17 @@ public class TicketService {
 		// if we completely close the ticket then no need to add any trigger
 		// if issue is escalated then need to add close trigger only
 
-		adcard.setBody(conlist);
-		adcard.setMsTeams(mst);
+		
 
 		if ("escalate".equalsIgnoreCase(triggerClicked)) {
-
 			ActionSet action = new ActionSet();
 			action.setType("Action.Submit");
 			action.setTitle("CLOSE TICKET");
-
 			ActionData ad = new ActionData();
 			ad.setButton("closeticket");
 			action.setData(ad);
-
 			actList.add(action);
-
 			adcard.setActions(actList);
-
 		}
 		// remove all users except created user
 	

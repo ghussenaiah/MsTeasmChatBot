@@ -37,7 +37,7 @@
      </appender>
     
     <!-- default is DEBUG -->
-    <root level="DEBUG">
+    <root level="INFO">
         <appender-ref ref="CONSOLAPPENDER" />
         <appender-ref ref="FILEAPPENDER" />
         <appender-ref ref="ROLLINGFILEAPPENDER" />

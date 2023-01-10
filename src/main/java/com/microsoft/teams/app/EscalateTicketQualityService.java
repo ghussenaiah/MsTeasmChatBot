@@ -1,6 +1,7 @@
 package com.microsoft.teams.app;
 
 import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashSet;
@@ -37,6 +38,7 @@ import com.microsoft.graph.models.TeamsAppInstallation;
 import com.microsoft.graph.requests.ConversationMemberCollectionPage;
 import com.microsoft.graph.requests.ConversationMemberCollectionResponse;
 import com.microsoft.graph.requests.GraphServiceClient;
+import com.microsoft.graph.serializer.OffsetDateTimeSerializer;
 import com.microsoft.teams.app.entity.ActionSet;
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
@@ -95,13 +97,17 @@ public class EscalateTicketQualityService {
 	
 	@Autowired
 	Utility utility;
+	
+	
+   
+	public volatile LinkedHashMap<String, LinkedList<ConversationMember>> ticketMembers  = new LinkedHashMap<String, LinkedList<ConversationMember>>();
 
 	/*
 	 * @Autowired AuthenticationService authService;
 	 */
 
 	public String ticketStatusUpdate(String status, Ticket_296 tkt,
-			TurnContext turnContext) {
+			TurnContext turnContext) throws ParseException {
 		
 		String json = null;
 		// tkt = ticket.get(turnContext.getActivity().getFrom().getId());
@@ -271,6 +277,27 @@ public class EscalateTicketQualityService {
 			EscalationMap_312 escMap=escImpl.findAllBySupportId(tkt.getSupportId());
 			
 			User appuser=escMap.getUser();
+			
+			String url="https://graph.microsoft.com/v1.0/users/".concat(appuser.getTeamsId());
+			
+			AadUserConversationMember conversationMember = new AadUserConversationMember();
+			conversationMember.additionalDataManager().put("user@odata.bind",
+					new JsonPrimitive(url));
+			conversationMember.additionalDataManager().put("@odata.type", new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+			try {
+				conversationMember.visibleHistoryStartDateTime = OffsetDateTimeSerializer
+						.deserialize("0001-01-01T00:00:00Z");
+			} catch (ParseException e1) {
+				// TODO Auto-generated catch block
+				e1.printStackTrace();
+			}
+			LinkedList<String> rolesList = new LinkedList<String>();
+			rolesList.add("owner");
+			conversationMember.roles = rolesList;
+
+			graphClient.chats(ChatId).members().buildRequest()
+					.post(conversationMember);
+
 
 			ChatMessage chatMessage = new ChatMessage();
 			ItemBody body = new ItemBody();
@@ -290,6 +317,7 @@ public class EscalateTicketQualityService {
 			mentions.mentioned = mentioned;
 			mentionsList.add(mentions);
 			chatMessage.mentions = mentionsList;
+			graphClient.chats(ChatId).messages().buildRequest().post(chatMessage);
 			
 			
 			
@@ -309,13 +337,17 @@ public class EscalateTicketQualityService {
 			 * mentionsList.add(mentions); chatMessage.mentions = mentionsList;
 			 */
 
-			graphClient.chats(ChatId).messages().buildRequest().post(chatMessage);
+			
+			
+			
+
+			
 		
 
 		}
 		return json;
 	}
-
+	
 	public void updateCloseTicketMessageId(String messageId, ConcurrentHashMap<String, Ticket_296> ticket,
 			TurnContext turnContext) {
 		try {
@@ -327,6 +359,64 @@ public class EscalateTicketQualityService {
 
 			e.printStackTrace();
 		}
+	}
+
+
+	public void updateTiecktMembersList(String suppirtId,
+			TurnContext turnContext) {
+		
+		final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
+		String UserteamsId = turnContext.getActivity().getFrom().getAadObjectId();
+		String chatId = turnContext.getActivity().getConversation().getId();
+		
+		Support_298 sup = supportImpl.findAll(suppirtId);
+		
+		Set<User> userList=sup.getUser();
+		
+		Set<String> addedMembers=new HashSet<String>();
+		
+		for (User user:userList) {
+
+			if (user != null && user.getTeamsId() != null) {
+			  
+					AadUserConversationMember member = new AadUserConversationMember();
+					LinkedList<String> rolesList = new LinkedList<String>();
+					rolesList.add("owner");
+					member.roles = rolesList; //
+					addedMembers.add(user.getTeamsId());
+					member.additionalDataManager().put("user@odata.bind",
+							new JsonPrimitive("https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
+					member.additionalDataManager().put("@odata.type",
+							new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+					//graphClient.chats(chatId).members().buildRequest().post(member);
+					membersList.add(member);
+					
+				}
+		}
+	
+		  if (!addedMembers.contains(UserteamsId)) {
+				  
+				com.microsoft.graph.models.User user = graphClient.users(UserteamsId).buildRequest().select("userType").get();
+				AadUserConversationMember member = new AadUserConversationMember();
+				LinkedList<String> rolesList = new LinkedList<String>();
+				 if(user.userType.equalsIgnoreCase("Guest")) {
+					 rolesList.add("guest");
+				 }else {
+					 rolesList.add("owner");
+				 }
+				 
+				 member.roles = rolesList;
+				 member.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+UserteamsId+"')"));
+				 member.additionalDataManager().put("@odata.type",
+						new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+				 membersList.add(member);
+				//graphClient.chats(chatId).members().buildRequest().post(member);
+			
+			}
+		  
+		  ticketMembers.put(chatId, membersList);
+		  
 	}
 
 	public String creatchatwithTeamMembers(Ticket_296 tkt, TurnContext turnContext,
@@ -343,8 +433,6 @@ public class EscalateTicketQualityService {
 		//Set<String> addedMembers=new HashSet<String>();
 		LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
 		
-		
-
 		/*
 		 * final ClientSecretCredential usernamePasswordCredential = new
 		 * ClientSecretCredentialBuilder()
@@ -379,24 +467,27 @@ public class EscalateTicketQualityService {
 		 * System.out.println(graphClient.getServiceRoot());
 		 */
 		
-	
+		String chatId = turnContext.getActivity().getConversation().getId();
 
 		Chat chat = new Chat();
 		chat.chatType = ChatType.GROUP;
 		chat.topic = "Ticket #".concat(tkt.getTicketNumber() + " " + tkt.getTicketTitle());
 		
 		// adding sfhelp user
-		AadUserConversationMember members1 = new AadUserConversationMember();
-		LinkedList<String> rolesList1 = new LinkedList<String>();
-		rolesList1.add("owner");
-		members1.roles = rolesList1;
-		members1.additionalDataManager().put("user@odata.bind",
-				new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
-		members1.additionalDataManager().put("@odata.type",
-				new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-
-		membersList.add(members1);
-		//addedMembers.add("5f92b236-28ec-474f-bae4-f9cab9275230");
+		
+		/*
+		 * AadUserConversationMember members1 = new AadUserConversationMember();
+		 * LinkedList<String> rolesList1 = new LinkedList<String>();
+		 * rolesList1.add("owner"); members1.roles = rolesList1;
+		 * members1.additionalDataManager().put("user@odata.bind", new JsonPrimitive(
+		 * "https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"
+		 * )); members1.additionalDataManager().put("@odata.type", new
+		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+		 * 
+		 * membersList.add(members1);
+		 */
+		 
+				
 		
 		
 		/*
@@ -461,6 +552,7 @@ public class EscalateTicketQualityService {
 		 * membersList.add(members1);
 		 */
 
+		
 		/*
 		 * AadUserConversationMember members2 = new AadUserConversationMember();
 		 * LinkedList<String> rolesList2 = new LinkedList<String>();
@@ -471,6 +563,13 @@ public class EscalateTicketQualityService {
 		 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
 		 * membersList.add(members2);
 		 */
+		 
+		
+		LinkedList<ConversationMember> UserList=ticketMembers.get(chatId);
+		
+		if(UserList!=null && UserList.size()>0) {
+			membersList.addAll(UserList);
+		}
 
 
 		ConversationMemberCollectionResponse conversationMemberCollectionResponse = new ConversationMemberCollectionResponse();
@@ -502,6 +601,8 @@ public class EscalateTicketQualityService {
 			tkt.setChatweburl(chaturl);
 			
 			if (chaturl != null) {
+				
+				ticketMembers.remove(chatId);
 
 				Thread newThread = new Thread(() -> {
 					
@@ -584,55 +685,47 @@ public class EscalateTicketQualityService {
 
 			ticketRepo.save(tkt);
 			
-			
-			Support_298 sup = supportImpl.findAll(tkt.getSupportId());
-			
-			Set<User> userList=sup.getUser();
-			
-			Set<String> addedMembers=new HashSet<String>();
-			
-			//LinkedList<ConversationMember> membersList = new LinkedList<ConversationMember>();
-			
-			for (User user:userList) {
-
-				if (user != null && user.getTeamsId() != null) {
-				  
-						AadUserConversationMember member = new AadUserConversationMember();
-						LinkedList<String> rolesList = new LinkedList<String>();
-						rolesList.add("owner");
-						member.roles = rolesList; //
-						addedMembers.add(user.getTeamsId());
-						member.additionalDataManager().put("user@odata.bind",
-								new JsonPrimitive("https://graph.microsoft.com/v1.0/users('" + user.getTeamsId() + "')"));
-						member.additionalDataManager().put("@odata.type",
-								new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-						graphClient.chats(chatId).members().buildRequest().post(member);
-						//membersList.add(members);
-					}
-			}
-		
-			  if (!addedMembers.contains(UserteamsId)) {
-					 
-					 
-					com.microsoft.graph.models.User user = graphClient.users(UserteamsId).buildRequest().select("userType").get();
-					AadUserConversationMember member = new AadUserConversationMember();
-					LinkedList<String> rolesList = new LinkedList<String>();
-					 if(user.userType.equalsIgnoreCase("Guest")) {
-						 rolesList.add("guest");
-					 }else {
-						 rolesList.add("owner");
-					 }
-					 
-					
-					 member.roles = rolesList;
-					//members.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('5f92b236-28ec-474f-bae4-f9cab9275230')"));
-					 member.additionalDataManager().put("user@odata.bind", new JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+UserteamsId+"')"));
-					 member.additionalDataManager().put("@odata.type",
-							new JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
-					graphClient.chats(chatId).members().buildRequest().post(member);
-				//	membersList.add(members);
-					
-				}
+			/*
+			 * Support_298 sup = supportImpl.findAll(tkt.getSupportId());
+			 * 
+			 * Set<User> userList=sup.getUser();
+			 * 
+			 * Set<String> addedMembers=new HashSet<String>();
+			 * 
+			 * for (User user:userList) {
+			 * 
+			 * if (user != null && user.getTeamsId() != null) {
+			 * 
+			 * AadUserConversationMember member = new AadUserConversationMember();
+			 * LinkedList<String> rolesList = new LinkedList<String>();
+			 * rolesList.add("owner"); member.roles = rolesList; //
+			 * addedMembers.add(user.getTeamsId());
+			 * member.additionalDataManager().put("user@odata.bind", new
+			 * JsonPrimitive("https://graph.microsoft.com/v1.0/users('" + user.getTeamsId()
+			 * + "')")); member.additionalDataManager().put("@odata.type", new
+			 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+			 * graphClient.chats(chatId).members().buildRequest().post(member);
+			 * 
+			 * } }
+			 * 
+			 * if (!addedMembers.contains(UserteamsId)) {
+			 * 
+			 * com.microsoft.graph.models.User user =
+			 * graphClient.users(UserteamsId).buildRequest().select("userType").get();
+			 * AadUserConversationMember member = new AadUserConversationMember();
+			 * LinkedList<String> rolesList = new LinkedList<String>();
+			 * if(user.userType.equalsIgnoreCase("Guest")) { rolesList.add("guest"); }else {
+			 * rolesList.add("owner"); }
+			 * 
+			 * member.roles = rolesList;
+			 * member.additionalDataManager().put("user@odata.bind", new
+			 * JsonPrimitive("https://graph.microsoft.com/v1.0/users('"+UserteamsId+"')"));
+			 * member.additionalDataManager().put("@odata.type", new
+			 * JsonPrimitive("#microsoft.graph.aadUserConversationMember"));
+			 * graphClient.chats(chatId).members().buildRequest().post(member);
+			 * 
+			 * }
+			 */
 			  
 		
 
