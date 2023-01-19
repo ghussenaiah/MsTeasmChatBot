@@ -360,6 +360,21 @@ public class EchoBot extends TeamsActivityHandler {
 				// cardAttachment = new Attachment();
 				//ticketService.ClearChat(turnContext);
 			}
+			
+			else 
+			{
+				cardAttachment = new Attachment();
+
+				// callShowImage(turnContext);
+				try {
+					// cardAttachment.setContent(Serialization.jsonToTree(Department));
+					cardAttachment.setContent(Serialization.jsonToTree(ticketService.HelpCommands(turnContext)));
+
+				} catch (IOException e) {
+
+					e.printStackTrace();
+				}
+			}
 		}
 		
 	

@@ -906,7 +906,7 @@ public class TicketService {
 		
 		Container headline=new Container();
 		headline.setType("TextBlock");
-		headline.setText("Supported Chat Commands ");
+		headline.setText("Pls use below supported chat commands ");
 		headline.setWrap(true);
 		headline.setStyle("heading");
 		
