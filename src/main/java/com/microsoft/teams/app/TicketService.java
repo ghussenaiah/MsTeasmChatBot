@@ -3,21 +3,21 @@ package com.microsoft.teams.app;
 import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.HashSet;
+
 import java.util.LinkedHashMap;
-import java.util.LinkedList;
+
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
+
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ConcurrentHashMap;
 
-import org.hibernate.internal.build.AllowSysOut;
+import org.apache.commons.lang3.time.DateUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -27,30 +27,29 @@ import com.microsoft.bot.schema.Activity;
 import com.microsoft.bot.schema.Attachment;
 import com.microsoft.bot.schema.ResourceResponse;
 import com.microsoft.bot.schema.Serialization;
-import com.microsoft.graph.models.AadUserConversationMember;
 import com.microsoft.graph.models.ChatMessage;
-import com.microsoft.graph.models.ConversationMember;
+
 import com.microsoft.graph.requests.ChatMessageCollectionPage;
-import com.microsoft.graph.requests.ConversationMemberCollectionPage;
+
 import com.microsoft.graph.requests.GraphServiceClient;
 import com.microsoft.teams.app.entity.Action;
 import com.microsoft.teams.app.entity.ActionData;
 import com.microsoft.teams.app.entity.ActionSet;
-import com.microsoft.teams.app.entity.Actionfallback;
+
 import com.microsoft.teams.app.entity.AdaptiveCardsRequest;
 import com.microsoft.teams.app.entity.AutoGenarationCode;
 import com.microsoft.teams.app.entity.Cell;
 import com.microsoft.teams.app.entity.Choices;
 import com.microsoft.teams.app.entity.Column;
 import com.microsoft.teams.app.entity.Container;
-import com.microsoft.teams.app.entity.Data;
+
 import com.microsoft.teams.app.entity.Item;
 import com.microsoft.teams.app.entity.MsTeams;
 import com.microsoft.teams.app.entity.Rows;
 import com.microsoft.teams.app.entity.SupportDepartment_311;
-import com.microsoft.teams.app.entity.Support_298;
+
 import com.microsoft.teams.app.entity.Ticket_296;
-import com.microsoft.teams.app.entity.User;
+
 import com.microsoft.teams.app.repository.AutoGenerationRepo;
 import com.microsoft.teams.app.repository.SupportRepo;
 import com.microsoft.teams.app.repository.TicketRepo;
@@ -65,7 +64,7 @@ import okhttp3.Request;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.ObjectWriter;
-import com.google.gson.JsonPrimitive;
+
 
 @Slf4j
 @Component
@@ -1089,14 +1088,14 @@ public class TicketService {
 		conlist.add(con);
 		
 		 
-		    SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");  
-		   
-		    String strDate = formatter.format(tkt.getCreateDateTime());  
-		    
+		SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+
+		int minutesToAdd = 330;// server running with utc so we are converting to IST
+
+		Date newDate = DateUtils.addMinutes(tkt.getCreateDateTime(), minutesToAdd);
+
+		String strDate = formatter.format(newDate);
 		  
-		
-		
-		
 		Container con3 = new Container();
 		con3.setType("Container");
 		// con2.setStyle("good");
