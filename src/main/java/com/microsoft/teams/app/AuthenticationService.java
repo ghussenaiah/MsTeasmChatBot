@@ -40,7 +40,7 @@ public class AuthenticationService {
 
 			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
 					// production
-					.clientId("3afa6722-1ab9-4bde-9824-fb727a612eb2").username("sf_helpdesk@srinivasa.co")
+					.clientId("e5e829ad-d3f3-4a87-8353-1287b37de258").username("sf_helpdesk@srinivasa.co")
 					.password("Jhills@45").build();
 
 			// testing purpose
@@ -49,12 +49,15 @@ public class AuthenticationService {
 			final TokenCredentialAuthProvider tokenCredentialAuthProvider = new TokenCredentialAuthProvider(
 					usernamePasswordCredential);
 
+	
 			graphClient = GraphServiceClient.builder().authenticationProvider(tokenCredentialAuthProvider)
 					.buildClient();
-			// User user = graphClient.me().buildRequest().get();
+			
+			
+			User user = graphClient.me().buildRequest().get();
 			// UserRequestBuilder user=graphClient.me().chats("");
 
-			// System.out.println(user.displayName);
+			 System.out.println(user.displayName);
 		}
 		return graphClient;
 	}

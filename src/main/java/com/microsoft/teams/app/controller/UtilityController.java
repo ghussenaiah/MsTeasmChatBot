@@ -89,8 +89,14 @@ public class UtilityController {
 	@PostMapping("/post")
 	public String postBody(@RequestBody AdpCardRequest comment) {
 		log.info("Fetching all employees from the redis.");
-		log.info("Fetching employee from the redis.%s", comment.getComment());
+		log.info("Fetching employee from the redis.%s", comment);
 		System.out.println("comment is " + comment.getComment());
+		boolean b=true;
+		
+		while(b) {
+			System.out.println("qweqweqweqwe");
+		}
+		
 		return "Hello " + comment;
 	}
 

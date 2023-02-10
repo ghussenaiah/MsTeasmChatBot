@@ -756,7 +756,10 @@ public class EscalateTicketQualityService {
 	public void AddChatBotToTeamsApp(String chatId, GraphServiceClient<Request> graphClient) {
 		TeamsAppInstallation teamsAppInstallation = new TeamsAppInstallation();
 		teamsAppInstallation.additionalDataManager().put("teamsApp@odata.bind", new JsonPrimitive(
-				"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/e4540487-96d6-46c2-96aa-ecd2be55c0fd"));
+				"https://graph.microsoft.com/v1.0/appCatalogs/teamsApps/7395a58b-c80d-4513-a72f-aed2e0bae73d"));
+		
+		
+		// old bot id e4540487-96d6-46c2-96aa-ecd2be55c0fd
 
 		/*
 		 * teamsAppInstallation.additionalDataManager().put("teamsApp@odata.bind", new
