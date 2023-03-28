@@ -480,9 +480,9 @@ public class TicketService {
 			String ChatId = turnContext.getActivity().getConversation().getId();
 			tkt = ticketRepo.findAllByChatGroupId(ChatId);
 		}
-
+		
 		String json = null;
-		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
+		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("chathistory_299");
 		int tktNumber = lastNumberObj.getAutoCodeNo();
 
 		String UserteamsId = turnContext.getActivity().getFrom().getAadObjectId();
