@@ -138,14 +138,12 @@ public class FetchnSave_Retry_Mechanism {
 	@Transactional
 	public synchronized void updateTeamsMsgToDatabase() throws Exception {
 
-		URL resource = getClass().getClassLoader().getResource("srinivaslogo.png");
-
-		System.out.println(resource);
-		resource.getFile();
+		// URL resource = getClass().getClassLoader().getResource("srinivaslogo.png"); // working code
+		// resource.getFile();
 		int chatNumber=-1;
 		int holdforUpdate=-1;
 
-		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("ChatHistory_299");
+		AutoGenarationCode lastNumberObj = autoGenerationRepo.getLastTicketNumber("chathistory_299");
 		if(lastNumberObj!=null) {
 			chatNumber = lastNumberObj.getAutoCodeNo();
 			holdforUpdate = chatNumber;
@@ -170,8 +168,10 @@ public class FetchnSave_Retry_Mechanism {
 		// System.out.println(token);
 
 		final GraphServiceClient<Request> graphClient = AuthenticationService.getInstance();
+		
+		log.info("=================> Restoring the chat messages from teams to mysql <========================");
 
-		System.out.println(graphClient.getServiceRoot());
+		//System.out.println(graphClient.getServiceRoot());
 
 		try {
 
@@ -183,6 +183,8 @@ public class FetchnSave_Retry_Mechanism {
 
 				// ChatMessageCollectionPage messages =
 				// graphClient.chats("19:1d13e45f1c94414cb73baee6c68e27d0@thread.v2").messages().buildRequest().top(2).get();
+				
+				log.info("==================> current db ticket no is  = {}<=============",tkt.getTicketNumber());
 
 				if (tkt.getChatGroupId() != null) {
 					ChatMessageCollectionPage messages = graphClient.chats(tkt.getChatGroupId()).messages()
@@ -200,8 +202,10 @@ public class FetchnSave_Retry_Mechanism {
 							if (message.createdDateTime.compareTo(erplastmsgupdate) > 0) {
 
 								ChatHistory_299 ch = new ChatHistory_299();
-								System.out.println("Id: " + message.id);
-								System.out.println("CreatedTime: " + message.createdDateTime);
+								//System.out.println("Id: " + message.id);
+								//System.out.println("CreatedTime: " + message.createdDateTime);
+								log.info("==================> Teams Message Id  = {}<=============",message.id);
+								log.info("==================> Teams Message CreatedTime  = {}<=============",message.createdDateTime);
 								DateTimeFormatter customFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd hh:mm:ss");
 
 								if (message.body.content != null && message.attachments.size() == 0
@@ -217,9 +221,10 @@ public class FetchnSave_Retry_Mechanism {
 									String date = message.createdDateTime.format(customFormatter);
 									// Date messageDate = (Date) customFormatter.parse(date);
 									String actualmessage = textdata.replaceAll("<[^>]*>", "");
-									System.out.println(actualmessage);
+									//System.out.println(actualmessage);
+									log.info("==================> Teams Actual Message  = {}<=============",actualmessage);
 
-									System.out.println();
+									//System.out.println();
 									// System.out.println(erplastmsgupdate.compareTo(message.createdDateTime));
 									// messageDate.after();
 									ch.setId(String.valueOf(chatNumber));
@@ -239,6 +244,8 @@ public class FetchnSave_Retry_Mechanism {
 
 								} else {
 
+									
+									log.info("==================> Teams File Message <=======================");
 									List<ChatMessageAttachment> chatMsgAttachList = message.attachments;
 
 									for (ChatMessageAttachment cmA : chatMsgAttachList) {
@@ -247,6 +254,8 @@ public class FetchnSave_Retry_Mechanism {
 												.equalsIgnoreCase("application/vnd.microsoft.card.adaptive")) {
 
 											Map<String, String> fileMap = DownloadFileUsingUrl(graphClient, cmA);
+											
+											log.info("==================> Teams File Map <======================={}",fileMap);
 											System.out.println(cmA);
 											String messgeId = message.id;
 											String chatId = String.valueOf(chatNumber);
@@ -309,18 +318,22 @@ public class FetchnSave_Retry_Mechanism {
 		try {
 			if (fileId != null) {
 
+				log.info("==================> Saving File Message  = {}<=============",actualmessage);
 				jdbcTemplate.update(
 						"insert into chathistory_299 (id, message, senderid, teamsmessageid,createtime,file) VALUES ("
 								+ chatId + ",'" + actualmessage + "','" + fromuser + "','" + messgeId + "','" + date
 								+ "','" + fileId + "')");
 			} else {
 
+				log.info("==================> Saving Message  = {}<=============",actualmessage);
 				jdbcTemplate.update(
 						"insert into chathistory_299 (id, message, senderid, teamsmessageid,createtime) VALUES ("
 								+ chatId + ",'" + actualmessage + "','" + fromuser + "','" + messgeId + "','" + date
 								+ "')");
+				
 			}
 
+			log.info("==================> Updating third table <=============");
 			jdbcTemplate.update("insert into ticket_296__chathistory_299 (ticket_296id, chathistory_299id) VALUES ("
 					+ tktId + "," + chatId + ")");
 		} catch (Exception e) {
