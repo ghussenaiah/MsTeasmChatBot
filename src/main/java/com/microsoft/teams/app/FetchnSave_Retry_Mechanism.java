@@ -221,6 +221,7 @@ public class FetchnSave_Retry_Mechanism {
 									String date = message.createdDateTime.format(customFormatter);
 									// Date messageDate = (Date) customFormatter.parse(date);
 									String actualmessage = textdata.replaceAll("<[^>]*>", "");
+									actualmessage = actualmessage.replaceAll("'","");  // removing single quotes 
 									//System.out.println(actualmessage);
 									log.info("==================> Teams Actual Message  = {}<=============",actualmessage);
 
