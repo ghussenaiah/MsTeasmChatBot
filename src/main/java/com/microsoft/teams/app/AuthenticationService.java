@@ -38,11 +38,11 @@ public class AuthenticationService {
 	public static GraphServiceClient<Request> getInstance() {
 		if (graphClient == null) {
 
+			// production
 			final UsernamePasswordCredential usernamePasswordCredential = new UsernamePasswordCredentialBuilder()
-					// production
 					.clientId("e5e829ad-d3f3-4a87-8353-1287b37de258").username("sf_helpdesk@srinivasa.co")
 					.password("Jhills@45").build();
-
+            
 			// testing purpose
 			// .clientId("d9c45a22-46b6-4c1f-b78d-b909f3649434").username("sf_helpdesk@srinivasa.co").password("Jhills@45").build();
 
@@ -53,11 +53,9 @@ public class AuthenticationService {
 			graphClient = GraphServiceClient.builder().authenticationProvider(tokenCredentialAuthProvider)
 					.buildClient();
 			
-			
-			User user = graphClient.me().buildRequest().get();
-			// UserRequestBuilder user=graphClient.me().chats("");
-
-			 System.out.println(user.displayName);
+			// hello world
+			// User user = graphClient.me().buildRequest().get(); working code 
+			// System.out.println(user.displayName);
 		}
 		return graphClient;
 	}
