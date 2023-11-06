@@ -37,9 +37,9 @@ public class DataConn {
 			}
 		}
 		return connection;
-	}
+	} 
 	
-	@PostConstruct
+	// @PostConstruct
 	public Connection dbconnection() {
 
 		try {
